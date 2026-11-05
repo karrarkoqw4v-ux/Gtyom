@@ -9,7 +9,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
 import com.google.mediapipe.tasks.genai.llminference.LlmInferenceSession
-import com.google.mediapipe.tasks.genai.llminference.ProgressListener
+import com.google.mediapipe.tasks.core.OutputHandler
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -20,6 +20,7 @@ class MainActivity : Activity() {
     private lateinit var web: WebView
     private var llm: LlmInference? = null
     @Volatile private var busy = false
+    @Volatile private var curSession: LlmInferenceSession? = null
     private val model get() = File(filesDir, "model.task")
 
     private fun emit(o: JSONObject) {
@@ -97,9 +98,20 @@ class MainActivity : Activity() {
             Thread {
                 try {
                     if (llm == null) {
+                        val listener = OutputHandler.ProgressListener<String> { part, done ->
+                            emit(JSONObject().put("type", "tok").put("t", part ?: ""))
+                            if (done) {
+                                busy = false
+                                emit(JSONObject().put("type", "done"))
+                                val old = curSession
+                                curSession = null
+                                Thread { try { old?.close() } catch (_: Throwable) {} }.start()
+                            }
+                        }
                         val opts = LlmInference.LlmInferenceOptions.builder()
                             .setModelPath(model.absolutePath)
                             .setMaxTokens(2048)
+                            .setResultListener(listener)
                             .build()
                         llm = LlmInference.createFromOptions(this@MainActivity, opts)
                     }
@@ -108,15 +120,9 @@ class MainActivity : Activity() {
                         .setTemperature(0.7f)
                         .build()
                     val session = LlmInferenceSession.createFromOptions(llm!!, sopts)
+                    curSession = session
                     session.addQueryChunk(chatML(json))
-                    session.generateResponseAsync(ProgressListener<String> { part, done ->
-                        emit(JSONObject().put("type", "tok").put("t", part ?: ""))
-                        if (done) {
-                            busy = false
-                            emit(JSONObject().put("type", "done"))
-                            Thread { try { session.close() } catch (_: Throwable) {} }.start()
-                        }
-                    })
+                    session.generateResponseAsync()
                 } catch (e: Throwable) { busy = false; err(e.message) }
             }.start()
         }
