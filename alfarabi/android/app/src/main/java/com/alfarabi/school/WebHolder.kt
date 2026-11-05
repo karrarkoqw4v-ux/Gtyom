@@ -199,7 +199,7 @@ object WebHolder {
 
     class Bridge {
         @JavascriptInterface
-        fun notify(kind: String, title: String, body: String, tag: String) = Notifier.show(app, kind, title, body, tag)
+        fun notify(kind: String, title: String, body: String, tag: String) = Notifier.school(app, title, body, "", tag, "")
 
         @JavascriptInterface
         fun cancelNotif(tag: String) = Notifier.cancel(app, tag)
