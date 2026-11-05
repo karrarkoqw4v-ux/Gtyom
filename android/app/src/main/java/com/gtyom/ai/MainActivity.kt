@@ -8,6 +8,8 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
+import com.google.mediapipe.tasks.genai.llminference.LlmInferenceSession
+import com.google.mediapipe.tasks.genai.llminference.ProgressListener
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -98,17 +100,23 @@ class MainActivity : Activity() {
                         val opts = LlmInference.LlmInferenceOptions.builder()
                             .setModelPath(model.absolutePath)
                             .setMaxTokens(2048)
-                            .setTopK(40)
-                            .setTemperature(0.7f)
-                            .setRandomSeed(1)
-                            .setResultListener { part, done ->
-                                emit(JSONObject().put("type", "tok").put("t", part ?: ""))
-                                if (done) { busy = false; emit(JSONObject().put("type", "done")) }
-                            }
                             .build()
                         llm = LlmInference.createFromOptions(this@MainActivity, opts)
                     }
-                    llm!!.generateResponseAsync(chatML(json))
+                    val sopts = LlmInferenceSession.LlmInferenceSessionOptions.builder()
+                        .setTopK(40)
+                        .setTemperature(0.7f)
+                        .build()
+                    val session = LlmInferenceSession.createFromOptions(llm!!, sopts)
+                    session.addQueryChunk(chatML(json))
+                    session.generateResponseAsync(ProgressListener<String> { part, done ->
+                        emit(JSONObject().put("type", "tok").put("t", part ?: ""))
+                        if (done) {
+                            busy = false
+                            emit(JSONObject().put("type", "done"))
+                            Thread { try { session.close() } catch (_: Throwable) {} }.start()
+                        }
+                    })
                 } catch (e: Throwable) { busy = false; err(e.message) }
             }.start()
         }
