@@ -1,0 +1,69 @@
+/* شاشة تسجيل الدخول: خلفية فاتحة، حقول بأيقونات، زر أسود رئيسي */
+:root{--dr-ink:#111c19;--dr-green:#2f8f6a;--dr-bg:#f4f6f5;--dr-line:#d9dedc}
+#auth{position:fixed;inset:0;z-index:95;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;justify-content:center;align-items:flex-start;background:var(--dr-bg);padding:0 0 env(safe-area-inset-bottom,0)}
+.dr-card{width:100%;max-width:440px;padding:calc(env(safe-area-inset-top,0px) + 18px) 24px 28px;display:flex;flex-direction:column;gap:14px;text-align:center}
+.dr-back{align-self:flex-start;width:44px;height:44px;border:0;background:none;color:var(--dr-ink);display:grid;place-items:center;margin:0 -8px}
+.dr-logo{margin:4px auto 0;height:72px;display:grid;place-items:center}
+.dr-card h1{margin:6px 0 0;font-size:1.75rem;font-weight:700;color:var(--dr-ink)}
+.dr-sub{margin:0 0 6px;color:#5b6663;font-size:1rem;line-height:1.6}
+.dr-field{text-align:right}
+.dr-lbl{display:flex;justify-content:space-between;align-items:baseline;font-size:0.9688rem;font-weight:700;color:var(--dr-ink);margin:8px 4px 8px}
+.dr-lbl em{font-style:normal;font-weight:500;color:#8a9491;font-size:0.875rem}
+.dr-box{display:flex;align-items:center;gap:10px;height:58px;background:#fff;border:1.5px solid var(--dr-line);border-radius:20px;padding:0 16px;transition:border-color .15s,box-shadow .15s}
+.dr-box:focus-within{border-color:var(--dr-green);box-shadow:0 0 0 3px rgba(47,143,106,.15)}
+.dr-ic{color:#7d8885;display:grid;place-items:center;flex:0 0 auto}
+.dr-input{flex:1;min-width:0;height:100%;border:0;outline:0;background:none;font-size:1.0312rem;color:var(--dr-ink)}
+.dr-input::placeholder{color:#9aa4a1}
+.dr-eye{border:0;background:none;color:var(--dr-ink);display:grid;place-items:center;padding:4px}
+.dr-main{height:58px;border:0;border-radius:20px;background:var(--dr-ink);color:#fff;font-size:1.125rem;font-weight:700;position:relative;margin-top:6px}
+.dr-main.load span{opacity:0}.dr-main.load::after{content:"";position:absolute;inset:0;margin:auto;width:22px;height:22px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.dr-forgot{border:0;background:none;color:var(--dr-green);font-weight:700;font-size:1rem;padding:6px}
+.dr-or{display:flex;align-items:center;gap:14px;color:#7d8885;font-size:0.9375rem;margin:6px 0}
+.dr-or::before,.dr-or::after{content:"";flex:1;height:1px;background:var(--dr-line)}
+.dr-google{height:58px;border-radius:20px;border:1.5px solid var(--dr-line);background:#fff;color:var(--dr-ink);font-size:1.0625rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:12px;position:relative}
+.dr-google>span{display:grid;place-items:center}
+.dr-google.load{opacity:.6;pointer-events:none}
+.dr-alt{margin:18px 0 0;color:#5b6663;font-size:1rem}
+.dr-alt button{border:0;background:none;color:var(--dr-green);font-weight:700;font-size:1rem;padding:0 4px}
+.iq-msg{background:#fdecef;color:#a3243a;border-radius:14px;padding:10px 14px;font-size:0.9062rem;text-align:right}.iq-msg.ok{background:#e2f6ef;color:#0b6b4f}
+.iq-warn{background:#fff6e0;color:#7a5200;border-radius:14px;padding:10px 14px;font-size:0.875rem;text-align:right}
+/* حقول ونوافذ الملف الشخصي بنفس الأسلوب */
+.iq-in{width:100%;height:54px;border-radius:18px;border:1.5px solid var(--dr-line);background:#fff;padding:0 16px;font-size:1rem;text-align:right}
+.iq-in[dir=ltr]{text-align:left}.iq-in:focus{outline:0;border-color:var(--dr-green);box-shadow:0 0 0 3px rgba(47,143,106,.15)}
+.iq-main{height:54px;border:0;border-radius:18px;font-weight:700;font-size:1.0625rem;color:#fff;background:var(--dr-ink);position:relative}
+.iq-main.load span{opacity:0}.iq-main.load::after{content:"";position:absolute;inset:0;margin:auto;width:22px;height:22px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.iq-link{background:none;border:0;color:var(--dr-green);font-weight:700;font-size:0.9375rem;padding:4px}.iq-link.center{align-self:center}
+.iq-social{height:54px;border-radius:18px;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:700;border:1.5px solid var(--dr-line);background:#fff;color:var(--dr-ink)}
+.iq-x{width:36px;height:36px;border-radius:12px;border:0;background:rgba(0,0,0,.05)}
+.iq-card{position:relative;width:100%;max-width:440px;padding:calc(env(safe-area-inset-top,0px) + 22px) 24px 26px;display:flex;flex-direction:column;gap:12px;text-align:center}
+.iq-card h1{margin:0;font-size:1.625rem;font-weight:700;color:var(--dr-ink)}
+.iq-sub{margin:-2px 0 4px;color:#5b6663;font-size:0.9375rem;line-height:1.6}
+.iq-x{position:absolute;top:10px;left:14px}
+.iq-guest{background:none;border:0;color:#5b6663;font-size:0.875rem;text-decoration:underline;padding:6px}
+.iq-alt{margin:4px 0 0;color:#5b6663;font-size:0.9375rem}.iq-alt button{background:none;border:0;color:var(--dr-green);font-weight:700;padding:0 2px}
+.iq-or{display:flex;align-items:center;gap:10px;color:#7d8885;font-size:0.875rem}.iq-or::before,.iq-or::after{content:"";flex:1;height:1px;background:var(--dr-line)}
+.iq-social>span{display:grid;place-items:center}
+/* بطاقة الحساب والإعدادات بأعلى الرئيسية */
+.acct{width:100%;display:flex;align-items:center;gap:12px;text-align:right;border:0;border-radius:20px;padding:12px 14px;margin-bottom:12px;color:#fff;background:linear-gradient(120deg,#0f3d8a,#1d6fe0);box-shadow:0 8px 20px rgba(29,111,224,.3);position:relative;overflow:hidden}
+.acct::after{content:"";position:absolute;inset:auto auto 0 0;width:100%;height:4px;background:linear-gradient(90deg,#ce1126 33%,#fff 33% 66%,#0b0b0b 66%)}
+.acct .av{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-weight:700;font-size:1.1875rem;flex:0 0 auto;overflow:hidden}
+.acct .av img{width:100%;height:100%;object-fit:cover}
+.acct .tx{flex:1;min-width:0}.acct b{display:block;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.acct small{opacity:.85;font-size:0.8125rem}
+.acct .go{opacity:.9;display:grid;place-items:center}
+.acct-box{background:var(--surface-2);border-radius:16px;padding:12px;margin-bottom:6px}
+.iq-social.soon{opacity:.55;cursor:default}.iq-social em{font-style:normal;font-size:0.7188rem;background:#ce1126;color:#fff;border-radius:999px;padding:2px 9px;margin-inline-start:4px}
+/* الملف الشخصي والنوافذ */
+.iq-av{width:124px;height:124px;border-radius:50%;border:0;margin:4px auto 2px;position:relative;background:linear-gradient(140deg,#0f3d8a,#1d6fe0);color:#fff;display:grid;place-items:center;font-size:2.875rem;font-weight:700;box-shadow:0 8px 20px rgba(15,61,138,.3);overflow:visible}
+.iq-av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.iq-av i{position:absolute;bottom:2px;left:2px;width:38px;height:38px;border-radius:50%;background:#007a3d;border:3px solid #f4efe3;display:grid;place-items:center;font-style:normal;font-size:1.0625rem}
+.iq-modal{position:fixed;inset:0;z-index:120;background:rgba(10,18,32,.62);display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}
+.iq-dlg{width:100%;max-width:400px;background:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:11px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.iq-dlg h2{margin:0;font-size:1.25rem}.iq-dlg .btn-row{margin-top:4px}
+.iq-dlg .iq-main{flex:1;height:48px;font-size:1rem}
+.iq-crop{touch-action:none;width:300px;height:300px;margin:0 auto;border-radius:20px;background:#000;display:block}
+.iq-crop-z{width:100%;accent-color:#007a3d}
+.acct-hd{display:flex;align-items:center;gap:14px;background:var(--surface-2);border-radius:18px;padding:14px;margin-bottom:12px}
+.acct-hd .av{width:64px;height:64px;border-radius:50%;background:linear-gradient(140deg,#0f3d8a,#1d6fe0);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.625rem;overflow:hidden;flex:0 0 auto}
+.acct-hd .av img{width:100%;height:100%;object-fit:cover}
+.acct-hd small{color:var(--ink-2);display:block;direction:ltr;text-align:right}
+.acct-list{display:grid;gap:8px}.acct-list .btn{justify-content:flex-start;width:100%}

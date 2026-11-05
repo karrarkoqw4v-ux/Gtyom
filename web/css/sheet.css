@@ -1,0 +1,13 @@
+.sheet-head{display:flex;align-items:center;gap:8px;padding:14px 14px 6px;position:relative;cursor:pointer}
+.sheet-grip{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:46px;height:5px;border-radius:9px;background:#d5dce6;border:0;padding:0}
+.sheet-grip::after{content:"";position:absolute;inset:-14px -30px}
+.sheet-head h2{flex:1;margin:0;font-size:1.125rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet-head .rot{transform:rotate(-90deg);transition:transform .2s}
+#sheet.mini .sheet-head .rot{transform:rotate(90deg)}
+.sheet-body{overflow:auto;padding:4px 16px 18px;overscroll-behavior:contain}
+.big-time{font-size:1.875rem;font-weight:700;color:var(--go);line-height:1.2}
+.route-sum{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.route-ends{background:var(--surface-2);border-radius:var(--r-card);padding:10px 14px;margin:10px 0}
+.route-ends div{display:flex;gap:10px;align-items:center;padding:4px 0}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--primary);flex:0 0 auto;box-shadow:0 0 0 4px var(--primary-soft)}
+.dot.end{background:var(--go);box-shadow:0 0 0 4px var(--go-soft)}

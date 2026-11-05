@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#ffffff">
+<title>خرطتكم – خرائط العراق</title>
+<script>if(window.Android)document.documentElement.classList.add("android")</script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-48.png" sizes="48x48" type="image/png">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="خرطتكم">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="application-name" content="خرطتكم">
+<meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" href="vendor/fonts.css">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/sheet.css">
+<link rel="stylesheet" href="css/nav.css">
+<link rel="stylesheet" href="css/markers.css">
+<link rel="stylesheet" href="css/icons.css">
+<link rel="stylesheet" href="css/glass.css">
+<link rel="stylesheet" href="css/auth.css">
+<link rel="stylesheet" href="css/features.css">
+<link rel="stylesheet" href="css/weather.css">
+</head>
+<body>
+<div id="map" aria-label="خريطة العراق"></div>
+<header id="top"></header>
+<div id="fabs"></div>
+<div id="nav-banner" hidden></div>
+<section id="sheet" aria-live="polite"></section>
+<div id="toast" role="status"></div>
+<div id="gate" hidden></div>
+<div id="auth" hidden></div>
+<script src="vendor/maplibre-gl.js"></script>
+<script src="vendor/pmtiles.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

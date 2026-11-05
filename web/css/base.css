@@ -1,0 +1,18 @@
+:root{
+  --bg:#f3f6fa;--surface:#ffffff;--surface-2:#f6f8fb;--ink:#0f1f38;--ink-2:#46576e;--line:#e3e9f1;
+  --primary:#1d6fe0;--primary-soft:#e6efff;--go:#12a47b;--go-soft:#e2f6ef;--warn:#e8a10c;--danger:#d6455d;
+  --nav:#0f3d8a;--nav-2:#1a52b0;
+  --r-sheet:26px;--r-card:16px;--r-btn:14px;
+  --shadow:0 6px 24px rgba(20,36,59,.14);--shadow-sm:0 2px 8px rgba(20,36,59,.10);
+  --font:"IBM Plex Sans Arabic","Noto Sans Arabic",-apple-system,BlinkMacSystemFont,"SF Arabic",system-ui,"Segoe UI",Tahoma,sans-serif;
+  color-scheme:light;
+}
+html{font-size:clamp(15px,calc(13px + .85vw),19px);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{font-size:1rem}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.55;font-weight:500;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
