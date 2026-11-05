@@ -192,11 +192,21 @@ textarea::placeholder{color:var(--muted)}
   <h2>الإعدادات</h2>
   <label>مصدر الردود
     <select id="mode">
+      <option value="browser">Qwen داخل المتصفح (بدون مفتاح ولا سيرفر)</option>
       <option value="anthropic">Claude (Anthropic API)</option>
       <option value="api">API متوافق مع OpenAI</option>
       <option value="local">نموذجي المحلي (server.py)</option>
     </select>
   </label>
+  <div id="fBrowser" style="display:flex;flex-direction:column;gap:14px">
+    <label>حجم الموديل
+      <select id="bModel">
+        <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">1.5B — خفيف، للموبايل (~1 GB)</option>
+        <option value="Qwen2.5-3B-Instruct-q4f16_1-MLC">3B — أذكى (~2 GB)</option>
+        <option value="Qwen2.5-7B-Instruct-q4f16_1-MLC">7B — الأذكى، للكمبيوتر القوي (~5 GB)</option>
+      </select></label>
+    <p class="hint">أول رد ينزّل الموديل مرة وحدة ويُحفظ بجهازك، وبعدها يشتغل بدون إنترنت تقريباً. يحتاج متصفح يدعم WebGPU (Chrome حديث).</p>
+  </div>
   <div id="fAnth" style="display:flex;flex-direction:column;gap:14px">
     <label>رابط الـ Worker (موصى به، بدون مفتاح بالمتصفح)<input id="anthUrl" placeholder="https://xxx.workers.dev"></label>
     <label>أو مفتاح Anthropic API مباشر<input id="anthKey" type="password" placeholder="sk-ant-..."></label>
@@ -223,7 +233,7 @@ const ic=n=>`<svg><use href="#i-${n}"/></svg>`;
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
 
 let chats=LS.get('chats',[]), cur=null, busy=false, abortC=null, files=[], typing=null;
-let cfg=Object.assign({mode:'anthropic',anthropicUrl:'',anthropicKey:'',anthropicModel:'claude-sonnet-5-5',localUrl:'http://localhost:8000',apiUrl:'',apiKey:'',apiModel:'gpt-4o-mini',sys:'أنت مساعد ذكي ومفيد.',lang:'ar-IQ'},LS.get('cfg',{}));
+let cfg=Object.assign({mode:'browser',bModel:'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',anthropicUrl:'',anthropicKey:'',anthropicModel:'claude-sonnet-5-5',localUrl:'http://localhost:8000',apiUrl:'',apiKey:'',apiModel:'gpt-4o-mini',sys:'أنت مساعد ذكي ومفيد. أجب بنفس لغة المستخدم، وبالعربية الفصحى أو بلهجة المستخدم إذا كتب بلهجة، بشكل واضح ومفصّل.',lang:'ar-IQ'},LS.get('cfg',{}));
 const save=()=>LS.set('chats',chats);
 
 /* ---------- utils ---------- */
@@ -318,7 +328,8 @@ async function reply(c){
   const push=t=>{if(!m.content)body.classList.add('cur');m.content+=t;body.innerHTML=md(m.content);scrollDown()};
   try{
     const hist=c.msgs.map(x=>({role:x.role,content:x.content+((x.files||[]).filter(f=>f.text).map(f=>`\n\n[ملف: ${f.name}]\n${f.text}`).join(''))}));
-    if(cfg.mode==='api')await viaApi(hist,push,abortC.signal);
+    if(cfg.mode==='browser')await viaBrowser(hist,push,abortC.signal,t=>{body.innerHTML='<p>'+esc(t)+'</p>'});
+    else if(cfg.mode==='api')await viaApi(hist,push,abortC.signal);
     else if(cfg.mode==='anthropic')await viaAnthropic(hist,push,abortC.signal);
     else await viaLocal(hist,push,abortC.signal);
   }catch(e){
@@ -352,6 +363,19 @@ async function viaApi(h,push,sig){
     const lines=buf.split('\n');buf=lines.pop();
     for(const l of lines){const t=l.trim();if(!t.startsWith('data:'))continue;const d=t.slice(5).trim();if(d==='[DONE]')return;
       try{const j=JSON.parse(d);const x=j.choices?.[0]?.delta?.content??j.choices?.[0]?.message?.content;if(x)push(x)}catch{}}}
+}
+let engine=null,engineModel=null;
+async function viaBrowser(h,push,sig,status){
+  if(!navigator.gpu)throw new Error('متصفحك لا يدعم WebGPU. استخدم Chrome حديث، أو اختر مصدراً ثانياً من الإعدادات');
+  if(!engine||engineModel!==cfg.bModel){
+    status('جاري تحميل المكتبة...');
+    const webllm=await import('https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.79/+esm');
+    engine=await webllm.CreateMLCEngine(cfg.bModel,{initProgressCallback:r=>status('جاري تجهيز الموديل: '+Math.round((r.progress||0)*100)+'% — '+(r.text||'')),});
+    engineModel=cfg.bModel;
+  }
+  sig.addEventListener('abort',()=>engine.interruptGenerate());
+  const it=await engine.chat.completions.create({stream:true,temperature:0.7,max_tokens:2048,messages:[{role:'system',content:cfg.sys},...h]});
+  for await(const c of it){const x=c.choices[0]?.delta?.content;if(x)push(x);if(sig.aborted)break}
 }
 async function viaAnthropic(h,push,sig){
   if(!cfg.anthropicUrl&&!cfg.anthropicKey)throw new Error('ضع رابط الـ Worker أو مفتاح Anthropic من الإعدادات');
@@ -428,14 +452,14 @@ function setTheme(t){document.documentElement.dataset.theme=t;LS.set('theme',t)}
 setTheme(LS.get('theme',matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
 $('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
 
-function modeUI(){const m=$('#mode').value;$('#fLocal').style.display=m==='local'?'block':'none';$('#fAnth').style.display=m==='anthropic'?'flex':'none';$('#fApi').style.display=m==='api'?'flex':'none'}
+function modeUI(){const m=$('#mode').value;$('#fBrowser').style.display=m==='browser'?'flex':'none';$('#fLocal').style.display=m==='local'?'block':'none';$('#fAnth').style.display=m==='anthropic'?'flex':'none';$('#fApi').style.display=m==='api'?'flex':'none'}
 $('#mode').onchange=modeUI;
 $('#openSet').onclick=()=>{
-  $('#mode').value=cfg.mode;$('#anthKey').value=cfg.anthropicKey;$('#anthUrl').value=cfg.anthropicUrl;$('#anthModel').value=cfg.anthropicModel;$('#localUrl').value=cfg.localUrl;$('#apiUrl').value=cfg.apiUrl;$('#apiKey').value=cfg.apiKey;
+  $('#mode').value=cfg.mode;$('#bModel').value=cfg.bModel;$('#anthKey').value=cfg.anthropicKey;$('#anthUrl').value=cfg.anthropicUrl;$('#anthModel').value=cfg.anthropicModel;$('#localUrl').value=cfg.localUrl;$('#apiUrl').value=cfg.apiUrl;$('#apiKey').value=cfg.apiKey;
   $('#apiModel').value=cfg.apiModel;$('#sys').value=cfg.sys;$('#lang').value=cfg.lang;modeUI();$('#modal').classList.add('on');closeSide();
 };
 $('#saveSet').onclick=()=>{
-  cfg={mode:$('#mode').value,anthropicKey:$('#anthKey').value.trim(),anthropicUrl:$('#anthUrl').value.trim(),anthropicModel:$('#anthModel').value.trim()||'claude-sonnet-5-5',localUrl:$('#localUrl').value.trim(),apiUrl:$('#apiUrl').value.trim(),apiKey:$('#apiKey').value.trim(),
+  cfg={mode:$('#mode').value,bModel:$('#bModel').value,anthropicKey:$('#anthKey').value.trim(),anthropicUrl:$('#anthUrl').value.trim(),anthropicModel:$('#anthModel').value.trim()||'claude-sonnet-5-5',localUrl:$('#localUrl').value.trim(),apiUrl:$('#apiUrl').value.trim(),apiKey:$('#apiKey').value.trim(),
     apiModel:$('#apiModel').value.trim(),sys:$('#sys').value.trim(),lang:$('#lang').value};
   LS.set('cfg',cfg);$('#modal').classList.remove('on');toast('تم الحفظ');
 };
@@ -443,7 +467,6 @@ $('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').classList.remove('o
 $('#clearAll').onclick=()=>{if(confirm('حذف كل المحادثات؟')){chats=[];save();cur=null;render();renderList();$('#modal').classList.remove('on')}};
 if(mobile())side.classList.add('closed');
 renderFiles();render();renderList();upd();
-if(cfg.mode==='anthropic'&&!cfg.anthropicKey&&!cfg.anthropicUrl)setTimeout(()=>{$('#openSet').click()},400);
 </script>
 </body>
 </html>
