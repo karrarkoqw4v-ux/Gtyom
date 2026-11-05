@@ -37,6 +37,7 @@ import { showNav, updateNav, hideNav, showRecenter } from './ui/nav-view.js';
 import { showOffline } from './ui/offline-view.js';
 import { showSettings } from './ui/settings-view.js';
 import { showAuth } from './ui/auth-view.js';
+import { tripStart, tripUpdate, tripArrive, tripEnd } from './native/trip.js';
 import { startPreview, stopPreview } from './vehicle/preview.js';
 import { initGov } from './map/gov.js';
 import { showAccount } from './ui/profile-view.js';
@@ -156,6 +157,10 @@ on('ui:provinces', showProvinces);
 on('ui:offline', p => showOffline(p));
 on('ui:settings', showSettings);
 on('ui:auth', showAuth);
+// أزرار التطبيق: زر الرجوع يسكّر شاشة الدخول، وزر «إنهاء» بالإشعار ينهي الرحلة، ورسالة نقص الصوت العربي
+window.__back = () => { const a = document.getElementById('auth'); if (a && !a.hidden) { a.hidden = true; a.replaceChildren(); return true; } return false; };
+window.__endTrip = () => emit('ui:endnav');
+window.__ttsMissing = () => toast('ما لقينا صوت عربي بجهازك. من إعدادات الجهاز ← اللغة ← تحويل النص إلى كلام ← نزّل العربية، حتى تسمع الاتجاهات', 9000);
 on('ui:account', showAccount);
 restoreSession();
 on('ui:trip', showTrip);
@@ -201,7 +206,7 @@ on('ui:start', ({ sim }) => {
   if (!sim && (!state.pos || dist([state.pos.lng, state.pos.lat], c0) > 150)) { sim = true; toast('أنت مو عند نقطة البداية، رح يتحرك السهم تلقائياً على الطريق بالاتجاهات الصحيحة', 4200); }
   state.navigating = true; following = true;
   nav = new Navigator(state.route, state.vehicle);
-  showNav(); keepScreenOn(true);
+  showNav(); keepScreenOn(true); tripStart(state.dest.name, state.route);
   speak(`لنبدأ. ${state.dest.name}`, true);
   if (sim) simulate(state.route);
   else {
@@ -219,6 +224,7 @@ on('position', pos => {
   if (following) follow(pos, camZoom(), state.simulating ? 260 : 900, camPitch());
 });
 on('nav:progress', p => {
+  tripUpdate(p);
   updateNav(p); drawProgress(state.route.coords, p.index, p.point);
   const n = p.next;
   if (n && p.toNext < 260 && n.type !== 'arrive' && n.type !== 'depart' && !(n.type === 'continue' && n.modifier === 'straight')) drawManeuver(state.route.coords, p.cum, p.along + p.toNext);
@@ -243,7 +249,7 @@ on('nav:offroute', async pos => {
   try { const route = await getRoute(pos, state.dest, state.vehicle); state.route = route; nav = new Navigator(route, state.vehicle); drawRoute(route.coords); }
   catch { toast('ما قدرنا نعيد حساب الطريق'); }
 });
-on('nav:arrive', () => { toast('وصلت إلى وجهتك', 4000); setTimeout(() => emit('ui:endnav'), 3500); });
+on('nav:arrive', () => { tripArrive(); toast('وصلت إلى وجهتك', 4000); setTimeout(() => emit('ui:endnav'), 3500); });
 on('ui:nav-overview', () => { following = false; showRecenter(true); overview(state.route.coords, 140); });
 on('ui:recenter', () => { following = true; showRecenter(false); if (state.pos) follow(state.pos, camZoom(), 900, camPitch()); });
 map.on('dragstart', () => {
@@ -253,7 +259,7 @@ map.on('dragstart', () => {
 on('ui:endnav', () => {
   stopSimulation(); stopVoice();
   state.navigating = false; nav = null; state.start = null;
-  hideNav(); clearRoute(); clearPadding(); keepScreenOn(false);
+  hideNav(); clearRoute(); clearPadding(); keepScreenOn(false); tripEnd();
   map.easeTo({ pitch: 45, bearing: 0, duration: 800 });
   showHome(true);
 });

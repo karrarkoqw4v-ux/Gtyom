@@ -14,10 +14,10 @@ import { setSaved } from '../location/saved.js';
 import { on } from '../core/events.js';
 const chip = (ic, text, onclick) => el('button', { class: 'chip', onclick }, icon(ic, { size: 18, anim: '' }), text);
 // بطاقة الحساب بأعلى الرئيسية: تفتح الإعدادات
-const acctCard = () => el('button', { class: 'acct', onclick: () => emit(user ? 'ui:account' : 'ui:settings') },
+const acctCard = () => el('button', { class: 'acct', onclick: () => emit(user ? 'ui:account' : 'ui:auth') },
   el('span', { class: 'av' }, user?.photo ? el('img', { src: user.photo, alt: '', referrerpolicy: 'no-referrer' }) : (user?.name?.[0] || icon('users', { size: 24, anim: '' }))),
-  el('span', { class: 'tx' }, el('b', {}, user?.name || user?.email || 'ضيف'), el('small', {}, user ? 'حسابي والإعدادات' : 'الإعدادات · سجّل دخولك من هنا')),
-  el('span', { class: 'go' }, icon('gear', { size: 24 })));
+  el('span', { class: 'tx' }, el('b', {}, user?.name || user?.email || 'ضيف'), el('small', {}, user ? 'حسابي' : 'اضغط لتسجيل الدخول أو إنشاء حساب')),
+  el('span', { class: 'go', role: 'button', 'aria-label': 'الإعدادات', onclick: e => { e.stopPropagation(); emit('ui:settings'); } }, icon('gear', { size: 24 })));
 // مشاركة موقعي الحالي بكل التفاصيل
 async function shareMine() {
   if (!state.pos) { const r = await requestLocation(); if (!r.ok) return toast('حدد موقعك أولاً من زر موقعي'); emit('ui:locate'); await new Promise(r2 => setTimeout(r2, 1500)); }

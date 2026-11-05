@@ -28,8 +28,8 @@ function mood(p) {
 }
 // رسم الغيوم والمطر والبرق والثلج والغبار على canvas
 function animate(cv, M) {
-  const ctx = cv.getContext('2d'); let W = 0, H = 0, raf = 0, last = 0, drops = [], flakes = [], flash = 0, bolt = null, t0 = performance.now();
-  const clouds = Array.from({ length: 4 + Math.round(M.cloud / 22) }, (_, i) => ({ x: Math.random(), y: Math.random() * 0.62, r: 0.22 + Math.random() * 0.3, v: (0.006 + Math.random() * 0.012) * (1 + M.wind / 40) * (i % 2 ? 1 : -1), a: 0.18 + Math.random() * 0.2 }));
+  const ctx = cv.getContext('2d'); let W = 0, H = 0, raf = 0, last = 0, drops = [], flakes = [], flash = 0, bolt = null, t0 = performance.now(), splashes = [], dustP = [];
+  const clouds = Array.from({ length: 4 + Math.round(M.cloud / 22) }, (_, i) => ({ x: Math.random(), y: Math.random() * 0.62, r: 0.22 + Math.random() * 0.3, v: (0.006 + Math.random() * 0.012) * (1 + M.wind / 40) * (i % 2 ? 1 : -1), a: 0.18 + Math.random() * 0.2, lobes: Array.from({ length: 6 }, (_, k) => ({ dx: (k - 2.5) * 0.42 + (Math.random() - 0.5) * 0.2, dy: (Math.random() - 0.5) * 0.45 - (k % 2 ? 0.1 : 0), s: 0.5 + Math.random() * 0.5 })) }));
   const stars = M.key === 'clear' && !M.day ? Array.from({ length: 70 }, () => ({ x: Math.random(), y: Math.random() * 0.6, r: Math.random() * 1.4 + 0.3, p: Math.random() * 6 })) : [];
   const sl = Math.max(-0.35, Math.min(0.35, M.wind / 90));
   function resize() { W = cv.width = cv.clientWidth; H = cv.height = cv.clientHeight; }
@@ -51,19 +51,31 @@ function animate(cv, M) {
       }
     } else if (M.key === 'clear' && M.day) { const g = ctx.createRadialGradient(W * 0.78, H * 0.12, 0, W * 0.78, H * 0.12, W * 0.7); g.addColorStop(0, 'rgba(255,240,190,.55)'); g.addColorStop(1, 'rgba(255,240,190,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
     stars.forEach(s => { ctx.fillStyle = `rgba(255,255,255,${0.4 + 0.5 * Math.sin(t / 700 + s.p)})`; ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, 7); ctx.fill(); });
+    { const hz = ctx.createLinearGradient(0, H * 0.7, 0, H); const hc = M.key === 'dust' ? '214,170,100' : M.day ? '255,255,255' : '120,138,176'; hz.addColorStop(0, `rgba(${hc},0)`); hz.addColorStop(1, `rgba(${hc},${M.key === 'dust' ? 0.35 : 0.16})`); ctx.fillStyle = hz; ctx.fillRect(0, H * 0.7, W, H * 0.3); }
     const dark = M.key === 'storm' ? '28,34,60' : M.day ? '255,255,255' : '120,138,176';
     clouds.forEach(c => {
       c.x += c.v * dt; if (c.x > 1.4) c.x = -0.4; if (c.x < -0.4) c.x = 1.4;
       const x = c.x * W, y = c.y * H, r = c.r * W, g = ctx.createRadialGradient(x, y, 0, x, y, r);
       const a = c.a * (M.key === 'clear' ? Math.min(1, M.cloud / 40 + 0.15) : 1.35) * (M.key === 'storm' ? 1.5 : 1);
-      g.addColorStop(0, `rgba(${dark},${Math.min(0.6, a)})`); g.addColorStop(1, `rgba(${dark},0)`);
-      ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * 0.55, 0, 0, 7); ctx.fill();
+      // غيمة منتفخة من عدة فصوص متداخلة، قاعدتها أغمق من قمتها
+      c.lobes.forEach(l => {
+        const lx = x + l.dx * r * 0.8, ly = y + l.dy * r * 0.5, lr = r * l.s * 0.55, q = ctx.createRadialGradient(lx, ly - lr * 0.25, 0, lx, ly, lr);
+        q.addColorStop(0, `rgba(${dark},${Math.min(0.55, a)})`); q.addColorStop(0.6, `rgba(${dark},${Math.min(0.55, a) * 0.45})`); q.addColorStop(1, `rgba(${dark},0)`);
+        ctx.fillStyle = q; ctx.beginPath(); ctx.arc(lx, ly, lr, 0, 7); ctx.fill();
+      });
     });
     if (M.key === 'dust' || M.key === 'fog') { for (let i = 0; i < 3; i++) { const y = H * (0.25 + i * 0.22), off = ((t / 40 * (1 + i)) % (W * 1.5)) - W * 0.25; const g = ctx.createLinearGradient(off, 0, off + W * 0.9, 0); const c = M.key === 'dust' ? '214,170,100' : '225,230,236'; g.addColorStop(0, `rgba(${c},0)`); g.addColorStop(0.5, `rgba(${c},.28)`); g.addColorStop(1, `rgba(${c},0)`); ctx.fillStyle = g; ctx.fillRect(off, y, W * 0.9, H * 0.16); } }
     if (M.key === 'rain' || M.key === 'storm') {
       const want = Math.min(200, Math.round(35 + M.mm * 22)); while (drops.length < want) drops.push({ x: Math.random() * (W + 80), y: Math.random() * H, l: 22 + Math.random() * 34, v: 520 + Math.random() * 380, w: 1 + Math.random() * 1.2, a: 0.25 + Math.random() * 0.35 });
       drops.length = Math.min(drops.length, want); ctx.lineCap = 'round';
-      drops.forEach(d => { d.y += d.v * dt; d.x += d.v * dt * sl; if (d.y > H) { d.y = -d.l; d.x = Math.random() * (W + 80); } const g = ctx.createLinearGradient(d.x, d.y, d.x - d.l * sl, d.y + d.l); g.addColorStop(0, 'rgba(210,225,255,0)'); g.addColorStop(1, `rgba(210,225,255,${d.a})`); ctx.strokeStyle = g; ctx.lineWidth = d.w; ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - d.l * sl, d.y + d.l); ctx.stroke(); });
+      drops.forEach(d => { d.y += d.v * dt; d.x += d.v * dt * sl; if (d.y > H) { if (splashes.length < 70 && Math.random() < 0.35) splashes.push({ x: d.x, y: H - 6 - Math.random() * 40, r: 1, a: 0.5 }); d.y = -d.l; d.x = Math.random() * (W + 80); } const g = ctx.createLinearGradient(d.x, d.y, d.x - d.l * sl, d.y + d.l); g.addColorStop(0, 'rgba(210,225,255,0)'); g.addColorStop(1, `rgba(210,225,255,${d.a})`); ctx.strokeStyle = g; ctx.lineWidth = d.w; ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - d.l * sl, d.y + d.l); ctx.stroke(); });
+    }
+    if (M.key === 'rain' || M.key === 'storm') {
+      splashes = splashes.filter(sp => { sp.r += 40 * dt; sp.a -= 1.4 * dt; if (sp.a <= 0) return false; ctx.strokeStyle = `rgba(215,228,255,${sp.a})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(sp.x, sp.y, sp.r, sp.r * 0.32, 0, 0, 7); ctx.stroke(); return true; });
+    }
+    if (M.key === 'dust') {
+      const want = Math.min(120, 40 + Math.round(M.dust / 8)); while (dustP.length < want) dustP.push({ x: Math.random() * W, y: Math.random() * H, r: 0.8 + Math.random() * 2.2, v: 60 + Math.random() * 140 + M.wind * 3, p: Math.random() * 6, a: 0.15 + Math.random() * 0.35 });
+      dustP.forEach(q => { q.x += q.v * dt; q.y += Math.sin(t / 600 + q.p) * 0.6; if (q.x > W + 10) { q.x = -10; q.y = Math.random() * H; } ctx.fillStyle = `rgba(226,186,120,${q.a})`; ctx.beginPath(); ctx.arc(q.x, q.y, q.r, 0, 7); ctx.fill(); });
     }
     if (M.key === 'snow') { while (flakes.length < 90) flakes.push({ x: Math.random() * W, y: Math.random() * H, r: 1.2 + Math.random() * 2.6, v: 40 + Math.random() * 60, p: Math.random() * 6 }); flakes.forEach(f => { f.y += f.v * dt; f.x += Math.sin(t / 900 + f.p) * 0.6 + sl * 30 * dt; if (f.y > H) { f.y = -5; f.x = Math.random() * W; } ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 7); ctx.fill(); }); }
     if (M.key === 'storm') {

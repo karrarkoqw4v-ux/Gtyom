@@ -14,6 +14,7 @@ async function init() {
     for (const l of ['app', 'auth', 'firestore']) await loadScript(`https://www.gstatic.com/firebasejs/${V}/firebase-${l}-compat.js`);
     window.firebase.initializeApp(FIREBASE_CONFIG);
     fb = window.firebase; fb.auth().languageCode = 'ar';
+    try { await fb.auth().setPersistence(fb.auth.Auth.Persistence.LOCAL); } catch {}
     fb.auth().onAuthStateChanged(u => setUser(u));
     return fb;
   })();
