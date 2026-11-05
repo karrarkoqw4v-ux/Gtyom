@@ -12,18 +12,15 @@
   } catch (e) {}
 
   var LS = window.localStorage;
+  var CK = 'alfarabi_chat_v2', SS = 'alfarabi_sess_acc', SK = 'alfarabi_school_v1', RK = 'alfarabi_rec_v1', DBK = 'alfarabi_db_v1';
   function J(k, d) { try { return JSON.parse(LS.getItem(k)) || d; } catch (e) { return d; } }
+  function okk(k) { return String(k).replace(/[.#$\[\]\/]/g, '_'); }
+  function nrm(s) { return String(s || '').replace(/[\sً-ْ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه'); }
+  function same(a, b) { a = nrm(a); b = nrm(b); return a.length > 4 && b.length > 4 && (a === b || a.indexOf(b) > -1 || b.indexOf(a) > -1); }
+  function fg() { try { return !!A.isForeground(); } catch (e) { return false; } }
 
-  /* ===== 2) Notification: نربط إشعارات الصفحة بإشعارات الأندرويد ===== */
-  function N(title, opts) {
-    opts = opts || {};
-    var tag = String(opts.tag || '');
-    var kind = tag === 'call' ? 'call' : 'school';
-    try { A.notify(kind, String(title), String(opts.body || ''), tag); } catch (e) {}
-    this.title = title; this.body = opts.body || ''; this.tag = tag;
-    this.close = function () { try { A.cancelNotif(tag); } catch (e) {} };
-    this.onclick = null;
-  }
+  /* ===== 2) إشعارات الصفحة القديمة (Notification): نلغيها لأن التطبيق يرسل إشعاراته بنفسه ===== */
+  function N() { this.close = function () {}; }
   N.permission = 'granted';
   N.requestPermission = function (cb) {
     try { A.requestNotifPermission(); } catch (e) {}
@@ -31,7 +28,6 @@
     return Promise.resolve('granted');
   };
   window.Notification = N;
-  // الصفحات الداخلية (iframe) تاخذ نفس الدالة
   function patchFrame(f) {
     try { f.contentWindow.Notification = N; } catch (e) {}
     try { f.addEventListener('load', function () { try { f.contentWindow.Notification = N; } catch (e) {} }); } catch (e) {}
@@ -43,8 +39,6 @@
     }).observe(document.documentElement, { childList: true, subtree: true });
   }
   if (document.documentElement) watchFrames(); else document.addEventListener('DOMContentLoaded', watchFrames);
-  // لما ترجع للتطبيق نلغي إشعار المكالمة
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) { try { A.cancelNotif('call'); } catch (e) {} } });
 
   /* ===== 3) الاتصال بخادم المدرسة (الصور والإشعارات) عبر التطبيق ===== */
   var ORIGIN = '';
@@ -79,21 +73,26 @@
     };
   }
 
-  /* ===== 4) الحساب الحالي: نعلم الخلفية لتبقى تستقبل الإشعارات ===== */
-  var CK = 'alfarabi_chat_v2', SS = 'alfarabi_sess_acc', SK = 'alfarabi_school_v1';
+  /* ===== 4) الحساب الحالي ===== */
   function me() {
     var s = LS.getItem('alfarabi_session'); if (!s) return null;
-    var a = J(SS, null); if (!a || a.email !== s) { var db = J('alfarabi_db_v1', { accounts: [] }); a = (db.accounts || []).find(function (x) { return x.email === s; }); }
+    var a = J(SS, null); if (!a || a.email !== s) { var db = J(DBK, { accounts: [] }); a = (db.accounts || []).find(function (x) { return x.email === s; }); }
     if (!a || a.kicked) return null;
-    return { uid: String(a.createdAt || a.name), role: a.role, grade: String(a.grade || ''), name: a.name || '' };
+    var raw = a.createdAt || a.name;
+    return { uid: String(raw), raw: raw, role: a.role, grade: String(a.grade || ''), name: a.name || '', child: a.child || '' };
   }
+  function accOf(uid) {
+    var s = String(uid), list = (J(DBK, { accounts: [] }).accounts) || [];
+    return list.find(function (a) { return String(a.createdAt || a.name) === s; });
+  }
+  function photoOf(uid) { var a = accOf(uid), p = a && a.photo; return p && String(p).length < 350000 ? String(p) : ''; }
   var lastUid = null;
   setInterval(function () {
     var u = me(), id = u && u.role !== 'admin' ? u.uid : '';
     if (id !== lastUid) { lastUid = id; try { A.session(id); } catch (e) {} }
   }, 3000);
 
-  /* ===== 5) رسائل المحادثات الجديدة (تشمل المجموعات وقنوات المدرسين) ===== */
+  /* ===== 5) المحادثات والمكالمات (لحظياً عند وصول البيانات) ===== */
   var GN = { 1: 'الأول متوسط', 2: 'الثاني متوسط', 3: 'الثالث متوسط', 4: 'الرابع العلمي', 5: 'الخامس العلمي' };
   function mineKey(k, u) {
     if (k.indexOf('dsup_') === 0) return k === 'dsup_' + u.uid;
@@ -102,29 +101,77 @@
     return k === (u.grade || '2');
   }
   function preview(m) { return m.t || (m.aud ? '🎤 رسالة صوتية' : m.img ? '📷 صورة' : m.vid ? '🎬 فيديو' : m.q ? '📊 استطلاع' : m.f ? '📎 ملف' : 'رسالة جديدة'); }
-  var lastLen = -1, seenTs = {}, chatInit = false;
+  var lastLen = -1, seenTs = {}, chatInit = false, callSeen = {};
   function chatTick() {
     var u = me(); if (!u || u.role === 'admin') return;
     var s = LS.getItem(CK) || ''; if (s.length === lastLen) return; lastLen = s.length;
     var d; try { d = JSON.parse(s) || {}; } catch (e) { return; }
-    var groups = (J(SK, {}).groups) || {};
+    var groups = (J(SK, {}).groups) || {}, visible = fg();
     Object.keys(d).forEach(function (g) {
       if (!mineKey(g, u)) return;
       var arr = d[g] || [], last = seenTs[g] || 0, mx = last;
+      // مكالمة واردة
+      if (g[0] === 'd' && g.indexOf('dsup_') !== 0) {
+        var cr = null; arr.forEach(function (x) { if (x && x.c === 'cr' && String(x.u) !== u.uid) cr = x; });
+        if (cr) {
+          var live = Date.now() - cr.ts <= 45000 && !arr.some(function (y) { return y && y.cid === cr.cid && (y.c === 'ca' || y.c === 'cd' || y.c === 'ce'); });
+          if (live && !callSeen[cr.cid] && !visible) {
+            callSeen[cr.cid] = 1;
+            try { A.notifyCall(cr.n || 'مكالمة', photoOf(cr.u), String(cr.cid), g); } catch (e) {}
+            setTimeout(function () { try { A.cancelNotif('call'); } catch (e) {} }, 45000);
+          } else if (!live && callSeen[cr.cid] === 1) { callSeen[cr.cid] = 2; try { A.cancelNotif('call'); } catch (e) {} }
+        }
+      }
+      // رسائل جديدة
       arr.forEach(function (m) {
         if (!m || !m.ts) return;
         if (m.ts > mx) mx = m.ts;
-        if (!chatInit || m.ts <= last || m.c || String(m.u) === u.uid || Date.now() - m.ts > 10 * 60e3) return;
-        var gn = g[0] === 'd' ? '' : ((groups[g] && groups[g].name) || (g === 'p' ? 'أولياء الأمور' : GN[g] || ''));
-        try { A.notify('msg', (m.n || 'رسالة') + (gn ? ' • ' + gn : ''), preview(m), 'chat:' + g); } catch (e) {}
+        if (!chatInit || m.ts <= last || m.c || String(m.u) === u.uid || Date.now() - m.ts > 10 * 60e3 || visible) return;
+        var isGroup = g[0] !== 'd';
+        var conv = isGroup ? ((groups[g] && groups[g].name) || (g === 'p' ? 'أولياء الأمور' : GN[g] || 'المجموعة')) : (m.n || '');
+        try { A.notifyMessage('chat:' + g, conv, isGroup, m.n || 'رسالة', photoOf(m.u), preview(m), m.ts); } catch (e) {}
       });
       seenTs[g] = mx;
     });
     chatInit = true;
   }
-  setInterval(chatTick, 1500);
 
-  /* ===== 6) إعلانات المدرسة وتحاضير الدروس الجديدة ===== */
+  /* ===== 6) درجات وغيابات وقنوات المدرسين ===== */
+  var recInit = false, recSeen = null;
+  function recTick() {
+    var u = me(); if (!u || u.role === 'admin') return;
+    var recs = J(RK, []); if (!Array.isArray(recs)) return;
+    var chans = recs.filter(function (r) { return r.k === 'ch'; });
+    var list = [];
+    recs.forEach(function (r) {
+      if ((r.k === 'a' || r.k === 'g') && (u.role === 'parent' ? same(u.child, r.n) : u.role === 'student' ? same(u.name, r.n) : false)) list.push({ id: 'r' + r.id, r: r, t: r.k === 'a' ? 'a' : 'g' });
+      else if (r.k === 'cp') {
+        var c = chans.filter(function (x) { return x.id === r.ch; })[0];
+        if (c && c.m && c.m['u' + okk(u.uid)] && String(c.o) !== u.uid && !(c.mu && c.mu['u' + okk(u.uid)])) list.push({ id: 'p' + r.id, r: r, c: c, t: 'cp' });
+      }
+    });
+    var key = 'af_rec_seen_' + u.uid, old = J(key, null), ids = list.map(function (x) { return x.id; });
+    if (old === null) { try { LS.setItem(key, JSON.stringify(ids)); } catch (e) {} recSeen = ids; return; }
+    if (recSeen === null) recSeen = old;
+    var changed = false;
+    list.forEach(function (x) {
+      if (recSeen.indexOf(x.id) > -1) return;
+      changed = true;
+      if (fg() || Date.now() - (x.r.ts || 0) > 24 * 3600e3) return;
+      try {
+        if (x.t === 'g') A.notifySchool(x.r.n || 'طالب', (x.r.s || 'المادة') + ': ' + x.r.v + (x.r.nt ? ' · ' + x.r.nt : ''), 'نتيجة امتحان', 'rec:' + x.id, photoOf2(x.r.n));
+        else if (x.t === 'a') A.notifySchool(x.r.n || 'طالب', 'غياب ' + (x.r.d || ''), 'غياب', 'rec:' + x.id, photoOf2(x.r.n));
+        else A.notifyMessage('chan:' + x.c.id, x.c.cn || 'قناة', true, x.c.on || 'المدرس', photoOf(x.c.o), x.r.t || (x.r.img ? '📷 صورة' : x.r.q ? '📊 استطلاع' : 'منشور جديد'), x.r.ts || Date.now());
+      } catch (e) {}
+    });
+    if (changed || ids.length !== recSeen.length) { recSeen = ids; try { LS.setItem(key, JSON.stringify(ids)); } catch (e) {} }
+  }
+  function photoOf2(name) {
+    var list = (J(DBK, { accounts: [] }).accounts) || [], a = list.find(function (x) { return same(x.name, name); }), p = a && a.photo;
+    return p && String(p).length < 350000 ? String(p) : '';
+  }
+
+  /* ===== 7) إعلانات المدرسة وتحاضير الدروس ===== */
   var seenAnn = null;
   function schoolTick() {
     var u = me(); if (!u || u.role === 'admin') return;
@@ -133,16 +180,48 @@
     var plans = (Array.isArray(info.lessonPlans) ? info.lessonPlans : []).filter(function (p) { return u.role === 'teacher' ? false : String(p.grade) === u.grade || u.role === 'parent'; });
     var ids = ann.map(function (a) { return 'a' + (a.id || a.createdAt || a.title); }).concat(plans.map(function (p) { return 'p' + (p.id || p.title); }));
     var key = 'af_ann_seen_' + u.uid, old = J(key, null);
-    if (old === null || seenAnn === null) { seenAnn = old || ids; try { LS.setItem(key, JSON.stringify(ids)); } catch (e) {} if (old === null) return; }
-    ann.forEach(function (a) { var i = 'a' + (a.id || a.createdAt || a.title); if (seenAnn.indexOf(i) < 0) { try { A.notify('school', 'إعلان جديد: ' + (a.title || ''), String(a.desc || '').slice(0, 140), 'ann:' + i); } catch (e) {} } });
-    plans.forEach(function (p) { var i = 'p' + (p.id || p.title); if (seenAnn.indexOf(i) < 0) { try { A.notify('school', 'تحضير جديد: ' + (p.title || ''), (p.subj ? p.subj + ' - ' : '') + String(p.description || '').slice(0, 120), 'plan:' + i); } catch (e) {} } });
+    if (old === null) { try { LS.setItem(key, JSON.stringify(ids)); } catch (e) {} seenAnn = ids; return; }
+    if (seenAnn === null) seenAnn = old;
+    if (!fg()) {
+      ann.forEach(function (a) { var i = 'a' + (a.id || a.createdAt || a.title); if (seenAnn.indexOf(i) < 0) { try { A.notifySchool(a.title || 'إعلان جديد', String(a.desc || ''), 'إعلان من الإدارة', 'ann:' + i, ''); } catch (e) {} } });
+      plans.forEach(function (p) { var i = 'p' + (p.id || p.title); if (seenAnn.indexOf(i) < 0) { try { A.notifySchool(p.title || 'تحضير جديد', String(p.description || ''), 'تحضير الدروس' + (p.subj ? ' • ' + p.subj : '') + (GN[p.grade] ? ' • ' + GN[p.grade] : ''), 'plan:' + i, ''); } catch (e) {} } });
+    }
     if (ids.length !== seenAnn.length || ids.some(function (x) { return seenAnn.indexOf(x) < 0; })) { seenAnn = ids; try { LS.setItem(key, JSON.stringify(ids)); } catch (e) {} }
   }
-  setInterval(schoolTick, 4000);
 
-  /* ===== 6.5) أدوات فحص ومزامنة البيانات (تظهر من إعدادات التطبيق) ===== */
+  /* ===== 8) تشغيل الفحص لحظياً عند كتابة البيانات + احتياط كل 4 ثواني ===== */
+  var timers = {};
+  function sched(t) {
+    if (timers[t]) return;
+    timers[t] = setTimeout(function () { timers[t] = 0; try { ({ c: chatTick, r: recTick, s: schoolTick })[t](); } catch (e) {} }, 250);
+  }
+  var origSet = Storage.prototype.setItem;
+  Storage.prototype.setItem = function (k) {
+    var r = origSet.apply(this, arguments);
+    if (this === window.localStorage) { if (k === CK) sched('c'); else if (k === RK) sched('r'); else if (k === SK) sched('s'); }
+    return r;
+  };
+  window.addEventListener('storage', function (e) { if (!e || !e.key) return; if (e.key === CK) sched('c'); else if (e.key === RK) sched('r'); else if (e.key === SK) sched('s'); });
+  setInterval(function () { sched('c'); sched('r'); sched('s'); }, 4000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { try { A.cancelNotif('call'); } catch (e) {} } });
+
+  /* ===== 9) أوامر من الإشعارات: رد سريع ورفض مكالمة ===== */
+  window.afSendReply = function (g, text) {
+    var u = me(); if (!u || !text) return false;
+    var d = J(CK, {}), t = Date.now();
+    (d[g] = d[g] || []).push({ id: t, u: u.raw, n: u.name, r: u.role, ts: t, t: String(text) });
+    try { LS.setItem(CK, JSON.stringify(d)); return true; } catch (e) { return false; }
+  };
+  window.afDeclineCall = function (g, cid) {
+    var u = me(); if (!u) return false;
+    var d = J(CK, {}), t = Date.now();
+    (d[g] = d[g] || []).push({ id: t * 1000 + Math.floor(Math.random() * 1000), u: u.raw, n: u.name, c: 'cd', cid: isNaN(+cid) ? cid : +cid, ts: t });
+    try { LS.setItem(CK, JSON.stringify(d)); return true; } catch (e) { return false; }
+  };
+
+  /* ===== 10) أدوات فحص ومزامنة البيانات (تظهر من إعدادات التطبيق) ===== */
   function localCounts() {
-    var db = J('alfarabi_db_v1', { accounts: [] }), sd = J(SK, {}), ch = J(CK, {}), n = 0;
+    var db = J(DBK, { accounts: [] }), sd = J(SK, {}), ch = J(CK, {}), n = 0;
     Object.keys(ch).forEach(function (g) { n += (ch[g] || []).length; });
     return { accounts: (db.accounts || []).length, students: (sd.students || []).length, teachers: (sd.teachers || []).length, groups: Object.keys(sd.groups || {}).length, messages: n };
   }
@@ -177,7 +256,7 @@
     A.showText('رفع البيانات', ok ? 'تم رفع حسابات وبيانات ومحادثات هذا الجهاز للخادم. افتح "فحص المزامنة" بعد دقيقة للتأكد.' : 'تعذّر الرفع.');
   };
 
-  /* ===== 7) فتح إعدادات التطبيق: 5 ضغطات سريعة بأعلى الشاشة ===== */
+  /* ===== 11) فتح إعدادات التطبيق: 5 ضغطات سريعة بأعلى الشاشة ===== */
   var taps = [];
   document.addEventListener('click', function (e) {
     if (e.clientY > 90) return;

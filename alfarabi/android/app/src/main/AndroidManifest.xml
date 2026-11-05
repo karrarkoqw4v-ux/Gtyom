@@ -41,6 +41,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:name=".ReplyReceiver" android:exported="false" />
+        <receiver android:name=".MuteReceiver" android:exported="false" />
+        <receiver android:name=".DeclineReceiver" android:exported="false" />
         <service
             android:name=".KeepAliveService"
             android:exported="false"

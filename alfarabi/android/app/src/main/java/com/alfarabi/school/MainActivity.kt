@@ -62,6 +62,8 @@ class MainActivity : Activity() {
     }
 
     override fun onStop() { super.onStop(); leftAt = SystemClock.elapsedRealtime() }
+    override fun onResume() { super.onResume(); WebHolder.foreground = true; Notifier.cancel(this, "call") }
+    override fun onPause() { WebHolder.foreground = false; super.onPause() }
 
     // ===== قفل البصمة =====
     private fun lock() {

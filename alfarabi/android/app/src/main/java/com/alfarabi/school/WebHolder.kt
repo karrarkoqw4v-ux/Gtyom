@@ -48,6 +48,7 @@ object WebHolder {
     var web: WebView? = null
     var fileCb: ValueCallback<Array<Uri>>? = null
     var permReq: PermissionRequest? = null
+    @Volatile var foreground = false
     private var ctx: MutableContextWrapper? = null
 
     fun prefs(c: Context) = c.getSharedPreferences("af", Context.MODE_PRIVATE)
@@ -202,6 +203,20 @@ object WebHolder {
 
         @JavascriptInterface
         fun cancelNotif(tag: String) = Notifier.cancel(app, tag)
+
+        @JavascriptInterface
+        fun isForeground(): Boolean = foreground
+
+        @JavascriptInterface
+        fun notifyCall(name: String, photo: String, cid: String, g: String) = Notifier.call(app, name, photo, cid, g)
+
+        @JavascriptInterface
+        fun notifyMessage(tag: String, conv: String, isGroup: Boolean, sender: String, photo: String, text: String, ts: Long) =
+            Notifier.message(app, tag, conv, isGroup, sender, photo, text, ts)
+
+        @JavascriptInterface
+        fun notifySchool(title: String, body: String, sub: String, tag: String, photo: String) =
+            Notifier.school(app, title, body, sub, tag, photo)
 
         @JavascriptInterface
         fun requestNotifPermission() { activity?.runOnUiThread { activity?.askNotifPermission() } }
