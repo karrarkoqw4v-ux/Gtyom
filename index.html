@@ -192,12 +192,18 @@ textarea::placeholder{color:var(--muted)}
   <h2>الإعدادات</h2>
   <label>مصدر الردود
     <select id="mode">
+      <option value="android">على الجهاز (تطبيق أندرويد)</option>
       <option value="browser">Qwen داخل المتصفح (بدون مفتاح ولا سيرفر)</option>
       <option value="anthropic">Claude (Anthropic API)</option>
       <option value="api">API متوافق مع OpenAI</option>
       <option value="local">نموذجي المحلي (server.py)</option>
     </select>
   </label>
+  <div id="fAndroid" style="display:flex;flex-direction:column;gap:14px">
+    <label>رابط ملف النموذج (.task)<input id="modelUrl" placeholder="https://.../model.task"></label>
+    <div style="display:flex;gap:8px"><button class="gbtn" id="dlModel" type="button">تنزيل النموذج</button><button class="gbtn" id="pickModel" type="button">اختيار ملف من الجهاز</button></div>
+    <p class="hint">التطبيق يشغّل النموذج على معالج جهازك مجاناً وبدون إنترنت بعد التنزيل. ممكن تنزّل أي نموذج بصيغة MediaPipe .task أو تختار ملف حملته بنفسك.</p>
+  </div>
   <div id="fBrowser" style="display:flex;flex-direction:column;gap:14px">
     <label>حجم الموديل
       <select id="bModel">
@@ -238,7 +244,7 @@ const ic=n=>`<svg><use href="#i-${n}"/></svg>`;
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
 
 let chats=LS.get('chats',[]), cur=null, busy=false, abortC=null, files=[], typing=null;
-let cfg=Object.assign({mode:'browser',wModel:'onnx-community/Qwen2.5-0.5B-Instruct',bModel:'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',anthropicUrl:'',anthropicKey:'',anthropicModel:'claude-sonnet-5-5',localUrl:'http://localhost:8000',apiUrl:'',apiKey:'',apiModel:'gpt-4o-mini',sys:'أنت مساعد ذكي ومفيد. أجب بنفس لغة المستخدم، وبالعربية الفصحى أو بلهجة المستخدم إذا كتب بلهجة، بشكل واضح ومفصّل.',lang:'ar-IQ'},LS.get('cfg',{}));
+let cfg=Object.assign({mode:(window.Android?'android':'browser'),modelUrl:'https://huggingface.co/litert-community/Qwen2.5-0.5B-Instruct/resolve/main/Qwen2.5-0.5B-Instruct_multi-prefill-seq_q8_ekv1280.task',wModel:'onnx-community/Qwen2.5-0.5B-Instruct',bModel:'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',anthropicUrl:'',anthropicKey:'',anthropicModel:'claude-sonnet-5-5',localUrl:'http://localhost:8000',apiUrl:'',apiKey:'',apiModel:'gpt-4o-mini',sys:'أنت مساعد ذكي ومفيد. أجب بنفس لغة المستخدم، وبالعربية الفصحى أو بلهجة المستخدم إذا كتب بلهجة، بشكل واضح ومفصّل.',lang:'ar-IQ'},LS.get('cfg',{}));
 const save=()=>LS.set('chats',chats);
 
 /* ---------- utils ---------- */
@@ -333,7 +339,8 @@ async function reply(c){
   const push=t=>{if(!m.content)body.classList.add('cur');m.content+=t;body.innerHTML=md(m.content);scrollDown()};
   try{
     const hist=c.msgs.map(x=>({role:x.role,content:x.content+((x.files||[]).filter(f=>f.text).map(f=>`\n\n[ملف: ${f.name}]\n${f.text}`).join(''))}));
-    if(cfg.mode==='browser')await viaBrowser(hist,push,abortC.signal,t=>{body.innerHTML='<p>'+esc(t)+'</p>'});
+    if(cfg.mode==='android'&&window.Android)await viaAndroid(hist,push,abortC.signal,t=>{body.innerHTML='<p>'+esc(t)+'</p>'});
+    else if(cfg.mode==='browser')await viaBrowser(hist,push,abortC.signal,t=>{body.innerHTML='<p>'+esc(t)+'</p>'});
     else if(cfg.mode==='api')await viaApi(hist,push,abortC.signal);
     else if(cfg.mode==='anthropic')await viaAnthropic(hist,push,abortC.signal);
     else await viaLocal(hist,push,abortC.signal);
@@ -368,6 +375,24 @@ async function viaApi(h,push,sig){
     const lines=buf.split('\n');buf=lines.pop();
     for(const l of lines){const t=l.trim();if(!t.startsWith('data:'))continue;const d=t.slice(5).trim();if(d==='[DONE]')return;
       try{const j=JSON.parse(d);const x=j.choices?.[0]?.delta?.content??j.choices?.[0]?.message?.content;if(x)push(x)}catch{}}}
+}
+let nat=null;window.__native=e=>{nat&&nat(e)};
+function nativeCall(handler,start,sig){
+  return new Promise((res,rej)=>{
+    const stop=()=>{nat=null;rej(new DOMException('','AbortError'))};
+    sig?.addEventListener('abort',stop);
+    nat=e=>{const r=handler(e);if(r==='ok'){nat=null;res()}else if(r instanceof Error){nat=null;rej(r)}};
+    try{start()}catch(x){nat=null;rej(x)}
+  });
+}
+async function viaAndroid(h,push,sig,status){
+  if(!Android.hasModel()){
+    status('جاري تنزيل النموذج...');
+    await nativeCall(e=>e.type==='dl'?(status('جاري تنزيل النموذج: '+e.pct+'%'),0):e.type==='dlok'?'ok':e.type==='err'?new Error(e.m):0,()=>Android.downloadModel(cfg.modelUrl),sig);
+  }
+  status('جاري تجهيز النموذج على جهازك...');
+  await nativeCall(e=>e.type==='tok'?(push(e.t),0):e.type==='done'?'ok':e.type==='err'?new Error(e.m):0,
+    ()=>Android.generate(JSON.stringify([{role:'system',content:cfg.sys},...h.slice(-6)])),sig);
 }
 let wgen=null;
 async function viaWasm(h,push,sig,status){
@@ -472,20 +497,25 @@ function setTheme(t){document.documentElement.dataset.theme=t;LS.set('theme',t)}
 setTheme(LS.get('theme',matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
 $('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
 
-function modeUI(){const m=$('#mode').value;$('#fBrowser').style.display=m==='browser'?'flex':'none';$('#fLocal').style.display=m==='local'?'block':'none';$('#fAnth').style.display=m==='anthropic'?'flex':'none';$('#fApi').style.display=m==='api'?'flex':'none'}
+function modeUI(){const m=$('#mode').value;$('#fAndroid').style.display=m==='android'?'flex':'none';$('#fBrowser').style.display=m==='browser'?'flex':'none';$('#fLocal').style.display=m==='local'?'block':'none';$('#fAnth').style.display=m==='anthropic'?'flex':'none';$('#fApi').style.display=m==='api'?'flex':'none'}
 $('#mode').onchange=modeUI;
 $('#openSet').onclick=()=>{
-  $('#mode').value=cfg.mode;$('#bModel').value=cfg.bModel;$('#wModel').value=cfg.wModel;$('#anthKey').value=cfg.anthropicKey;$('#anthUrl').value=cfg.anthropicUrl;$('#anthModel').value=cfg.anthropicModel;$('#localUrl').value=cfg.localUrl;$('#apiUrl').value=cfg.apiUrl;$('#apiKey').value=cfg.apiKey;
+  $('#mode').value=cfg.mode;$('#modelUrl').value=cfg.modelUrl;$('#bModel').value=cfg.bModel;$('#wModel').value=cfg.wModel;$('#anthKey').value=cfg.anthropicKey;$('#anthUrl').value=cfg.anthropicUrl;$('#anthModel').value=cfg.anthropicModel;$('#localUrl').value=cfg.localUrl;$('#apiUrl').value=cfg.apiUrl;$('#apiKey').value=cfg.apiKey;
   $('#apiModel').value=cfg.apiModel;$('#sys').value=cfg.sys;$('#lang').value=cfg.lang;modeUI();$('#modal').classList.add('on');closeSide();
 };
 $('#saveSet').onclick=()=>{
-  cfg={mode:$('#mode').value,bModel:$('#bModel').value,wModel:$('#wModel').value,anthropicKey:$('#anthKey').value.trim(),anthropicUrl:$('#anthUrl').value.trim(),anthropicModel:$('#anthModel').value.trim()||'claude-sonnet-5-5',localUrl:$('#localUrl').value.trim(),apiUrl:$('#apiUrl').value.trim(),apiKey:$('#apiKey').value.trim(),
+  cfg={mode:$('#mode').value,modelUrl:$('#modelUrl').value.trim(),bModel:$('#bModel').value,wModel:$('#wModel').value,anthropicKey:$('#anthKey').value.trim(),anthropicUrl:$('#anthUrl').value.trim(),anthropicModel:$('#anthModel').value.trim()||'claude-sonnet-5-5',localUrl:$('#localUrl').value.trim(),apiUrl:$('#apiUrl').value.trim(),apiKey:$('#apiKey').value.trim(),
     apiModel:$('#apiModel').value.trim(),sys:$('#sys').value.trim(),lang:$('#lang').value};
   LS.set('cfg',cfg);$('#modal').classList.remove('on');toast('تم الحفظ');
 };
 $('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').classList.remove('on')};
 $('#clearAll').onclick=()=>{if(confirm('حذف كل المحادثات؟')){chats=[];save();cur=null;render();renderList();$('#modal').classList.remove('on')}};
 if(mobile())side.classList.add('closed');
+$('#dlModel').onclick=async()=>{if(!window.Android){toast('هذا الزر يشتغل داخل التطبيق فقط');return}
+  cfg.modelUrl=$('#modelUrl').value.trim();LS.set('cfg',cfg);$('#modal').classList.remove('on');
+  nat=e=>{if(e.type==='dl')toast('تنزيل '+e.pct+'%');if(e.type==='dlok')toast('تم تنزيل النموذج');if(e.type==='err')toast(e.m)};Android.downloadModel(cfg.modelUrl)};
+$('#pickModel').onclick=()=>{if(!window.Android){toast('هذا الزر يشتغل داخل التطبيق فقط');return}
+  $('#modal').classList.remove('on');nat=e=>{if(e.type==='dlok')toast('تم اختيار النموذج');if(e.type==='err')toast(e.m)};Android.pickModel()};
 renderFiles();render();renderList();upd();
 </script>
 </body>
