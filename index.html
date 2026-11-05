@@ -205,6 +205,11 @@ textarea::placeholder{color:var(--muted)}
         <option value="Qwen2.5-3B-Instruct-q4f16_1-MLC">3B — أذكى (~2 GB)</option>
         <option value="Qwen2.5-7B-Instruct-q4f16_1-MLC">7B — الأذكى، للكمبيوتر القوي (~5 GB)</option>
       </select></label>
+    <label>إذا جهازك بدون WebGPU (نموذج احتياطي على المعالج)
+      <select id="wModel">
+        <option value="onnx-community/Qwen2.5-0.5B-Instruct">0.5B — الأسرع (~350 MB)</option>
+        <option value="onnx-community/Qwen2.5-1.5B-Instruct">1.5B — أذكى وأبطأ (~1 GB)</option>
+      </select></label>
     <p class="hint">أول رد ينزّل الموديل مرة وحدة ويُحفظ بجهازك، وبعدها يشتغل بدون إنترنت تقريباً. يحتاج متصفح يدعم WebGPU (Chrome حديث).</p>
   </div>
   <div id="fAnth" style="display:flex;flex-direction:column;gap:14px">
@@ -233,7 +238,7 @@ const ic=n=>`<svg><use href="#i-${n}"/></svg>`;
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
 
 let chats=LS.get('chats',[]), cur=null, busy=false, abortC=null, files=[], typing=null;
-let cfg=Object.assign({mode:'browser',bModel:'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',anthropicUrl:'',anthropicKey:'',anthropicModel:'claude-sonnet-5-5',localUrl:'http://localhost:8000',apiUrl:'',apiKey:'',apiModel:'gpt-4o-mini',sys:'أنت مساعد ذكي ومفيد. أجب بنفس لغة المستخدم، وبالعربية الفصحى أو بلهجة المستخدم إذا كتب بلهجة، بشكل واضح ومفصّل.',lang:'ar-IQ'},LS.get('cfg',{}));
+let cfg=Object.assign({mode:'browser',wModel:'onnx-community/Qwen2.5-0.5B-Instruct',bModel:'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',anthropicUrl:'',anthropicKey:'',anthropicModel:'claude-sonnet-5-5',localUrl:'http://localhost:8000',apiUrl:'',apiKey:'',apiModel:'gpt-4o-mini',sys:'أنت مساعد ذكي ومفيد. أجب بنفس لغة المستخدم، وبالعربية الفصحى أو بلهجة المستخدم إذا كتب بلهجة، بشكل واضح ومفصّل.',lang:'ar-IQ'},LS.get('cfg',{}));
 const save=()=>LS.set('chats',chats);
 
 /* ---------- utils ---------- */
@@ -364,9 +369,24 @@ async function viaApi(h,push,sig){
     for(const l of lines){const t=l.trim();if(!t.startsWith('data:'))continue;const d=t.slice(5).trim();if(d==='[DONE]')return;
       try{const j=JSON.parse(d);const x=j.choices?.[0]?.delta?.content??j.choices?.[0]?.message?.content;if(x)push(x)}catch{}}}
 }
+let wgen=null;
+async function viaWasm(h,push,sig,status){
+  if(!wgen){
+    status('جهازك لا يدعم WebGPU، فسأشغّل نموذجاً أصغر على المعالج (أبطأ). جاري تحميل المكتبة...');
+    const T=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1');
+    window._T=T;
+    wgen=await T.pipeline('text-generation',cfg.wModel,{dtype:'q4',device:'wasm',
+      progress_callback:p=>{if(p.status==='progress')status('جاري تنزيل النموذج: '+Math.round(p.progress||0)+'% ('+(p.file||'').split('/').pop()+')');}});
+  }
+  status('يفكر...');
+  const T=window._T;
+  const streamer=new T.TextStreamer(wgen.tokenizer,{skip_prompt:true,skip_special_tokens:true,
+    callback_function:t=>{if(sig.aborted)throw new DOMException('','AbortError');push(t)}});
+  await wgen([{role:'system',content:cfg.sys},...h.slice(-8)],{max_new_tokens:512,do_sample:true,temperature:0.7,top_p:0.9,streamer});
+}
 let engine=null,engineModel=null;
 async function viaBrowser(h,push,sig,status){
-  if(!navigator.gpu)throw new Error('متصفحك لا يدعم WebGPU. استخدم Chrome حديث، أو اختر مصدراً ثانياً من الإعدادات');
+  if(!navigator.gpu)return viaWasm(h,push,sig,status);
   if(!engine||engineModel!==cfg.bModel){
     status('جاري تحميل المكتبة...');
     const webllm=await import('https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.79/+esm');
@@ -455,11 +475,11 @@ $('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'
 function modeUI(){const m=$('#mode').value;$('#fBrowser').style.display=m==='browser'?'flex':'none';$('#fLocal').style.display=m==='local'?'block':'none';$('#fAnth').style.display=m==='anthropic'?'flex':'none';$('#fApi').style.display=m==='api'?'flex':'none'}
 $('#mode').onchange=modeUI;
 $('#openSet').onclick=()=>{
-  $('#mode').value=cfg.mode;$('#bModel').value=cfg.bModel;$('#anthKey').value=cfg.anthropicKey;$('#anthUrl').value=cfg.anthropicUrl;$('#anthModel').value=cfg.anthropicModel;$('#localUrl').value=cfg.localUrl;$('#apiUrl').value=cfg.apiUrl;$('#apiKey').value=cfg.apiKey;
+  $('#mode').value=cfg.mode;$('#bModel').value=cfg.bModel;$('#wModel').value=cfg.wModel;$('#anthKey').value=cfg.anthropicKey;$('#anthUrl').value=cfg.anthropicUrl;$('#anthModel').value=cfg.anthropicModel;$('#localUrl').value=cfg.localUrl;$('#apiUrl').value=cfg.apiUrl;$('#apiKey').value=cfg.apiKey;
   $('#apiModel').value=cfg.apiModel;$('#sys').value=cfg.sys;$('#lang').value=cfg.lang;modeUI();$('#modal').classList.add('on');closeSide();
 };
 $('#saveSet').onclick=()=>{
-  cfg={mode:$('#mode').value,bModel:$('#bModel').value,anthropicKey:$('#anthKey').value.trim(),anthropicUrl:$('#anthUrl').value.trim(),anthropicModel:$('#anthModel').value.trim()||'claude-sonnet-5-5',localUrl:$('#localUrl').value.trim(),apiUrl:$('#apiUrl').value.trim(),apiKey:$('#apiKey').value.trim(),
+  cfg={mode:$('#mode').value,bModel:$('#bModel').value,wModel:$('#wModel').value,anthropicKey:$('#anthKey').value.trim(),anthropicUrl:$('#anthUrl').value.trim(),anthropicModel:$('#anthModel').value.trim()||'claude-sonnet-5-5',localUrl:$('#localUrl').value.trim(),apiUrl:$('#apiUrl').value.trim(),apiKey:$('#apiKey').value.trim(),
     apiModel:$('#apiModel').value.trim(),sys:$('#sys').value.trim(),lang:$('#lang').value};
   LS.set('cfg',cfg);$('#modal').classList.remove('on');toast('تم الحفظ');
 };
