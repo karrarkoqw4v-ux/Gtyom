@@ -1,0 +1,36 @@
+name: Build Alfarabi APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/hala-yweuvu, main]
+    paths: ["alfarabi/**", ".github/workflows/alfarabi.yml"]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: 8.10.2 }
+      - name: Copy web app into assets
+        run: |
+          mkdir -p alfarabi/android/app/src/main/assets
+          cp -r alfarabi/www/. alfarabi/android/app/src/main/assets/
+      - name: Build debug APK
+        working-directory: alfarabi/android
+        run: gradle assembleDebug --no-daemon --stacktrace
+      - name: Commit APK to repo
+        run: |
+          V=$(grep -oP 'versionName = "\K[^"]+' alfarabi/android/app/build.gradle.kts)
+          mkdir -p alfarabi/dist
+          rm -f alfarabi/dist/*.apk
+          cp alfarabi/android/app/build/outputs/apk/debug/app-debug.apk "alfarabi/dist/alfarabi-v$V.apk"
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A alfarabi/dist
+          git commit -m "Build: update Alfarabi APK v$V [skip ci]" || exit 0
+          git pull --rebase origin claude/hala-yweuvu || true
+          git push

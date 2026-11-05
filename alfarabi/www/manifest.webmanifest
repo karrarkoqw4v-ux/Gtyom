@@ -1,0 +1,22 @@
+{
+  "id": "/",
+  "name": "ثانوية الفارابي الأهلية للبنين",
+  "short_name": "الفارابي",
+  "description": "بوابة ثانوية الفارابي الأهلية للبنين",
+  "lang": "ar-IQ",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f8ff",
+  "theme_color": "#0aa6f5",
+  "icons": [
+    {
+      "src": "/school-install-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
