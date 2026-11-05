@@ -198,7 +198,8 @@ textarea::placeholder{color:var(--muted)}
     </select>
   </label>
   <div id="fAnth" style="display:flex;flex-direction:column;gap:14px">
-    <label>مفتاح Anthropic API<input id="anthKey" type="password" placeholder="sk-ant-..."></label>
+    <label>رابط الـ Worker (موصى به، بدون مفتاح بالمتصفح)<input id="anthUrl" placeholder="https://xxx.workers.dev"></label>
+    <label>أو مفتاح Anthropic API مباشر<input id="anthKey" type="password" placeholder="sk-ant-..."></label>
     <label>الموديل<input id="anthModel" placeholder="claude-sonnet-5-5"></label>
   </div>
   <div id="fLocal">
@@ -222,7 +223,7 @@ const ic=n=>`<svg><use href="#i-${n}"/></svg>`;
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
 
 let chats=LS.get('chats',[]), cur=null, busy=false, abortC=null, files=[], typing=null;
-let cfg=Object.assign({mode:'anthropic',anthropicKey:'',anthropicModel:'claude-sonnet-5-5',localUrl:'http://localhost:8000',apiUrl:'',apiKey:'',apiModel:'gpt-4o-mini',sys:'أنت مساعد ذكي ومفيد.',lang:'ar-IQ'},LS.get('cfg',{}));
+let cfg=Object.assign({mode:'anthropic',anthropicUrl:'',anthropicKey:'',anthropicModel:'claude-sonnet-5-5',localUrl:'http://localhost:8000',apiUrl:'',apiKey:'',apiModel:'gpt-4o-mini',sys:'أنت مساعد ذكي ومفيد.',lang:'ar-IQ'},LS.get('cfg',{}));
 const save=()=>LS.set('chats',chats);
 
 /* ---------- utils ---------- */
@@ -353,9 +354,10 @@ async function viaApi(h,push,sig){
       try{const j=JSON.parse(d);const x=j.choices?.[0]?.delta?.content??j.choices?.[0]?.message?.content;if(x)push(x)}catch{}}}
 }
 async function viaAnthropic(h,push,sig){
-  if(!cfg.anthropicKey)throw new Error('أضف مفتاح Anthropic API من الإعدادات');
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',signal:sig,headers:{'Content-Type':'application/json','x-api-key':cfg.anthropicKey,
-    'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+  if(!cfg.anthropicUrl&&!cfg.anthropicKey)throw new Error('ضع رابط الـ Worker أو مفتاح Anthropic من الإعدادات');
+  const direct=!cfg.anthropicUrl;
+  const r=await fetch(direct?'https://api.anthropic.com/v1/messages':cfg.anthropicUrl,{method:'POST',signal:sig,headers:direct?{'Content-Type':'application/json','x-api-key':cfg.anthropicKey,
+    'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}:{'Content-Type':'application/json'},
     body:JSON.stringify({model:cfg.anthropicModel,max_tokens:4096,stream:true,system:cfg.sys,messages:h})});
   if(!r.ok)throw new Error(r.status+' '+(await r.text()).slice(0,200));
   const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
@@ -429,11 +431,11 @@ $('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'
 function modeUI(){const m=$('#mode').value;$('#fLocal').style.display=m==='local'?'block':'none';$('#fAnth').style.display=m==='anthropic'?'flex':'none';$('#fApi').style.display=m==='api'?'flex':'none'}
 $('#mode').onchange=modeUI;
 $('#openSet').onclick=()=>{
-  $('#mode').value=cfg.mode;$('#anthKey').value=cfg.anthropicKey;$('#anthModel').value=cfg.anthropicModel;$('#localUrl').value=cfg.localUrl;$('#apiUrl').value=cfg.apiUrl;$('#apiKey').value=cfg.apiKey;
+  $('#mode').value=cfg.mode;$('#anthKey').value=cfg.anthropicKey;$('#anthUrl').value=cfg.anthropicUrl;$('#anthModel').value=cfg.anthropicModel;$('#localUrl').value=cfg.localUrl;$('#apiUrl').value=cfg.apiUrl;$('#apiKey').value=cfg.apiKey;
   $('#apiModel').value=cfg.apiModel;$('#sys').value=cfg.sys;$('#lang').value=cfg.lang;modeUI();$('#modal').classList.add('on');closeSide();
 };
 $('#saveSet').onclick=()=>{
-  cfg={mode:$('#mode').value,anthropicKey:$('#anthKey').value.trim(),anthropicModel:$('#anthModel').value.trim()||'claude-sonnet-5-5',localUrl:$('#localUrl').value.trim(),apiUrl:$('#apiUrl').value.trim(),apiKey:$('#apiKey').value.trim(),
+  cfg={mode:$('#mode').value,anthropicKey:$('#anthKey').value.trim(),anthropicUrl:$('#anthUrl').value.trim(),anthropicModel:$('#anthModel').value.trim()||'claude-sonnet-5-5',localUrl:$('#localUrl').value.trim(),apiUrl:$('#apiUrl').value.trim(),apiKey:$('#apiKey').value.trim(),
     apiModel:$('#apiModel').value.trim(),sys:$('#sys').value.trim(),lang:$('#lang').value};
   LS.set('cfg',cfg);$('#modal').classList.remove('on');toast('تم الحفظ');
 };
@@ -441,7 +443,7 @@ $('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').classList.remove('o
 $('#clearAll').onclick=()=>{if(confirm('حذف كل المحادثات؟')){chats=[];save();cur=null;render();renderList();$('#modal').classList.remove('on')}};
 if(mobile())side.classList.add('closed');
 renderFiles();render();renderList();upd();
-if(cfg.mode==='anthropic'&&!cfg.anthropicKey)setTimeout(()=>{$('#openSet').click()},400);
+if(cfg.mode==='anthropic'&&!cfg.anthropicKey&&!cfg.anthropicUrl)setTimeout(()=>{$('#openSet').click()},400);
 </script>
 </body>
 </html>
