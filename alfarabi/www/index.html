@@ -2,7 +2,6 @@
 <html lang="ar" dir="rtl">
 <head>
 <script id="af-build-guard">(function(){try{var B="af-20261104y",k="af_build";if(localStorage.getItem(k)===B)return;localStorage.setItem(k,B);var p=[];if(window.caches&&caches.keys)p.push(caches.keys().then(function(a){return Promise.all(a.map(function(n){return caches.delete(n)}))}));if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)p.push(navigator.serviceWorker.getRegistrations().then(function(a){return Promise.all(a.map(function(r){return r.unregister()}))}));Promise.all(p).catch(function(){}).then(function(){if(!sessionStorage.getItem("af_rl")){sessionStorage.setItem("af_rl","1");location.reload()}})}catch(e){}})();</script>
-<script id="af-fresh-start">(function(){try{var R="fresh_shhb_20261105b";if(localStorage.getItem("alfarabi_fresh_id")===R)return;var ks=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf("alfarabi_")===0)ks.push(k)}ks.forEach(function(k){localStorage.removeItem(k)});localStorage.setItem("alfarabi_fresh_id",R);try{indexedDB.deleteDatabase("alf_keep")}catch(e){}}catch(e){}})();</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
   <meta name="theme-color" content="#0aa6f5">
@@ -1197,6 +1196,8 @@ function stream(root,fn){var cur,es=new EventSource(base+'/'+root+'.json');
  es.addEventListener('put',function(e){var m=JSON.parse(e.data);set(m.path,m.data);fn(cur)});
  es.addEventListener('patch',function(e){var m=JSON.parse(e.data);Object.keys(m.data||{}).forEach(function(k){set((m.path==='/'?'':m.path)+'/'+k,m.data[k])});fn(cur)});
  es.onopen=function(){sseOk=1;st('متصل')};es.onerror=function(){sseOk=0;st('غير متصل — أستخدم الاستعلام الدوري')}}
+window.AFPushAll=function(){try{seen.a={};seen.m={};pushAcc(J(DBK,{accounts:[]}));pushChat(J(CK,{}));pushSchool(true);return 1}catch(e){return 0}};
+window.AFSyncInfo=function(){return{base:base,hold:hold,queue:q.length,state:window.FBSTATE||''}};
 var RK='alfarabi_rec_v1';
 function applyRec(c){c=c||{};var a=Object.keys(c).map(function(k){return c[k]}).filter(Boolean);J(RK,[]).forEach(function(x){if(pend['records/r'+x.id]&&!c['r'+x.id])a.push(x)});a.sort(function(x,y){return y.ts-x.ts});var j=JSON.stringify(a);if(localStorage.getItem(RK)!==j)raw.call(localStorage,RK,j)}
 window.addRec=function(r){var a=J(RK,[]);a.unshift(r);raw.call(localStorage,RK,JSON.stringify(a));pend['records/r'+r.id]=1;put('records/r'+r.id,r)};
@@ -1205,23 +1206,11 @@ window.delRec=function(id){var a=J(RK,[]).filter(function(x){return x.id!==id});
 window.recPending=function(id){return !!pend['records/r'+id]};
 window.chatDel=function(g,id){var gk='g'+g;put('chat/'+gk+'/m'+id,null);delete seen.m[gk+'m'+id];var d=J(CK,{});d[g]=(d[g]||[]).filter(function(x){return x.id!=id});raw.call(localStorage,CK,JSON.stringify(d))};
 var RID='reset_20261025';
-function resetGate(go){var dn=null;try{dn=localStorage.getItem('alfarabi_reset_id')}catch(e){}
- if(dn===RID){go();return}
- var D=['accounts','chat','votes','records','school','push','pushmap','pushq'];
- fetch(base+'/meta/reset.json').then(function(r){return r.json()}).then(function(v){
-  if(v===RID)return;
-  return Promise.all(D.map(function(k){return fetch(base+'/'+k+'.json',{method:'DELETE'})})).then(function(){return fetch(base+'/meta/reset.json',{method:'PUT',body:JSON.stringify(RID)})})
- }).then(function(){q.length=0;Object.keys(localStorage).forEach(function(k){if(k.indexOf('alfarabi_')===0&&k!==BK)localStorage.removeItem(k)});raw.call(localStorage,'alfarabi_reset_id',RID);location.reload()})
- .catch(function(){setTimeout(function(){resetGate(go)},3000)})}
-var FR='fresh_shhb_20261105b',FRK='ffffffffffffffffffffffffffffffff';
+function resetGate(go){go()}
+
 /* تنظيف القاعدة مرة وحدة فقط: ننتظر نكتب علامة التنظيف أولاً، وإذا ما انكتبت ما نمسح شي (قبل كان كل جهاز يمسح كل شي مرة ثانية) */
-function fresh(go){var done=false;function fin(){if(done)return;done=true;hold=0;go()}var t=setTimeout(fin,8000);
- function gj(u){return fetch(base+u,{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}
- function claim(u){return fetch(base+u,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(FR)}).then(function(r){return r.ok}).catch(function(){return false})}
- Promise.all([gj('/meta/fresh.json'),gj('/devices/'+FRK+'/fr.json')]).then(function(a){if(a[0]===FR||a[1]===FR||done)return;
-  return claim('/meta/fresh.json').then(function(ok){return ok||claim('/devices/'+FRK+'/fr.json')}).then(function(ok){if(!ok)return;
-   return Promise.all(['accounts','chat','votes','records','school','push','pushmap','pushq'].map(function(k){return fetch(base+'/'+k+'.json',{method:'DELETE'}).catch(function(){})}))})
- }).catch(function(){}).then(function(){clearTimeout(t);fin()})}
+/* تعطيل مسح الخادم: كان هذا الروتين يحذف الحسابات والمحادثات والدرجات من قاعدة المدرسة عند أول تشغيل لأي جهاز جديد */
+function fresh(go){hold=0;go()}
 function waitBase(ms){return new Promise(function(res){var t0=Date.now();(function l(){if(base&&!hold)return res(base);if(Date.now()-t0>ms)return res(base&&!hold?base:null);setTimeout(l,150)})()})}
 /* جلب بيانات المدرسة/الحسابات من الخادم فوراً (للدخول من جهاز جديد قبل اكتمال المزامنة) */
 window.AFSchoolNow=function(ms){return waitBase(ms||7000).then(function(b){if(!b)return false;return fetch(b+'/school.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(c){if(c&&!dS)applySchool(c);return true})}).catch(function(){return false})};

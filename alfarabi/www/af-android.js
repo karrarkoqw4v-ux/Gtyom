@@ -140,6 +140,43 @@
   }
   setInterval(schoolTick, 4000);
 
+  /* ===== 6.5) أدوات فحص ومزامنة البيانات (تظهر من إعدادات التطبيق) ===== */
+  function localCounts() {
+    var db = J('alfarabi_db_v1', { accounts: [] }), sd = J(SK, {}), ch = J(CK, {}), n = 0;
+    Object.keys(ch).forEach(function (g) { n += (ch[g] || []).length; });
+    return { accounts: (db.accounts || []).length, students: (sd.students || []).length, teachers: (sd.teachers || []).length, groups: Object.keys(sd.groups || {}).length, messages: n };
+  }
+  window.afReport = async function () {
+    var info = (window.AFSyncInfo && window.AFSyncInfo()) || {}, base = info.base, L = localCounts();
+    var out = ['حالة الاتصال: ' + (info.state || window.FBSTATE || 'غير معروفة'), 'عناصر بانتظار الرفع: ' + (info.queue || 0), '',
+      'على هذا الجهاز:', '• حسابات: ' + L.accounts, '• طلاب: ' + L.students + '  • مدرسون: ' + L.teachers, '• مجموعات: ' + L.groups + '  • رسائل: ' + L.messages];
+    if (!base) out.push('', 'ما تم الاتصال بقاعدة بيانات المدرسة بعد.');
+    else {
+      out.push('', 'على الخادم:');
+      var items = [['accounts', 'حسابات'], ['school/students', 'طلاب'], ['school/teachers', 'مدرسون'], ['school/groups', 'مجموعات'], ['chat', 'محادثات']];
+      for (var i = 0; i < items.length; i++) {
+        try {
+          var r = await rf(base + '/' + items[i][0] + '.json?shallow=true', { cache: 'no-store' });
+          if (!r.ok) { out.push('• ' + items[i][1] + ': خطأ ' + r.status + (r.status === 401 || r.status === 403 ? ' (قواعد الحماية ترفض)' : '')); continue; }
+          var j = await r.json();
+          out.push('• ' + items[i][1] + ': ' + (j && typeof j === 'object' ? Object.keys(j).length : 0));
+        } catch (e) { out.push('• ' + items[i][1] + ': تعذّر الاتصال'); }
+      }
+    }
+    A.showText('فحص المزامنة', out.join('\n'));
+  };
+  window.afPull = async function () {
+    try {
+      await Promise.all([window.AFAccountsNow && window.AFAccountsNow(15000), window.AFSchoolNow && window.AFSchoolNow(15000)]);
+      A.showText('سحب البيانات', 'تم سحب الحسابات وبيانات المدرسة من الخادم. جاري إعادة تحميل التطبيق...');
+      setTimeout(function () { location.reload(); }, 1500);
+    } catch (e) { A.showText('سحب البيانات', 'تعذّر السحب: ' + e); }
+  };
+  window.afPush = function () {
+    var ok = window.AFPushAll && window.AFPushAll();
+    A.showText('رفع البيانات', ok ? 'تم رفع حسابات وبيانات ومحادثات هذا الجهاز للخادم. افتح "فحص المزامنة" بعد دقيقة للتأكد.' : 'تعذّر الرفع.');
+  };
+
   /* ===== 7) فتح إعدادات التطبيق: 5 ضغطات سريعة بأعلى الشاشة ===== */
   var taps = [];
   document.addEventListener('click', function (e) {

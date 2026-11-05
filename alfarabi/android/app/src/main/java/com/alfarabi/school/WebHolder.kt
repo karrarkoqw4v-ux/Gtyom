@@ -210,6 +210,19 @@ object WebHolder {
         fun getOrigin(): String = prefs(app).getString("origin", "") ?: ""
 
         @JavascriptInterface
+        fun showText(title: String, text: String) {
+            activity?.runOnUiThread {
+                val a = activity ?: return@runOnUiThread
+                val tv = android.widget.TextView(a).apply {
+                    this.text = text; textSize = 15f; setTextIsSelectable(true)
+                    val p = (16 * resources.displayMetrics.density).toInt(); setPadding(p, p, p, 0)
+                    layoutDirection = android.view.View.LAYOUT_DIRECTION_RTL
+                }
+                android.app.AlertDialog.Builder(a).setTitle(title).setView(android.widget.ScrollView(a).apply { addView(tv) }).setPositiveButton("تمام", null).show()
+            }
+        }
+
+        @JavascriptInterface
         fun openSettings() { activity?.runOnUiThread { activity?.showSettings(false) } }
 
         /** يشغّل أو يوقف الخدمة الأمامية حسب تسجيل الدخول */

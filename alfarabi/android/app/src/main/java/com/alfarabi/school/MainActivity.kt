@@ -108,6 +108,24 @@ class MainActivity : Activity() {
             text = "السماح للتطبيق بالعمل بالخلفية"
             setOnClickListener { try { startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) } catch (_: Exception) {} }
         })
+        col.addView(TextView(this).apply { text = "\nأدوات البيانات"; textSize = 13f })
+        col.addView(Button(this).apply {
+            text = "فحص المزامنة مع الخادم"
+            setOnClickListener { WebHolder.web?.evaluateJavascript("window.afReport&&afReport()", null) }
+        })
+        col.addView(Button(this).apply {
+            text = "سحب البيانات من الخادم"
+            setOnClickListener { WebHolder.web?.evaluateJavascript("window.afPull&&afPull()", null) }
+        })
+        col.addView(Button(this).apply {
+            text = "رفع بيانات هذا الجهاز للخادم (استعادة)"
+            setOnClickListener {
+                AlertDialog.Builder(this@MainActivity).setTitle("تأكيد الرفع")
+                    .setMessage("هذا يستبدل بيانات المدرسة بالخادم ببيانات هذا الجهاز. استخدمه فقط من الجهاز اللي بياناته صحيحة وكاملة، وبعد ما تسوي فحص المزامنة.")
+                    .setPositiveButton("ارفع") { _, _ -> WebHolder.web?.evaluateJavascript("window.afPush&&afPush()", null) }
+                    .setNegativeButton("إلغاء", null).show()
+            }
+        })
         col.addView(Button(this).apply {
             text = "إعدادات الإشعارات"
             setOnClickListener {
@@ -116,7 +134,7 @@ class MainActivity : Activity() {
         })
         AlertDialog.Builder(this)
             .setTitle(if (first) "إعداد التطبيق" else "إعدادات التطبيق")
-            .setView(col)
+            .setView(android.widget.ScrollView(this).apply { addView(col) })
             .setPositiveButton("حفظ") { _, _ ->
                 val o = et.text.toString().trim().trimEnd('/')
                 val changed = o != p.getString("origin", "")
