@@ -503,7 +503,8 @@
     }
     function html() {
       var c = counts();
-      return '<div class="afp-c"><h3>الموجود حالياً</h3><p>طلاب مسجلون: <b>' + c.st + '</b> • مدرسون: <b>' + c.te + '</b> • أولياء أمور: <b>' + c.pa + '</b> • رسائل المحادثات: <b>' + c.msgs + '</b></p><p>المدرسون والإدارة لا يُحذفون أبداً.</p></div>' +
+      return '<div class="afp-c"><h3>بدء قاعدة بيانات جديدة</h3><p>يمسح المستخدمين والرسائل والتسجيلات ويبدأ من الصفر. <b>الملازم ما تنمسح أبداً</b>.</p><button class="afbtn" id="cuw" style="width:100%;background:linear-gradient(135deg,#ff5d6e,#d9283d)">مسح شامل وبدء جديد</button></div>' +
+        '<div class="afp-c"><h3>الموجود حالياً</h3><p>طلاب مسجلون: <b>' + c.st + '</b> • مدرسون: <b>' + c.te + '</b> • أولياء أمور: <b>' + c.pa + '</b> • رسائل المحادثات: <b>' + c.msgs + '</b></p><p>المدرسون والإدارة لا يُحذفون أبداً.</p></div>' +
         '<div class="afp-c"><h3>خيارات التنظيف</h3>' +
         '<label class="afck"><input type="checkbox" id="cu1" checked> حذف رسائل المحادثات الأقدم من <input type="number" id="cud" class="afin" style="width:80px;display:inline-block;margin:0 6px" value="30" min="1"> يوم</label>' +
         '<label class="afck"><input type="checkbox" id="cu2"> إبقاء آخر <input type="number" id="cun" class="afin" style="width:90px;display:inline-block;margin:0 6px" value="200" min="1"> طالب مسجل فقط وحذف حسابات الباقين</label>' +
@@ -514,6 +515,7 @@
         '<div class="afp-c"><p>خطوات الأمان: 1) اضغط «نسخة احتياطية» وتنزل ملف بكل البيانات. 2) اضغط «معاينة» لتشوف كم راح يتحذف. 3) بعدها يتفعل «تنفيذ التنظيف». الحذف نهائي ويطبّق على كل الأجهزة.</p></div>';
     }
     panel(doc, 'تنظيف البيانات', html(), function (p) {
+      p.querySelector('#cuw').onclick = function () { resetPage(doc); };
       var m = p.querySelector('#cum'), x = p.querySelector('#cux'), pr = p.querySelector('#cupr'), bar = pr.firstChild;
       function msg(t, c) { m.className = 'afmsg ' + (c || ''); m.textContent = t; }
       function arm() { x.disabled = !(backed && plan && (plan.msgs.length || plan.accs.length)); }
@@ -551,6 +553,88 @@
       };
     });
   }
+
+  /* ===================== مسح شامل وبدء قاعدة بيانات جديدة (الملازم محمية) ===================== */
+  function resetPage(doc) {
+    var backed = false;
+    var html = '<div class="afp-c"><h3>ماذا تريد تمسح؟</h3>' +
+      '<label class="afck"><input type="checkbox" id="rs1" checked> كل رسائل المحادثات</label>' +
+      '<label class="afck"><input type="checkbox" id="rs2" checked> حسابات الطلاب المسجلين</label>' +
+      '<label class="afck"><input type="checkbox" id="rs3" checked> حسابات أولياء الأمور</label>' +
+      '<label class="afck"><input type="checkbox" id="rs4"> حسابات المدرسين (يرجعون يسجّلون من جديد)</label>' +
+      '<label class="afck"><input type="checkbox" id="rs5" checked> سجلات الدرجات والغيابات والتقييمات</label>' +
+      '<label class="afck"><input type="checkbox" id="rs6"> التحاضير المنشورة</label>' +
+      '<label class="afck"><input type="checkbox" id="rs7" checked> إحصائيات الاستخدام</label>' +
+      '<p style="margin-top:8px">محمي دائماً ولا ينمسح: <b>الملازم وملفاتها، وحساب الإدارة، ومعلومات المدرسة</b>.</p></div>' +
+      '<div class="afp-c"><h3>خطوات الأمان</h3><p>1) نزّل نسخة احتياطية من الخادم. 2) اكتب كلمة «مسح» للتأكيد. 3) اضغط تنفيذ.</p>' +
+      '<button class="afbtn gray" id="rsb" style="width:100%">تنزيل نسخة احتياطية</button>' +
+      '<input id="rsc" class="afin" placeholder="اكتب: مسح" style="margin-top:10px"><div class="afmsg" id="rsm"></div><div class="hdpr" id="rspr" style="display:none"><i></i></div>' +
+      '<button class="afbtn" id="rsx" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#ff5d6e,#d9283d)" disabled>تنفيذ المسح</button></div>';
+    panel(doc, 'مسح شامل', html, function (p) {
+      var m = p.querySelector('#rsm'), x = p.querySelector('#rsx'), pr = p.querySelector('#rspr'), bar = pr.firstChild, cf = p.querySelector('#rsc');
+      function msg(t, c) { m.className = 'afmsg ' + (c || ''); m.textContent = t; }
+      function arm() { x.disabled = !(backed && cf.value.trim() === 'مسح'); }
+      cf.addEventListener('input', arm);
+      function gj(path) { return fetch(window.FBBASE + path + '.json', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+      p.querySelector('#rsb').onclick = function () {
+        if (!window.FBBASE) return msg('لا يوجد اتصال بقاعدة البيانات', 'bad');
+        msg('جاري تجهيز النسخة الاحتياطية...');
+        Promise.all(['accounts', 'chat', 'records', 'plans', 'school', 'usage'].map(function (k) { return gj('/' + k).catch(function () { return null; }); })).then(function (r) {
+          var o = { when: new Date().toISOString(), accounts: r[0], chat: r[1], records: r[2], plans: r[3], school: r[4], usage: r[5] };
+          var a = doc.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o)], { type: 'application/json' })); a.download = 'alfarabi-full-backup-' + ymd(new Date()) + '.json';
+          doc.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 800); backed = true; msg('تم تنزيل النسخة الاحتياطية ✓', 'ok'); arm();
+        }).catch(function () { msg('تعذّر تجهيز النسخة', 'bad'); });
+      };
+      x.onclick = function () {
+        confirmDlg(doc, 'سيتم المسح نهائياً من كل الأجهزة. الملازم ما تنمسح. هل أنت متأكد؟', 'نعم، امسح', function () {
+          x.disabled = true; pr.style.display = 'block'; msg('جاري المسح...');
+          var roles = []; if (p.querySelector('#rs2').checked) roles.push('student'); if (p.querySelector('#rs3').checked) roles.push('parent'); if (p.querySelector('#rs4').checked) roles.push('teacher');
+          var nodes = []; if (p.querySelector('#rs1').checked) nodes.push('chat'); if (p.querySelector('#rs5').checked) { nodes.push('records'); nodes.push('plansSeen'); }
+          if (p.querySelector('#rs6').checked) nodes.push('plans'); if (p.querySelector('#rs7').checked) { nodes.push('usage'); nodes.push('usagesrc'); nodes.push('stats'); }
+          var B = window.FBBASE, jobs = [];
+          nodes.forEach(function (k) { jobs.push(function () { return fetch(B + '/' + k + '.json', { method: 'DELETE' }); }); });
+          var accP = roles.length ? gj('/accounts').catch(function () { return null; }) : Promise.resolve(null);
+          accP.then(function (accs) {
+            Object.keys(accs || {}).forEach(function (k) { var a = accs[k]; if (a && roles.indexOf(a.role) > -1) jobs.push(function () { return fetch(B + '/accounts/' + k + '.json', { method: 'DELETE' }); }); });
+            var total = jobs.length, done = 0, i = 0, fail = 0;
+            function w() { if (i >= jobs.length) return Promise.resolve(); var j = jobs[i++]; return j().then(function (r) { if (r && !r.ok) fail++; }, function () { fail++; }).then(function () { done++; bar.style.width = (total ? done / total * 100 : 100) + '%'; return w(); }); }
+            var ws = []; for (var q = 0; q < 6; q++) ws.push(w());
+            return Promise.all(ws).then(function () { return fail; });
+          }).then(function (fail) {
+            var mk = { ts: Date.now(), roles: roles, chat: nodes.indexOf('chat') > -1, records: nodes.indexOf('records') > -1 };
+            return fetch(B + '/config/reset.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mk) }).then(function () { applyReset(mk); return fail; });
+          }).then(function (fail) { bar.style.width = '100%'; msg(fail ? 'تم المسح مع ' + fail + ' عنصر ما انحذف (راجع القواعد).' : 'تم المسح وبدأت قاعدة بيانات جديدة ✓', fail ? 'bad' : 'ok'); })
+            .catch(function (e) { msg('تعذّر المسح: ' + (e && e.message || e), 'bad'); });
+        });
+      };
+    });
+  }
+  /* تنظيف النسخ المحلية على الأجهزة بعد المسح الشامل */
+  function applyReset(mk) {
+    try {
+      if (mk.chat) LS.removeItem('alfarabi_chat_v2');
+      if (mk.records) LS.removeItem('alfarabi_rec_v1');
+      var db = J('alfarabi_db_v1', null);
+      if (db && db.accounts && mk.roles && mk.roles.length) { db.accounts = db.accounts.filter(function (a) { return mk.roles.indexOf(a.role) < 0; }); LS.setItem('alfarabi_db_v1', JSON.stringify(db)); }
+      var se = J('alfarabi_sess_acc', null);
+      if (se && mk.roles && mk.roles.indexOf(se.role) > -1) LS.removeItem('alfarabi_sess_acc');
+    } catch (e) { }
+  }
+  (function () {
+    if (!g('af_reset_first', '')) s('af_reset_first', String(Date.now()));
+    function chk() {
+      if (!window.FBBASE || document.hidden) return;
+      fetch(window.FBBASE + '/config/reset.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (mk) {
+        if (!mk || !mk.ts) return;
+        var seen = +g('af_reset_seen', '0') || 0;
+        if (mk.ts <= seen) return;
+        s('af_reset_seen', String(mk.ts));
+        if (mk.ts <= (+g('af_reset_first', '0') || 0)) return;   // جهاز جديد بعد المسح
+        applyReset(mk); try { location.reload(); } catch (e) { }
+      }).catch(function () { });
+    }
+    setTimeout(chk, 9000); setInterval(chk, 5 * 60 * 1000);
+  })();
   function confirmDlg(doc, msg, okText, cb) {
     var o = doc.createElement('div'); o.className = 'afcf';
     o.innerHTML = '<div class="afcf-b"><p>' + esc(msg) + '</p><div><button class="afbtn gray" data-n>إلغاء</button><button class="afbtn" style="background:linear-gradient(135deg,#ff5d6e,#d9283d)" data-y>' + esc(okText) + '</button></div></div>';
@@ -607,7 +691,7 @@
     setTimeout(function () { tick(); setInterval(tick, 5000); }, 4000);
   })();
 
-  window.AFX = { panel: function (d, t, h, b) { return panel(d, t, h, b, true); }, esc: esc, on: on, roleInfo: function () { return roleInfo(); }, J: J };
+  window.AFX = { cleanup: cleanupPage, reset: resetPage, panel: function (d, t, h, b) { return panel(d, t, h, b, true); }, esc: esc, on: on, roleInfo: function () { return roleInfo(); }, J: J };
 
   /* ===================== إدراج الأزرار بقائمة الإعدادات ===================== */
   function injectEntries(doc) {

@@ -3,7 +3,7 @@
   'use strict';
   var A = window.Android;
   if (!A || !window.AFX) return;
-  var X = window.AFX, esc = X.esc, CHUNK = 700 * 1024, MAXMB = 300;
+  var X = window.AFX, esc = X.esc, CHUNK = 1536 * 1024, MAXMB = 300;
   var CATS = ['ملزمة منهجية', 'ملزمة اختبارات', 'ملزمة مراجعة', 'أسئلة وزارية', 'أخرى'];
 
   /* ---------- شبكة (قاعدة بيانات المدرسة) ---------- */
@@ -247,8 +247,11 @@
   /* ---------- رفع الملف ---------- */
   function readSlice(file, a, b) { return new Promise(function (res, rej) { var fr = new FileReader(); fr.onload = function () { res(String(fr.result).split(',')[1] || ''); }; fr.onerror = function () { rej(new Error('تعذّرت قراءة الملف')); }; fr.readAsDataURL(file.slice(a, b)); }); }
   function coverFrom(file) {
-    return file.arrayBuffer().then(function (buf) {
-      return loadPdf().then(function (lib) { return lib.getDocument({ data: buf }).promise; });
+    return loadPdf().then(function (lib) {
+      var u = URL.createObjectURL(file);
+      return lib.getDocument({ url: u, disableAutoFetch: true, disableStream: false, rangeChunkSize: 262144 }).promise.catch(function () {
+        return file.arrayBuffer().then(function (buf) { return lib.getDocument({ data: buf }).promise; });
+      });
     }).then(function (pdf) {
       return pdf.getPage(1).then(function (pg) {
         var v0 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: 240 / v0.width }), cv = document.createElement('canvas'); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
@@ -257,12 +260,18 @@
     });
   }
   function uploadPdf(file, id, onProg) {
-    var n = Math.ceil(file.size / CHUNK), i = 0;
-    function next() {
-      if (i >= n) return Promise.resolve(n);
-      return readSlice(file, i * CHUNK, Math.min(file.size, (i + 1) * CHUNK)).then(function (b64) { return putJ('/handout_files/' + id + '/c' + i + '.json', b64); }).then(function () { i++; onProg(i / n); return next(); });
+    var n = Math.ceil(file.size / CHUNK), next = 0, done = 0, failed = null, W = 6;
+    function one(i, tries) {
+      return readSlice(file, i * CHUNK, Math.min(file.size, (i + 1) * CHUNK)).then(function (b64) { return putJ('/handout_files/' + id + '/c' + i + '.json', b64); })
+        .catch(function (e) { if (tries > 0) return one(i, tries - 1); throw e; });
     }
-    return next();
+    function worker() {
+      if (failed || next >= n) return Promise.resolve();
+      var i = next++;
+      return one(i, 2).then(function () { done++; onProg(done / n); return worker(); }, function (e) { failed = e; throw e; });
+    }
+    var ws = []; for (var k = 0; k < Math.min(W, n); k++) ws.push(worker());
+    return Promise.all(ws).then(function () { return n; });
   }
   function coverFile(f) {
     return new Promise(function (res) {
@@ -299,8 +308,10 @@
         }
         var id = 'h' + Date.now(), rec;
         msg('جاري فحص الملف...'); bar.style.width = '4%';
-        coverFrom(pf).then(function (c) { rec = c; return cf ? coverFile(cf).then(function (x) { if (x) rec.cover = x; }) : null; })
-          .then(function () { msg('جاري رفع الملزمة... لا تغلق الصفحة'); return uploadPdf(pf, id, function (f) { bar.style.width = (8 + f * 90) + '%'; }); })
+        msg('جاري رفع الملزمة... لا تغلق الصفحة');
+        var coverP = coverFrom(pf).then(function (c) { rec = c; return cf ? coverFile(cf).then(function (x) { if (x) rec.cover = x; }) : null; });
+        var upP = uploadPdf(pf, id, function (f) { bar.style.width = (8 + f * 88) + '%'; });
+        Promise.all([coverP, upP]).then(function (r) { return r[1]; })
           .then(function (n) { var meta = { id: id, name: name, teacher: teacher, cat: cat, grade: '3', upd: upd, cover: rec.cover, pages: rec.pages, size: pf.size, chunks: n, by: R.uid, byName: R.name }; return putJ('/handouts/' + id + '.json', meta); })
           .then(function () { bar.style.width = '100%'; msg('تم رفع الملزمة بنجاح ✓', 'ok'); setTimeout(function () { p.remove(); done(); }, 700); })
           .catch(function (e) { go.disabled = false; pr.style.display = 'none'; delP('/handout_files/' + id + '.json').catch(function () {}); msg('تعذّر الرفع: ' + (e && e.message || e) + '. تأكد من الملف ومن قواعد قاعدة البيانات.', 'bad'); });
