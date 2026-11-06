@@ -18,8 +18,8 @@
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var I = {
-    and: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0v7a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 17z"/><path d="M8.5 4.5 7 2.5M15.5 4.5 17 2.5"/><circle cx="9.5" cy="9" r=".6" fill="currentColor"/><circle cx="14.5" cy="9" r=".6" fill="currentColor"/><path d="M3.5 11v5M20.5 11v5"/></svg>',
-    app: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3c0 1.6-1.2 3-2.8 3.2C13.5 4.6 14.800 3.200 16.500 3z"/><path d="M12 7.500c1-.7 2-1 3-1 1.600 0 2.800.8 3.500 1.800-2.800 1.600-2.400 5.400.4 6.600-.7 2-2.200 4.100-3.700 4.100-1 0-1.300-.6-2.500-.6s-1.600.6-2.500.6c-1.600 0-4.200-3.200-4.200-6.700 0-2.700 1.800-4.500 3.800-4.500.9 0 1.700.4 2.200.7z"/></svg>',
+    and: '<svg viewBox="0 0 24 24"><path fill="#3DDC84" d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4483-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993 0 .5511-.4483.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3435-4.1021-2.6892-7.5743-6.1185-9.4396"/></svg>',
+    app: '<svg viewBox="0 0 24 24"><path fill="#000" d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>',
     apk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>',
     web: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.500 2.500 3.500 5.500 3.500 9S14.500 18.500 12 21c-2.500-2.500-3.500-5.500-3.500-9S9.500 5.500 12 3z"/></svg>',
     shr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0L8 7m4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>',
@@ -46,14 +46,17 @@
     '#afl .sn{font-size:18px;font-weight:800;color:#14213d}',
     '#afl .ds{font-size:13.5px;color:#4b5b78;margin:8px 4px 18px;line-height:1.8}',
     '#afl .bt{width:100%;display:flex;align-items:center;gap:12px;border:0;border-radius:18px;padding:14px 16px;margin:0 0 11px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;text-align:right;position:relative}',
-    '#afl .bt svg{width:28px;height:28px;flex:none}',
+    '#afl .bt svg{width:30px;height:30px;flex:none}',
+    '#afl .bt .lg2{width:46px;height:46px;border-radius:14px;background:#fff;display:grid;place-items:center;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.15)}',
+    '#afl .bt .lg2 svg{width:28px;height:28px}',
     '#afl .bt .t{flex:1;min-width:0}',
     '#afl .bt small{display:block;font-size:12px;font-weight:600;opacity:.85;margin-top:1px}',
     '#afl .bt:active{transform:scale(.98)}',
     '#afl .a{background:linear-gradient(135deg,#0aa6f5,#2a7de1);color:#fff;box-shadow:0 8px 20px rgba(10,166,245,.38)}',
-    '#afl .i{background:linear-gradient(135deg,#1f2a44,#14213d);color:#fff;box-shadow:0 8px 20px rgba(20,33,61,.3)}',
+    '#afl .i{background:#fff;color:#000;border:2px solid #14213d;box-shadow:0 8px 20px rgba(20,33,61,.18)}',
     '#afl .y{background:linear-gradient(135deg,#ffe066,#ffc107);color:#14213d;box-shadow:0 8px 20px rgba(255,193,7,.4)}',
     '#afl .g{background:rgba(255,255,255,.45);color:#7b88a3;border:1.5px dashed #b8c6df;cursor:default;box-shadow:none}',
+    '#afl .g .lg2{background:rgba(255,255,255,.7);opacity:.6;box-shadow:none}',
     '#afl .g .bd{background:rgba(20,33,61,.08);color:#5a6b8c;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;white-space:nowrap}',
     '#afl .you{position:absolute;top:-9px;left:14px;background:#ffc107;color:#14213d;font-size:11px;font-weight:800;border-radius:999px;padding:2px 10px}',
     '#afl .sk{background:none;border:0;color:#2a7de1;font:inherit;font-size:14px;font-weight:700;padding:10px;cursor:pointer;text-decoration:underline;text-underline-offset:4px}',
@@ -87,6 +90,11 @@
     '#afl .dc{background:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.95);border-radius:26px;padding:18px 16px;box-shadow:0 12px 36px rgba(30,100,170,.12);margin-bottom:14px}',
     '#afl .dc h3{margin:0 0 4px;font-size:19px;text-align:center;color:#14213d;font-weight:800}',
     '#afl .dc .sb2{margin:0 0 12px;text-align:center;font-size:13px;color:#5a6b8c}',
+    '#afl .lb{font-size:12.5px;font-weight:800;color:#5a6b8c;margin:8px 4px 6px;text-align:right}',
+    '#afl .gd{display:grid;gap:8px}#afl .g3{grid-template-columns:repeat(3,1fr)}#afl .g2{grid-template-columns:repeat(2,1fr)}',
+    '#afl .gd button{border:2px solid #e1e8f4;background:#f6f9fd;color:#14213d;border-radius:14px;padding:10px 4px;font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;line-height:1.4}',
+    '#afl .gd button.on{background:linear-gradient(135deg,#0aa6f5,#2a7de1);border-color:transparent;color:#fff}',
+    '#afl .gd.r button.on{background:linear-gradient(135deg,#ffe066,#ffc107);color:#14213d}',
     '#afl .ch{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:0 0 10px}',
     '#afl .ch button{border:2px solid #e1e8f4;background:#f6f9fd;color:#14213d;border-radius:999px;padding:7px 14px;font:inherit;font-size:13.5px;font-weight:800;cursor:pointer}',
     '#afl .ch button.on{background:linear-gradient(135deg,#0aa6f5,#2a7de1);border-color:transparent;color:#fff}',
@@ -111,29 +119,30 @@
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<div class="hi">أهلاً وسهلاً</div><h1>ترحب بكم</h1><div class="sn">ثانوية الفارابي الأهلية للبنين</div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
-    '<button class="bt a" data-a="and">' + (isAnd ? badge('جهازك') : '') + I.and + '<span class="t">تثبيت كتطبيق Android<small>ملف APK أو من المتصفح</small></span></button>' +
-    '<button class="bt i" data-a="ios">' + (isIOS ? badge('جهازك') : '') + I.app + '<span class="t">تثبيت كتطبيق Apple<small>iPhone و iPad من سفاري</small></span></button>' +
-    '<div class="bt g">' + I.app + '<span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
+    '<button class="bt a" data-a="and">' + (isAnd ? badge('جهازك') : '') + '<span class="lg2">' + I.and + '</span>' + '<span class="t">تثبيت كتطبيق Android<small>ملف APK أو من المتصفح</small></span></button>' +
+    '<button class="bt i" data-a="ios">' + (isIOS ? badge('جهازك') : '') + '<span class="lg2">' + I.app + '</span>' + '<span class="t">تثبيت كتطبيق Apple<small>iPhone و iPad من سفاري</small></span></button>' +
+    '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
     '<button class="sk" data-a="go">المتابعة من المتصفح بدون تثبيت</button>' +
     '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div>' +
     '</div><div class="doc" id="afdoc"></div></div>';
 
 
-  var STAGES = [['m1', 'أول متوسط'], ['m2', 'ثاني متوسط'], ['m3', 'ثالث متوسط'], ['prep', 'الإعدادية']];
+  var STM = [['m1', 'أول متوسط'], ['m2', 'ثاني متوسط'], ['m3', 'ثالث متوسط']], STP = [['p4', 'الرابع العلمي'], ['p5', 'الخامس العلمي']];
   var ROLES = [['st', 'طالب'], ['pa', 'ولي الأمر'], ['te', 'كادر التدريس']];
-  var GN = { m1: 'أول متوسط', m2: 'ثاني متوسط', m3: 'ثالث متوسط', prep: 'الرابع العلمي أو الخامس العلمي' };
+  var GN = { m1: 'أول متوسط', m2: 'ثاني متوسط', m3: 'ثالث متوسط', p4: 'الرابع العلمي', p5: 'الخامس العلمي' };
+  function isPrep(st) { return st === 'p4' || st === 'p5'; }
   function steps(role, stage) {
     var g = GN[stage];
-    if (role === 'st') return ['اذا كنت طالباً، اختر «طالب» من صفحة الدخول (المرحلة ' + (stage === 'prep' ? 'الإعدادية' : 'المتوسطة') + ').', 'قم بإدخال اسمك الثلاثي.', 'قم بإدخال معرّف حسابك من خلال بطاقة المدرسة.', 'قم بإدخال كلمة السر.', 'حدّد الصف: <b>' + g + '</b>.', 'اضغط «موافقة والتالي».', 'أو استخدم «عبر معرّف حسابي»: امسح باركود البطاقة بالكاميرا وسجّل مباشرة.'];
-    if (role === 'pa') return ['اختر «ولي الأمر» من صفحة الدخول (المرحلة ' + (stage === 'prep' ? 'الإعدادية' : 'المتوسطة') + ').', 'اكتب اسمك واسم ابنك الثلاثي.', 'حدّد صف الابن: <b>' + g + '</b>.', 'أكمل رقم الهاتف إذا طُلب منك.', 'اضغط «موافق ومتابعة»، وتظهر لك تفاصيل ابنك.'];
-    return ['اختر «كادر التدريس» من صفحة الدخول (المرحلة ' + (stage === 'prep' ? 'الإعدادية' : 'المتوسطة') + ').', 'اكتب اسمك الثلاثي ومعرّف حساب المدرس.', 'اختر الصف الذي تدرّسه: <b>' + g + '</b>، ثم اختر المادة.', 'اضغط «تحقق»، وبعد نجاح التحقق تدخل لحسابك وتبدأ بالتحاضير والرسائل.'];
+    if (role === 'st') return ['اذا كنت طالباً، اختر «طالب» من صفحة الدخول (المرحلة ' + (isPrep(stage) ? 'الإعدادية' : 'المتوسطة') + ').', 'قم بإدخال اسمك الثلاثي.', 'قم بإدخال معرّف حسابك من خلال بطاقة المدرسة.', 'قم بإدخال كلمة السر.', 'حدّد الصف: <b>' + g + '</b>.', 'اضغط «موافقة والتالي».', 'أو استخدم «عبر معرّف حسابي»: امسح باركود البطاقة بالكاميرا وسجّل مباشرة.'];
+    if (role === 'pa') return ['اختر «ولي الأمر» من صفحة الدخول (المرحلة ' + (isPrep(stage) ? 'الإعدادية' : 'المتوسطة') + ').', 'اكتب اسمك واسم ابنك الثلاثي.', 'حدّد صف الابن: <b>' + g + '</b>.', 'أكمل رقم الهاتف إذا طُلب منك.', 'اضغط «موافق ومتابعة»، وتظهر لك تفاصيل ابنك.'];
+    return ['اختر «كادر التدريس» من صفحة الدخول (المرحلة ' + (isPrep(stage) ? 'الإعدادية' : 'المتوسطة') + ').', 'اكتب اسمك الثلاثي ومعرّف حساب المدرس.', 'اختر الصف الذي تدرّسه: <b>' + g + '</b>، ثم اختر المادة.', 'اضغط «تحقق»، وبعد نجاح التحقق تدخل لحسابك وتبدأ بالتحاضير والرسائل.'];
   }
   var dst = 'm3', drl = 'st';
   function docHtml() {
-    var sc = STAGES.map(function (x) { return '<button data-s="' + x[0] + '"' + (x[0] === dst ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('');
+    function chips(a) { return a.map(function (x) { return '<button data-s="' + x[0] + '"' + (x[0] === dst ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join(''); }
     var rc = ROLES.map(function (x) { return '<button data-r="' + x[0] + '"' + (x[0] === drl ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('');
     return '<div class="dc"><h3>شروط الاستخدام وطريقة التسجيل</h3><p class="sb2">اختر صفك ثم نوع حسابك</p>' +
-      '<div class="ch" id="afsc">' + sc + '</div><div class="ch r" id="afrc">' + rc + '</div>' +
+      '<div class="lb">المرحلة المتوسطة</div><div class="gd g3">' + chips(STM) + '</div><div class="lb">المرحلة الإعدادية</div><div class="gd g2">' + chips(STP) + '</div><div class="lb">نوع الحساب</div><div class="gd g3 r">' + rc + '</div>' +
       '<ol class="st">' + steps(drl, dst).map(function (t) { return '<li><span>' + t + '</span></li>'; }).join('') + '</ol>' +
       '<div class="nt">المعرّف وكلمة السر تستلمهما من بطاقة المدرسة. إذا واجهتك مشكلة بالدخول راجع دعم المدرسة من صفحة الدخول.</div></div>' +
       '<div class="dc cr"><div class="ln"></div>تم تطوير التطبيق من الإدارة المحترمة، ومن الأساتذة كادر التدريس المحترم.<br><b>المشرف:</b> الأستاذ زين العابدين<br><b>المصمم:</b> كرار حيدر</div>';
