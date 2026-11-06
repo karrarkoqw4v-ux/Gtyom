@@ -40,6 +40,7 @@ class MainActivity : Activity() {
         val web = WebHolder.obtain(application, this)
         (web.parent as? ViewGroup)?.removeView(web)
         root.addView(web, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        applyBars(WebHolder.prefs(this).getBoolean("dark", false))
         onIntent(intent)
         firstRun = !WebHolder.prefs(this).getBoolean("setup", false)
         if (firstRun) { WebHolder.prefs(this).edit().putBoolean("setup", true).apply(); askNotifPermission(true) }
@@ -65,12 +66,43 @@ class MainActivity : Activity() {
     override fun onResume() { super.onResume(); WebHolder.foreground = true; Notifier.cancel(this, "call") }
     override fun onPause() { WebHolder.foreground = false; super.onPause() }
 
+    // ===== لون الشريطين (أعلى وأسفل الجهاز) نفس لون التطبيق =====
+    fun applyBars(dark: Boolean) {
+        WebHolder.prefs(this).edit().putBoolean("dark", dark).apply()
+        val c = if (dark) 0xFF08101D.toInt() else 0xFFFFFFFF.toInt()
+        window.statusBarColor = c
+        window.navigationBarColor = c
+        var f = window.decorView.systemUiVisibility
+        f = if (dark) f and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() else f or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        if (Build.VERSION.SDK_INT >= 26) f = if (dark) f and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv() else f or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        window.decorView.systemUiVisibility = f
+        root.setBackgroundColor(c)
+        WebHolder.web?.setBackgroundColor(c)
+    }
+
     // ===== قفل البصمة =====
     private fun lock() {
         showCover()
         if (locking) return
         locking = true
-        Bio.prompt(this, onOk = { locking = false; unlocked = true; hideCover() }, onFail = { locking = false })
+        // ننتظر شوية حتى تكمل الشاشة ظهورها، وإلا النظام يلغي نافذة البصمة
+        root.postDelayed({
+            if (isFinishing) { locking = false; return@postDelayed }
+            Bio.prompt(this, onOk = { locking = false; unlocked = true; hideCover() }, onFail = { locking = false })
+        }, 350)
+    }
+
+    /** تفعيل أو إيقاف القفل: نتأكد أن البصمة تشتغل قبل ما نفعّله حتى ما ينقفل التطبيق على أحد */
+    fun setBioLock(on: Boolean) {
+        val p = WebHolder.prefs(this)
+        if (!on) { p.edit().putBoolean("bio", false).apply(); return }
+        if (!Bio.available(this)) { jsBio(false, "البصمة غير متوفرة بالجهاز"); return }
+        Bio.prompt(this, onOk = { p.edit().putBoolean("bio", true).apply(); unlocked = true; jsBio(true, "تم تفعيل القفل بالبصمة") },
+            onFail = { m -> jsBio(false, if (m == "cancel") "انلغى التحقق" else "ما تم التحقق: $m") })
+    }
+
+    private fun jsBio(ok: Boolean, msg: String) {
+        runOnUiThread { WebHolder.web?.evaluateJavascript("window.__afBio&&__afBio($ok,${org.json.JSONObject.quote(msg)})", null) }
     }
 
     private fun showCover() {

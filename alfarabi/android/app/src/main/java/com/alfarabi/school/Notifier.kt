@@ -28,7 +28,7 @@ object Notifier {
     const val CH_MSG = "af_msg"
     const val CH_CALL = "af_call"
     const val CH_SCHOOL = "af_school"
-    const val CH_KEEP = "af_keep"
+    const val CH_KEEP = "af_keep2"
     const val ID_KEEP = 7
     const val ID_SUMMARY = 9
     const val ID_CALL = 8
@@ -48,6 +48,7 @@ object Notifier {
     fun init(c: Context) {
         if (Build.VERSION.SDK_INT < 26) return
         val m = nm(c)
+        try { m.deleteNotificationChannel("af_keep") } catch (_: Throwable) {}
         m.createNotificationChannel(NotificationChannel(CH_MSG, "الرسائل والمجموعات", NotificationManager.IMPORTANCE_HIGH).apply {
             description = "رسائل المحادثات والمجموعات وقنوات المدرسين"; enableVibration(true); lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         })
@@ -63,7 +64,7 @@ object Notifier {
         m.createNotificationChannel(NotificationChannel(CH_SCHOOL, "إعلانات المدرسة", NotificationManager.IMPORTANCE_DEFAULT).apply {
             description = "الإعلانات والتحاضير والدرجات والغيابات"
         })
-        m.createNotificationChannel(NotificationChannel(CH_KEEP, "حالة التطبيق", NotificationManager.IMPORTANCE_MIN).apply {
+        m.createNotificationChannel(NotificationChannel(CH_KEEP, "خدمة الخلفية", NotificationManager.IMPORTANCE_NONE).apply {
             description = "يبقي التطبيق متصلاً لاستقبال الإشعارات"; setShowBadge(false)
         })
     }
@@ -287,7 +288,7 @@ object Notifier {
         return builder(c, CH_KEEP)
             .setSmallIcon(R.drawable.ic_stat_school)
             .setContentTitle("ثانوية الفارابي")
-            .setContentText("متصل لاستقبال الرسائل والإشعارات")
+            .setContentText("")
             .setOngoing(true)
             .setShowWhen(false)
             .setContentIntent(openApp(c, "keep", ""))

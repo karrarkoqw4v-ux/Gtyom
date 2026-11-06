@@ -240,16 +240,53 @@ object WebHolder {
         @JavascriptInterface
         fun openSettings() { activity?.runOnUiThread { activity?.showSettings(false) } }
 
-        /** يشغّل أو يوقف الخدمة الأمامية حسب تسجيل الدخول */
+        /** يحفظ هوية المستخدم ويشغّل خدمة الخلفية (أو يوقفها عند تسجيل الخروج) */
         @JavascriptInterface
-        fun session(uid: String) {
+        fun session(uid: String, role: String, grade: String, name: String, child: String) {
+            val pr = prefs(app).edit()
+            if (uid.isEmpty()) pr.remove("u_uid").remove("u_role").remove("u_grade").remove("u_name").remove("u_child")
+            else pr.putString("u_uid", uid).putString("u_role", role).putString("u_grade", grade).putString("u_name", name).putString("u_child", child)
+            pr.apply()
             try {
                 if (uid.isNotEmpty()) {
                     val i = Intent(app, KeepAliveService::class.java)
                     if (Build.VERSION.SDK_INT >= 26) app.startForegroundService(i) else app.startService(i)
-                } else app.stopService(Intent(app, KeepAliveService::class.java))
+                } else { Sync.stop(); app.stopService(Intent(app, KeepAliveService::class.java)) }
             } catch (_: Throwable) {}
         }
+
+        @JavascriptInterface
+        fun setBase(url: String) { if (url.startsWith("http")) prefs(app).edit().putString("base", url).apply() }
+
+        /** هل مزامنة الخلفية الأصلية شغالة؟ إذا نعم الصفحة ما ترسل إشعارات حتى ما تتكرر */
+        @JavascriptInterface
+        fun nativeSync(): Boolean = Sync.healthy()
+
+        /** اسم الجهاز الحقيقي (الموديل + الاسم اللي حطه المستخدم للجهاز) */
+        @JavascriptInterface
+        fun deviceInfo(): String {
+            val model = (Build.MANUFACTURER.replaceFirstChar { it.uppercase() } + " " + Build.MODEL).trim()
+            val user = try { android.provider.Settings.Global.getString(app.contentResolver, "device_name") } catch (_: Throwable) { null }
+            val name = if (!user.isNullOrBlank() && !model.contains(user, true)) "$model ($user)" else model
+            return JSONObject().put("name", name).put("model", Build.MODEL).put("brand", Build.MANUFACTURER).put("os", Build.VERSION.RELEASE).toString()
+        }
+
+        /** معرّف ثابت للجهاز (يبقى نفسه بعد تحديث التطبيق) حتى يتعرف عليه الخادم */
+        @JavascriptInterface
+        fun deviceToken(): String {
+            val id = android.provider.Settings.Secure.getString(app.contentResolver, "android_id") ?: Build.FINGERPRINT
+            val d = java.security.MessageDigest.getInstance("SHA-256").digest(("$id|alfarabi|v1").toByteArray())
+            return d.joinToString("") { "%02x".format(it) }.substring(0, 32)
+        }
+
+        @JavascriptInterface
+        fun setBars(dark: Boolean) { activity?.runOnUiThread { activity?.applyBars(dark) } ?: prefs(app).edit().putBoolean("dark", dark).apply() }
+
+        @JavascriptInterface
+        fun bioState(): String = JSONObject().put("available", Bio.available(app)).put("enabled", prefs(app).getBoolean("bio", false) && Bio.available(app)).toString()
+
+        @JavascriptInterface
+        fun setBio(on: Boolean) { activity?.runOnUiThread { activity?.setBioLock(on) } }
 
         /** وسيط لطلبات الصفحة لخادم المدرسة (رفع الصور والإشعارات) */
         @JavascriptInterface

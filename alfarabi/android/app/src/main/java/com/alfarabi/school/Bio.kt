@@ -17,7 +17,7 @@ object Bio {
         if (Build.VERSION.SDK_INT < 28) return false
         if (Build.VERSION.SDK_INT >= 30) {
             val bm = c.getSystemService(BiometricManager::class.java) ?: return false
-            return bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS
+            return bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS
         }
         return c.packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)
     }
@@ -26,7 +26,7 @@ object Bio {
         try {
             val b = BiometricPrompt.Builder(act).setTitle("ثانوية الفارابي").setSubtitle("افتح التطبيق بالبصمة")
             if (Build.VERSION.SDK_INT >= 30) {
-                b.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+                b.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             } else {
                 b.setNegativeButton("إلغاء", act.mainExecutor) { _, _ -> onFail("cancel") }
             }
