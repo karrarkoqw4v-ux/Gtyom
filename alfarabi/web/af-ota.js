@@ -5,6 +5,7 @@
   var A = window.Android, X = window.AFX;
   if (!A) return;
   var PUB = {"kty":"EC","x":"9IvmMNuga6JvjOjjBUFq4MYBDfjhllaUD8rByaS5iD0","y":"JyAh6qs9loudQZR3OnaSysYMTcy7vpZ-FuhME4BnpF8","crv":"P-256"};
+  var UIV = '2026.11.06-j';
   var CHUNK = 700 * 1024, MAXB = 25 * 1024 * 1024;
   var isApp = !!(A.otaBegin) && !A.__web;
   function base() { return window.FBBASE || ''; }
@@ -118,7 +119,7 @@
     var esc = X.esc;
     function html() {
       var hasKey = !!getKey();
-      return '<div class="afp-c"><h3>مفتاح التحديث</h3><p>' + (hasKey ? 'المفتاح مُفعّل على هذا الجهاز ✓' : 'لإرسال تحديث لازم تستورد ملف المفتاح (alfarabi-update-key.json) مرة وحدة على هذا الجهاز.') + '</p><input type="file" id="mkf" accept=".json,application/json" style="width:100%;margin-top:8px"></div>' +
+      return '<div class="afp-c"><h3>نسخة ملفات الواجهة: ' + UIV + '</h3><p>هذا رقم النسخة المحمّلة على هذا الجهاز. بعد وصول التحديث يتغيّر الرقم.</p></div><div class="afp-c"><h3>مفتاح التحديث</h3><p>' + (hasKey ? 'المفتاح مُفعّل على هذا الجهاز ✓' : 'لإرسال تحديث لازم تستورد ملف المفتاح (alfarabi-update-key.json) مرة وحدة على هذا الجهاز.') + '</p><input type="file" id="mkf" accept=".json,application/json" style="width:100%;margin-top:8px"></div>' +
         '<div class="afp-c"><h3>إرسال تحديث للجميع</h3><p>ارفع ملف ZIP يحتوي ملفات الواجهة الجديدة، ويوصل لكل الأجهزة المثبّت عليها التطبيق خلال دقائق.</p>' +
         '<input type="file" id="mzf" accept=".zip,application/zip" style="width:100%;margin:8px 0"><input id="mnote" placeholder="وصف قصير للتحديث (اختياري)" style="width:100%;border:1.5px solid #cfdaed;border-radius:12px;padding:10px;font:inherit;margin:0 0 8px">' +
         '<button class="afbtn" id="mgo" style="width:100%">رفع وإرسال التحديث</button></div>' +
