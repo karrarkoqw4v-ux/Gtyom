@@ -275,6 +275,32 @@ object Notifier {
         try { nm(c).notify(if (tag.isEmpty()) (System.nanoTime() and 0x7fffffff).toInt() else idOf("s$tag"), b.build()) } catch (_: Throwable) {}
     }
 
+
+    /** إشعار مهم من الإدارة أو المدرس: أولوية عالية، ويفتح صفحته داخل التطبيق */
+    fun important(c: Context, title: String, body: String, from: String, tag: String, picture: String) {
+        init(c)
+        if (!enabled(c)) return
+        val b = builder(c, CH_MSG)
+            .setSmallIcon(R.drawable.ic_stat_school)
+            .setLargeIcon(logoBitmap(c))
+            .setContentTitle(title)
+            .setContentText(body.ifEmpty { "إشعار مهم" })
+            .setSubText("إشعار مهم • $from")
+            .setColor(0xFFD6243A.toInt())
+            .setAutoCancel(true)
+            .setShowWhen(true)
+            .setCategory(Notification.CATEGORY_EVENT)
+            .setContentIntent(openApp(c, "school", tag))
+        val pic = if (picture.startsWith("data:image")) try {
+            val bytes = Base64.decode(picture.substringAfter(','), Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        } catch (_: Throwable) { null } else null
+        if (pic != null) b.setStyle(Notification.BigPictureStyle().bigPicture(pic).setSummaryText(body))
+        else b.setStyle(Notification.BigTextStyle().bigText(body.ifEmpty { "إشعار مهم" }))
+        if (Build.VERSION.SDK_INT < 26) b.setPriority(Notification.PRIORITY_HIGH).setDefaults(Notification.DEFAULT_ALL)
+        try { nm(c).notify(idOf("s$tag"), b.build()) } catch (_: Throwable) {}
+    }
+
     fun cancel(c: Context, tag: String) {
         try {
             val m = nm(c)

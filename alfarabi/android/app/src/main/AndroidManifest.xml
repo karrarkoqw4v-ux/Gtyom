@@ -35,7 +35,7 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
-            android:configChanges="orientation|screenSize|keyboardHidden|uiMode|fontScale|density|smallestScreenSize|screenLayout">
+            android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation|uiMode|fontScale|density|smallestScreenSize|screenLayout|locale|layoutDirection|colorMode|mcc|mnc">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -219,6 +219,8 @@ object Sync {
                     }
                 }
                 "cp" -> channelPost(c, base, u, r, k)
+                "imp" -> if (r.opt("uid")?.toString() != u.uid)
+                    Notifier.important(c, r.optString("title", "إشعار مهم"), r.optString("body", ""), r.optString("from", "الإدارة"), "imp:$k", r.optString("img", ""))
             }
         }
         pr.edit().putStringSet("rec_seen", seen.toList().takeLast(400).toSet()).apply()

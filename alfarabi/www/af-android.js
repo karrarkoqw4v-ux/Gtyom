@@ -109,6 +109,7 @@
   function preview(m) { return m.t || (m.aud ? '🎤 رسالة صوتية' : m.img ? '📷 صورة' : m.vid ? '🎬 فيديو' : m.q ? '📊 استطلاع' : m.f ? '📎 ملف' : 'رسالة جديدة'); }
   var lastLen = -1, seenTs = {}, chatInit = false, callSeen = {};
   function chatTick() {
+    if (nativeOn()) return; // المزامنة الأصلية شغالة: ما نحتاج نقرأ ونحلل البيانات هنا (يخفف التقطيع)
     var u = me(); if (!u || u.role === 'admin') return;
     var s = LS.getItem(CK) || ''; if (s.length === lastLen) return; lastLen = s.length;
     var d; try { d = JSON.parse(s) || {}; } catch (e) { return; }
@@ -145,12 +146,14 @@
   /* ===== 6) درجات وغيابات وقنوات المدرسين ===== */
   var recInit = false, recSeen = null;
   function recTick() {
+    if (nativeOn()) return; // المزامنة الأصلية شغالة: ما نحتاج نقرأ ونحلل البيانات هنا (يخفف التقطيع)
     var u = me(); if (!u || u.role === 'admin') return;
     var recs = J(RK, []); if (!Array.isArray(recs)) return;
     var chans = recs.filter(function (r) { return r.k === 'ch'; });
     var list = [];
     recs.forEach(function (r) {
       if ((r.k === 'a' || r.k === 'g') && (u.role === 'parent' ? same(u.child, r.n) : u.role === 'student' ? same(u.name, r.n) : false)) list.push({ id: 'r' + r.id, r: r, t: r.k === 'a' ? 'a' : 'g' });
+      else if (r.k === 'imp' && String(r.uid) !== u.uid) list.push({ id: 'i' + r.id, r: r, t: 'imp' });
       else if (r.k === 'cp') {
         var c = chans.filter(function (x) { return x.id === r.ch; })[0];
         if (c && c.m && c.m['u' + okk(u.uid)] && String(c.o) !== u.uid && !(c.mu && c.mu['u' + okk(u.uid)])) list.push({ id: 'p' + r.id, r: r, c: c, t: 'cp' });
@@ -166,6 +169,7 @@
       if (fg() || Date.now() - (x.r.ts || 0) > 24 * 3600e3) return;
       try {
         if (x.t === 'g') NA.notifySchool(x.r.n || 'طالب', (x.r.s || 'المادة') + ': ' + x.r.v + (x.r.nt ? ' · ' + x.r.nt : ''), 'نتيجة امتحان', 'rec:' + x.id, photoOf2(x.r.n));
+        else if (x.t === 'imp') NA.notifySchool(x.r.title || 'إشعار مهم', String(x.r.body || ''), 'إشعار مهم من ' + (x.r.from || 'الإدارة'), 'imp:r' + x.r.id, '');
         else if (x.t === 'a') NA.notifySchool(x.r.n || 'طالب', 'غياب ' + (x.r.d || ''), 'غياب', 'rec:' + x.id, photoOf2(x.r.n));
         else NA.notifyMessage('chan:' + x.c.id, x.c.cn || 'قناة', true, x.c.on || 'المدرس', photoOf(x.c.o), x.r.t || (x.r.img ? '📷 صورة' : x.r.q ? '📊 استطلاع' : 'منشور جديد'), x.r.ts || Date.now());
       } catch (e) {}
@@ -180,6 +184,7 @@
   /* ===== 7) إعلانات المدرسة وتحاضير الدروس ===== */
   var seenAnn = null;
   function schoolTick() {
+    if (nativeOn()) return; // المزامنة الأصلية شغالة: ما نحتاج نقرأ ونحلل البيانات هنا (يخفف التقطيع)
     var u = me(); if (!u || u.role === 'admin') return;
     var info = J(SK, {}).info || {};
     var ann = (Array.isArray(info.announcements) ? info.announcements : []).filter(function (a) { return a.target === 'all' || String(a.target) === u.grade || (a.target === 'student' && a.student === u.name); });
@@ -208,7 +213,7 @@
     return r;
   };
   window.addEventListener('storage', function (e) { if (!e || !e.key) return; if (e.key === CK) sched('c'); else if (e.key === RK) sched('r'); else if (e.key === SK) sched('s'); });
-  setInterval(function () { sched('c'); sched('r'); sched('s'); }, 4000);
+  setInterval(function () { if (!nativeOn()) { sched('c'); sched('r'); sched('s'); } }, 6000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) { try { A.cancelNotif('call'); } catch (e) {} } });
 
   /* ===== 9) أوامر من الإشعارات: رد سريع ورفض مكالمة ===== */

@@ -49,6 +49,7 @@ object WebHolder {
     var fileCb: ValueCallback<Array<Uri>>? = null
     var permReq: PermissionRequest? = null
     @Volatile var foreground = false
+    @Volatile var pendingOpen = ""
     private var ctx: MutableContextWrapper? = null
 
     fun prefs(c: Context) = c.getSharedPreferences("af", Context.MODE_PRIVATE)
@@ -96,9 +97,13 @@ object WebHolder {
             loadWithOverviewMode = true
             setSupportZoom(false)
             builtInZoomControls = false
+            @Suppress("DEPRECATION") setRenderPriority(WebSettings.RenderPriority.HIGH)
+            cacheMode = WebSettings.LOAD_DEFAULT
             textZoom = 100 // نفس حجم الخط على كل الأجهزة بغض النظر عن حجم خط النظام
             userAgentString = userAgentString + " AlfarabiApp/1.0"
         }
+        w.setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+        try { w.setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false) } catch (_: Throwable) {}
         CookieManager.getInstance().setAcceptThirdPartyCookies(w, true)
         w.addJavascriptInterface(Bridge(), "Android")
 
@@ -206,6 +211,10 @@ object WebHolder {
 
         @JavascriptInterface
         fun isForeground(): Boolean = foreground
+
+        /** صفحة تنتظر الفتح بعد الضغط على إشعار (مثل الإشعار المهم) */
+        @JavascriptInterface
+        fun pendingOpen(): String { val p = pendingOpen; pendingOpen = ""; return p }
 
         @JavascriptInterface
         fun notifyCall(name: String, photo: String, cid: String, g: String) = Notifier.call(app, name, photo, cid, g)

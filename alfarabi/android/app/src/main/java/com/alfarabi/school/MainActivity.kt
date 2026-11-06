@@ -49,6 +49,8 @@ class MainActivity : Activity() {
     override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); onIntent(intent) }
 
     private fun onIntent(i: Intent?) {
+        val tg = i?.getStringExtra("tag") ?: ""
+        if (i?.getStringExtra("kind") == "school" && tg.startsWith("imp:")) WebHolder.pendingOpen = tg
         if (i?.getStringExtra("kind") == "call") {
             if (Build.VERSION.SDK_INT >= 27) { setShowWhenLocked(true); setTurnScreenOn(true) }
         }
