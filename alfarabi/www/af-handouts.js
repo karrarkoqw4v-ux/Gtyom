@@ -78,11 +78,12 @@
       '.hdv-t button{width:40px;height:40px;border:0;border-radius:12px;background:#eef3fb;color:#14213d;font-size:18px;cursor:pointer;display:grid;place-items:center}',
       '.hdv-t button.on{background:#0aa6f5;color:#fff}',
       '.hdv-t button svg{width:22px;height:22px}',
-      '.hdv-b{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:#fff;box-shadow:0 -2px 10px rgba(0,0,0,.1)}',
-      '.hdv-b button{aspect-ratio:1.45/1;border:2px solid #e1e8f4;background:#f6f9fd;color:#14213d;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;max-height:84px}',
-      '.hdv-b button svg{width:26px;height:26px;color:#1288c4}',
-      '.hdv-b button:active{background:#e6f3ff}',
-      '.hdv.night .hdv-b{background:#161b24}.hdv.night .hdv-b button{background:#1f2633;border-color:#2c3648;color:#e8eef9}',
+      '.hdv-b{position:absolute;left:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px;z-index:5;background:none;box-shadow:none;padding:0}',
+      '.hdv-b button{width:50px;height:50px;border:1.5px solid #dbe5f3;background:rgba(255,255,255,.96);color:#1288c4;border-radius:14px;display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 3px 12px rgba(20,33,61,.22)}',
+      '.hdv-b button svg{width:24px;height:24px}',
+      '.hdv-b button span{display:none}',
+      '.hdv-b button:active{background:#e6f3ff;transform:scale(.94)}',
+      '.hdv.night .hdv-b button{background:rgba(31,38,51,.96);border-color:#2c3648;color:#7cc8f5}',
       '.hdv-t .tt{flex:1;min-width:120px;font-weight:700;font-size:14px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}',
       '.hdv-t input{width:58px;height:38px;border:1.5px solid #cfdaed;border-radius:10px;text-align:center;font:inherit;font-size:14px}',
       '.hdv-t .pg{font-size:13px;color:#4b5b78;white-space:nowrap}',
@@ -150,7 +151,7 @@
       '<button data-a="zo" aria-label="تصغير">' + VI.minus + '</button><button data-a="zi" aria-label="تكبير">' + VI.plus + '</button><button data-a="fit" aria-label="ملء العرض">' + VI.fit + '</button><button data-a="nt" aria-label="وضع ليلي">' + VI.moon + '</button>' +
       '<div style="flex-basis:100%;display:flex;gap:8px;align-items:center"><span class="pg" id="hdpg" dir="ltr" style="unicode-bidi:isolate">…</span><input id="hdgo" type="number" min="1" inputmode="numeric" placeholder="صفحة"><button data-a="go" style="width:auto;padding:0 14px;font-size:13px;font-weight:700">اذهب</button></div></div>' +
       '<div class="hdv-s" id="hdS"></div>' +
-      '<div class="hdv-b"><button data-a="cr">' + VI.crop + '<span>اقتطاع صورة</span></button><button data-a="sv">' + VI.save + '<span>حفظ الصفحة</span></button><button data-a="st">' + VI.star + '<span>تقييم</span></button></div>' +
+      '<div class="hdv-b"><button data-a="cr" aria-label="اقتطاع صورة">' + VI.crop + '<span>اقتطاع صورة</span></button><button data-a="sv" aria-label="حفظ الصفحة">' + VI.save + '<span>حفظ الصفحة</span></button><button data-a="st" aria-label="تقييم">' + VI.star + '<span>تقييم</span></button></div>' +
       '<div class="hdv-l" id="hdL">جاري تحميل الملزمة 0%</div>';
     doc.body.appendChild(ov);
     var S = ov.querySelector('#hdS'), L = ov.querySelector('#hdL'), PG = ov.querySelector('#hdpg');
