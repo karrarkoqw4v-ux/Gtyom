@@ -77,6 +77,12 @@
       '.hdv-t{display:flex;align-items:center;gap:6px;padding:calc(8px + env(safe-area-inset-top,0px)) 8px 8px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);flex-wrap:wrap}',
       '.hdv-t button{width:40px;height:40px;border:0;border-radius:12px;background:#eef3fb;color:#14213d;font-size:18px;cursor:pointer;display:grid;place-items:center}',
       '.hdv-t button.on{background:#0aa6f5;color:#fff}',
+      '.hdv-t button svg{width:22px;height:22px}',
+      '.hdv-b{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:#fff;box-shadow:0 -2px 10px rgba(0,0,0,.1)}',
+      '.hdv-b button{aspect-ratio:1.45/1;border:2px solid #e1e8f4;background:#f6f9fd;color:#14213d;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;max-height:84px}',
+      '.hdv-b button svg{width:26px;height:26px;color:#1288c4}',
+      '.hdv-b button:active{background:#e6f3ff}',
+      '.hdv.night .hdv-b{background:#161b24}.hdv.night .hdv-b button{background:#1f2633;border-color:#2c3648;color:#e8eef9}',
       '.hdv-t .tt{flex:1;min-width:120px;font-weight:700;font-size:14px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}',
       '.hdv-t input{width:58px;height:38px;border:1.5px solid #cfdaed;border-radius:10px;text-align:center;font:inherit;font-size:14px}',
       '.hdv-t .pg{font-size:13px;color:#4b5b78;white-space:nowrap}',
@@ -84,7 +90,7 @@
       '.hdp{margin:0 auto 10px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.18);position:relative}',
       '.hdp canvas{display:block;width:100%;height:100%}',
       '.hdv.night .hdp canvas{filter:invert(.9) hue-rotate(180deg)}',
-      '.hdv-l{position:absolute;inset:60px 0 0;display:grid;place-items:center;text-align:center;color:#14213d;font-weight:700;font-size:15px;background:rgba(233,238,246,.92)}',
+      '.hdv-l{position:absolute;inset:60px 0 0;z-index:3;display:grid;place-items:center;text-align:center;color:#14213d;font-weight:700;font-size:15px;background:rgba(233,238,246,.92)}',
       '.hdv.night .hdv-l{color:#fff;background:rgba(14,17,23,.92)}',
       '.hdcr{position:absolute;inset:0;z-index:5;background:#0b0f16;display:flex;flex-direction:column}',
       '.hdcr-b{flex:1;overflow:auto;display:grid;place-items:start center;padding:10px}',
@@ -125,15 +131,27 @@
   }
 
   /* ---------- العارض ---------- */
+  var SV = function (d) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>'; };
+  var VI = {
+    back: SV('<path d="M9 5l7 7-7 7"/>'),
+    minus: SV('<path d="M5 12h14"/>'),
+    plus: SV('<path d="M12 5v14M5 12h14"/>'),
+    fit: SV('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
+    moon: SV('<path d="M20 14.5A8.5 8.5 0 019.5 4 8.5 8.5 0 1020 14.5z"/>'),
+    crop: SV('<path d="M6 2v14a2 2 0 002 2h14M2 6h14a2 2 0 012 2v14"/>'),
+    save: SV('<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/>'),
+    star: SV('<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>')
+  };
   function viewer(doc, h, R) {
     css(doc);
     if (!h.chunks) { X.panel(doc, h.name || 'ملزمة', '<div class="afp-c"><p style="font-size:16px;text-align:center;padding:34px 0;line-height:2">لم يتم رفع الملف PDF حتى الآن</p></div>'); return; }
     var ov = doc.createElement('div'); ov.className = 'hdv';
-    ov.innerHTML = '<div class="hdv-t"><button data-a="x" aria-label="رجوع">›</button><div class="tt">' + esc(h.name) + '</div>' +
-      '<button data-a="zo">−</button><button data-a="zi">+</button><button data-a="fit" title="ملء العرض">↔</button>' +
-      '<button data-a="nt" title="وضع ليلي">🌙</button><button data-a="cr" title="اقتطاع صورة">✂️</button><button data-a="sv" title="حفظ الصفحة كصورة">🖼</button><button data-a="st" title="تقييم">⭐</button>' +
-      '<div style="flex-basis:100%;display:flex;gap:8px;align-items:center"><span class="pg" id="hdpg" dir="ltr" style="unicode-bidi:isolate">…</span><input id="hdgo" type="number" min="1" inputmode="numeric" placeholder="صفحة"><button data-a="go" style="width:auto;padding:0 12px;font-size:13px">اذهب</button></div></div>' +
-      '<div class="hdv-s" id="hdS"></div><div class="hdv-l" id="hdL">جاري تحميل الملزمة 0%</div>';
+    ov.innerHTML = '<div class="hdv-t"><button data-a="x" aria-label="رجوع">' + VI.back + '</button><div class="tt">' + esc(h.name) + '</div>' +
+      '<button data-a="zo" aria-label="تصغير">' + VI.minus + '</button><button data-a="zi" aria-label="تكبير">' + VI.plus + '</button><button data-a="fit" aria-label="ملء العرض">' + VI.fit + '</button><button data-a="nt" aria-label="وضع ليلي">' + VI.moon + '</button>' +
+      '<div style="flex-basis:100%;display:flex;gap:8px;align-items:center"><span class="pg" id="hdpg" dir="ltr" style="unicode-bidi:isolate">…</span><input id="hdgo" type="number" min="1" inputmode="numeric" placeholder="صفحة"><button data-a="go" style="width:auto;padding:0 14px;font-size:13px;font-weight:700">اذهب</button></div></div>' +
+      '<div class="hdv-s" id="hdS"></div>' +
+      '<div class="hdv-b"><button data-a="cr">' + VI.crop + '<span>اقتطاع صورة</span></button><button data-a="sv">' + VI.save + '<span>حفظ الصفحة</span></button><button data-a="st">' + VI.star + '<span>تقييم</span></button></div>' +
+      '<div class="hdv-l" id="hdL">جاري تحميل الملزمة 0%</div>';
     doc.body.appendChild(ov);
     var S = ov.querySelector('#hdS'), L = ov.querySelector('#hdL'), PG = ov.querySelector('#hdpg');
     var pdf = null, N = 0, zoom = 1, ratio = 1.41, cw = 0, pages = [], obs = null, rt = 0;
@@ -210,7 +228,7 @@
         putJ('/handouts/' + h.id + '/rat/u' + okk(R.uid) + '.json', n).then(function () { h.rat = h.rat || {}; h.rat['u' + okk(R.uid)] = n; o.remove(); }).catch(function (x) { alert('تعذّر حفظ التقييم: ' + x.message); });
       };
     }
-    ov.querySelector('.hdv-t').addEventListener('click', function (e) {
+    ov.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-a]'); if (!b) return; var a = b.dataset.a;
       if (a === 'x') close(); else if (a === 'zi') setZoom(zoom * 1.25); else if (a === 'zo') setZoom(zoom / 1.25); else if (a === 'fit') setZoom(1);
       else if (a === 'nt') { ov.classList.toggle('night'); b.classList.toggle('on'); } else if (a === 'sv') savePage(curPage()); else if (a === 'cr') cropMode(); else if (a === 'st') rateBox();
