@@ -40,3 +40,6 @@ sed -i '/rel="icon" href="school-install-icon.svg"/d' web/index.html
 # رقم إصدار على روابط السكربتات حتى لا يعرض المتصفح نسخاً قديمة محفوظة
 V=$(date +%s)
 sed -i -E "s#(src=\"[^\"]*(af-webshim|af-landing|af-android|af-extra|af-handouts)\.js)\"#\1?v=$V\"#" web/index.html
+# نسخة APK الأحدث داخل الموقع (إن وُجدت) ليحمّلها الموقع مباشرة من نفس الاستضافة
+APK=$(ls -1 dist/alfarabi-v*.apk 2>/dev/null | sort -V | tail -1)
+if [ -n "$APK" ]; then cp "$APK" web/alfarabi.apk; basename "$APK" | sed -E 's/alfarabi-v(.*)\.apk/\1/' | tr -d '\n' > web/apk-version.txt; fi

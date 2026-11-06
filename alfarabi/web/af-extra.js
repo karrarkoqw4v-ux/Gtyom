@@ -704,14 +704,14 @@
       if (!isSettings) return;
       sc.setAttribute('data-afx', '1');
       var proto = opts[0];
-      function add(label, fn) {
+      function add(label, fn, top) {
         var b = proto.cloneNode(true); b.removeAttribute('data-o'); b.removeAttribute('id');
         var t = b.querySelector('.opt-text'); if (t) t.textContent = label; else b.firstChild.textContent = label;
         b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); fn(doc); });
-        sc.appendChild(b);
+        if (top && sc.firstChild) sc.insertBefore(b, sc.firstChild); else sc.appendChild(b);
       }
       var RI = roleInfo();
-      if (RI.role === 'admin') { add('📚 ملازم الثالث متوسط 2027', function (d) { if (window.afHandouts) window.afHandouts(d); }); add('🧹 تنظيف البيانات', cleanupPage); add('الصيانة والتحديثات', function (d) { if (window.afMaint) window.afMaint(d); }); }
+      if (RI.role === 'admin') { add('الصيانة والتحديثات', function (d) { if (window.afMaint) window.afMaint(d); }, true); add('📚 ملازم الثالث متوسط 2027', function (d) { if (window.afHandouts) window.afHandouts(d); }); add('🧹 تنظيف البيانات', cleanupPage); }
       add('📢 الإشعارات المهمة', importantPage);
       add('🎨 المظهر والأداء', themePage);
       add('🔒 الأمان والبصمة', securityPage);

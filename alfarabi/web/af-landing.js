@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.06-j';
+  var VER = '2026.11.06-l';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null;
   W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dip = e; refreshPwa(); });
@@ -184,13 +184,27 @@
   function close() { var s = D.getElementById('afs'); if (s) s.remove(); root.remove(); D.documentElement.classList.remove('afl-on'); D.documentElement.style.overflow = ''; }
   function skip() { try { LS && LS.setItem('af_land_skip', '1'); } catch (e) { } close(); }
 
-  /* أحدث ملف APK من المستودع */
-  try {
-    fetch('https://api.github.com/repos/' + REPO + '/contents/' + DIR + '?ref=' + encodeURIComponent(BR)).then(function (r) { return r.json(); }).then(function (l) {
-      var f = (l || []).filter(function (x) { return /\.apk$/i.test(x.name); }).sort(function (a, b) { return b.name.localeCompare(a.name, undefined, { numeric: true }); })[0];
-      if (f) { apk.url = f.download_url || apk.url; var m = /v([\d.]+)\.apk/.exec(f.name); apk.ver = m ? m[1] : ''; var v = D.getElementById('afv'); if (v) v.textContent = apk.ver ? 'أحدث نسخة ' + apk.ver + ' — تنزيل مباشر' : 'تنزيل مباشر'; }
-    }).catch(function () { });
-  } catch (e) { }
+  /* أحدث ملف APK: من نفس الاستضافة إن كان مرفوعاً، وإلا من المستودع */
+  (function () {
+    function setVer(v) { apk.ver = v || ''; var el = D.getElementById('afv'); if (el) el.textContent = apk.ver ? 'أحدث نسخة ' + apk.ver + ' — تنزيل مباشر' : 'تنزيل مباشر'; }
+    function remote() {
+      try {
+        fetch('https://api.github.com/repos/' + REPO + '/contents/' + DIR + '?ref=' + encodeURIComponent(BR)).then(function (r) { return r.json(); }).then(function (l) {
+          var f = (l || []).filter(function (x) { return /\.apk$/i.test(x.name); }).sort(function (a, b) { return b.name.localeCompare(a.name, undefined, { numeric: true }); })[0];
+          if (f) { apk.url = f.download_url || apk.url; var m = /v([\d.]+)\.apk/.exec(f.name); setVer(m ? m[1] : ''); }
+        }).catch(function () { });
+      } catch (e) { }
+    }
+    try {
+      fetch(BASE + 'alfarabi.apk', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
+        var ct = r.headers.get('content-type') || '', len = +(r.headers.get('content-length') || 0);
+        if (r.ok && !/text\/html/i.test(ct) && len > 1000000) {
+          apk.url = BASE + 'alfarabi.apk';
+          fetch(BASE + 'apk-version.txt', { cache: 'no-store' }).then(function (x) { return x.ok ? x.text() : ''; }).then(function (t) { setVer(String(t).trim().slice(0, 10)); }).catch(function () { });
+        } else remote();
+      }).catch(remote);
+    } catch (e) { remote(); }
+  })();
 
   function sheet(html) {
     var o = D.getElementById('afs'); if (o) o.remove();
