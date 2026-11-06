@@ -37,8 +37,8 @@
     '#afl .b1{width:260px;height:260px;background:#7fd3ff;top:-70px;right:-60px}',
     '#afl .b2{width:240px;height:240px;background:#ffd76a;bottom:-60px;left:-60px}',
     '#afl .b3{width:200px;height:200px;background:#ffb3a7;bottom:30%;right:-90px;opacity:.35}',
-    '#afl .wrap{position:relative;min-height:100%;display:grid;place-items:center;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(18px + env(safe-area-inset-bottom,0px))}',
-    '#afl .card{width:100%;max-width:420px;background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.9);border-radius:30px;padding:26px 20px 20px;box-shadow:0 18px 50px rgba(30,100,170,.18);text-align:center}',
+    '#afl .wrap{position:relative;min-height:100%;display:flex;flex-direction:column;align-items:center;gap:16px;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(18px + env(safe-area-inset-bottom,0px))}',
+    '#afl .card{margin-top:auto;width:100%;max-width:420px;background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.9);border-radius:30px;padding:26px 20px 20px;box-shadow:0 18px 50px rgba(30,100,170,.18);text-align:center}',
     '#afl .lgo{position:static;width:112px;height:112px;margin:0 auto 12px;border-radius:50%;background:#fff;box-shadow:0 8px 26px rgba(10,166,245,.35);overflow:hidden;display:grid;place-items:center}',
     '#afl .lgo img{width:100%;height:100%;object-fit:cover}',
     '#afl .hi{font-size:15px;color:#5a6b8c;font-weight:700}',
@@ -82,6 +82,24 @@
     '#afs ol li svg{width:20px;height:20px;vertical-align:middle;color:#1288c4}',
     '#afs .wn{background:#fff6dc;border:1.5px solid #ffe08a;border-radius:16px;padding:12px;font-size:14px;line-height:1.8;margin:0 0 12px}',
     '#afs .ar{position:fixed;bottom:12px;left:50%;margin-left:-14px;font-size:30px;color:#ffc107;animation:afb 1s infinite;pointer-events:none;text-shadow:0 2px 6px rgba(0,0,0,.4)}',
+
+    '#afl .doc{width:100%;max-width:420px;margin-bottom:auto}',
+    '#afl .dc{background:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.95);border-radius:26px;padding:18px 16px;box-shadow:0 12px 36px rgba(30,100,170,.12);margin-bottom:14px}',
+    '#afl .dc h3{margin:0 0 4px;font-size:19px;text-align:center;color:#14213d;font-weight:800}',
+    '#afl .dc .sb2{margin:0 0 12px;text-align:center;font-size:13px;color:#5a6b8c}',
+    '#afl .ch{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:0 0 10px}',
+    '#afl .ch button{border:2px solid #e1e8f4;background:#f6f9fd;color:#14213d;border-radius:999px;padding:7px 14px;font:inherit;font-size:13.5px;font-weight:800;cursor:pointer}',
+    '#afl .ch button.on{background:linear-gradient(135deg,#0aa6f5,#2a7de1);border-color:transparent;color:#fff}',
+    '#afl .ch.r button.on{background:linear-gradient(135deg,#ffe066,#ffc107);color:#14213d}',
+    '#afl .st{margin:0;padding:0;list-style:none;counter-reset:q}',
+    '#afl .st li{counter-increment:q;display:flex;gap:10px;align-items:flex-start;padding:9px 2px;font-size:14.5px;line-height:1.8;border-bottom:1px solid #eef2f9;text-align:right}',
+    '#afl .st li:last-child{border-bottom:0}',
+    '#afl .st li::before{content:counter(q);flex:none;width:26px;height:26px;margin-top:2px;border-radius:50%;background:#0aa6f5;color:#fff;font-weight:800;display:grid;place-items:center;font-size:13px}',
+    '#afl .nt{background:#fff6dc;border:1.5px solid #ffe08a;border-radius:14px;padding:10px 12px;font-size:13.5px;line-height:1.8;margin-top:10px;text-align:right}',
+    '#afl .cr{text-align:center;padding:6px 8px 4px;color:#33425f;font-size:14px;line-height:2}',
+    '#afl .cr b{color:#14213d}',
+    '#afl .cr .ln{width:60px;height:4px;border-radius:9px;background:linear-gradient(90deg,#0aa6f5,#ffc107);margin:0 auto 10px}',
+    '#afl .dn{text-align:center;font-size:12px;color:#6b7a98;margin:-2px 0 6px}',
     '@keyframes afu{from{transform:translateY(100%)}to{transform:none}}@keyframes aff{from{opacity:0}to{opacity:1}}@keyframes afb{50%{transform:translateY(8px)}}'
   ].join('\n');
   D.head.appendChild(css);
@@ -98,10 +116,33 @@
     '<div class="bt g">' + I.app + '<span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
     '<button class="sk" data-a="go">المتابعة من المتصفح بدون تثبيت</button>' +
     '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div>' +
-    '</div></div>';
+    '</div><div class="doc" id="afdoc"></div></div>';
 
+
+  var STAGES = [['m1', 'أول متوسط'], ['m2', 'ثاني متوسط'], ['m3', 'ثالث متوسط'], ['prep', 'الإعدادية']];
+  var ROLES = [['st', 'طالب'], ['pa', 'ولي الأمر'], ['te', 'كادر التدريس']];
+  var GN = { m1: 'أول متوسط', m2: 'ثاني متوسط', m3: 'ثالث متوسط', prep: 'الرابع العلمي أو الخامس العلمي' };
+  function steps(role, stage) {
+    var g = GN[stage];
+    if (role === 'st') return ['اذا كنت طالباً، اختر «طالب» من صفحة الدخول (المرحلة ' + (stage === 'prep' ? 'الإعدادية' : 'المتوسطة') + ').', 'قم بإدخال اسمك الثلاثي.', 'قم بإدخال معرّف حسابك من خلال بطاقة المدرسة.', 'قم بإدخال كلمة السر.', 'حدّد الصف: <b>' + g + '</b>.', 'اضغط «موافقة والتالي».', 'أو استخدم «عبر معرّف حسابي»: امسح باركود البطاقة بالكاميرا وسجّل مباشرة.'];
+    if (role === 'pa') return ['اختر «ولي الأمر» من صفحة الدخول (المرحلة ' + (stage === 'prep' ? 'الإعدادية' : 'المتوسطة') + ').', 'اكتب اسمك واسم ابنك الثلاثي.', 'حدّد صف الابن: <b>' + g + '</b>.', 'أكمل رقم الهاتف إذا طُلب منك.', 'اضغط «موافق ومتابعة»، وتظهر لك تفاصيل ابنك.'];
+    return ['اختر «كادر التدريس» من صفحة الدخول (المرحلة ' + (stage === 'prep' ? 'الإعدادية' : 'المتوسطة') + ').', 'اكتب اسمك الثلاثي ومعرّف حساب المدرس.', 'اختر الصف الذي تدرّسه: <b>' + g + '</b>، ثم اختر المادة.', 'اضغط «تحقق»، وبعد نجاح التحقق تدخل لحسابك وتبدأ بالتحاضير والرسائل.'];
+  }
+  var dst = 'm3', drl = 'st';
+  function docHtml() {
+    var sc = STAGES.map(function (x) { return '<button data-s="' + x[0] + '"' + (x[0] === dst ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('');
+    var rc = ROLES.map(function (x) { return '<button data-r="' + x[0] + '"' + (x[0] === drl ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('');
+    return '<div class="dc"><h3>شروط الاستخدام وطريقة التسجيل</h3><p class="sb2">اختر صفك ثم نوع حسابك</p>' +
+      '<div class="ch" id="afsc">' + sc + '</div><div class="ch r" id="afrc">' + rc + '</div>' +
+      '<ol class="st">' + steps(drl, dst).map(function (t) { return '<li><span>' + t + '</span></li>'; }).join('') + '</ol>' +
+      '<div class="nt">المعرّف وكلمة السر تستلمهما من بطاقة المدرسة. إذا واجهتك مشكلة بالدخول راجع دعم المدرسة من صفحة الدخول.</div></div>' +
+      '<div class="dc cr"><div class="ln"></div>تم تطوير التطبيق من الإدارة المحترمة، ومن الأساتذة كادر التدريس المحترم.<br><b>المشرف:</b> الأستاذ زين العابدين<br><b>المصمم:</b> كرار حيدر</div>';
+  }
   function mount() { if (!D.body) return setTimeout(mount, 30); D.body.appendChild(root); D.documentElement.style.overflow = 'hidden'; }
   mount();
+  function renderDoc() { var d = root.querySelector('#afdoc'); if (d) d.innerHTML = docHtml(); }
+  renderDoc();
+  root.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-s],[data-r]'); if (!b) return; if (b.hasAttribute('data-s')) dst = b.getAttribute('data-s'); else drl = b.getAttribute('data-r'); renderDoc(); });
   function close() { var s = D.getElementById('afs'); if (s) s.remove(); root.remove(); D.documentElement.style.overflow = ''; }
   function skip() { try { LS && LS.setItem('af_land_skip', '1'); } catch (e) { } close(); }
 
