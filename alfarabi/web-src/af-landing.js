@@ -5,13 +5,12 @@
   var ua = navigator.userAgent || '';
   var standalone = (W.matchMedia && W.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
   if (standalone) return;
-  try { if (LS && LS.getItem('af_land_skip') === '1') return; } catch (e) { }
   var BASE = (function () { var s = D.currentScript; var u = s && s.src ? s.src : location.href; return u.replace(/[^\/]*([?#].*)?$/, ''); })();
   var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.06-h';
+  var VER = '2026.11.06-i';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null;
   W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dip = e; refreshPwa(); });
@@ -150,7 +149,6 @@
     '<button class="bt k" id="afpwa" data-a="pwa" style="display:none"><span class="lg2">' + I.web + '</span><span class="t">تثبيت من المتصفح<small>بدون ملفات، بضغطة وحدة</small></span></button>' +
     '<button class="bt i" data-a="ios">' + (isIOS ? badge('جهازك') : '') + '<span class="lg2">' + I.app + '</span>' + '<span class="t">تثبيت كتطبيق Apple<small>iPhone و iPad من سفاري</small></span></button>' +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
-    '<button class="sk" data-a="go">المتابعة من المتصفح بدون تثبيت</button>' +
     '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div><div class="ft" style="opacity:.7;margin-top:2px">نسخة الموقع ' + VER + '</div>' +
     '</div><div class="doc" id="afdoc"></div></div>';
 
@@ -289,7 +287,6 @@
     if (a === 'and') return andSheet();
     if (a === 'ios') return iosSheet();
     if (a === 'sc') { var s = D.getElementById('afs'); if (s) s.remove(); if (ar) ar.remove(); return; }
-    if (a === 'go') return skip();
     if (a === 'apk') { if (!D.querySelector('#afs .sh')) toast('بدأ تنزيل التطبيق. افتح الملف بعد ما ينتهي واسمح بالتثبيت.'); var l = D.createElement('a'); l.href = apk.url; l.rel = 'noopener'; D.body.appendChild(l); l.click(); l.remove(); var t = D.querySelector('#afs .sh'); if (t) { var n = D.createElement('div'); n.className = 'wn'; n.innerHTML = 'بدأ التنزيل. بعد ما ينتهي افتح الملف واسمح بالتثبيت من هذا المصدر عند ظهور الطلب، وبعدها افتح «الفارابي».'; t.insertBefore(n, t.querySelector('.cl')); } return; }
     if (a === 'pwa') {
       if (dip) { dip.prompt(); dip.userChoice.then(function (c) { dip = null; if (c && c.outcome === 'accepted') close(); }); return; }
