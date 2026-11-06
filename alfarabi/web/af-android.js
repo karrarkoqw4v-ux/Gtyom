@@ -55,7 +55,7 @@
     if (b64) { var bin = atob(b64); u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); }
     p.res(new Response(status === 204 || status === 304 ? null : u, { status: status, headers: { 'content-type': ct || 'application/octet-stream' } }));
   };
-  function proxied(u) { return typeof u === 'string' && (u.indexOf('/push/') === 0 || u.indexOf('/media/') === 0 || u.indexOf('/Gtyom/version.json') === 0); }
+  function proxied(u) { return typeof u === 'string' && (u.indexOf('/push/') === 0 || u.indexOf('/media/') === 0 || u.indexOf('/version.json') === 0); }
   if (rf) {
     window.fetch = function (input, init) {
       var u = typeof input === 'string' ? input : (input && input.url) || '';
