@@ -26,13 +26,17 @@
     cp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
     chv: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+    fb: '<svg viewBox="0 0 24 24"><path fill="#fff" d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.600-1.500H16.700V4.400c-.3 0-1.200-.1-2.300-.1-2.300 0-3.900 1.400-3.900 4v2.200H8v3h2.500V21z"/></svg>',
+    ph: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+    wa: '<svg viewBox="0 0 24 24" fill="#25D366"><path d="M12 2a10 10 0 0 0-8.600 15.100L2 22l5-1.300A10 10 0 1 0 12 2zm5.200 14.200c-.2.600-1.300 1.200-1.800 1.200-.5.100-1 .2-3.300-.7-2.800-1.200-4.600-4-4.700-4.200-.1-.2-1.100-1.500-1.100-2.800s.7-2 1-2.300c.2-.3.500-.3.700-.3h.5c.2 0 .4 0 .6.500.2.600.8 2 .9 2.200.1.1.1.3 0 .5-.1.200-.2.300-.3.500l-.4.500c-.1.100-.3.300-.1.600.2.300.8 1.300 1.700 2.100 1.100 1 2.100 1.300 2.400 1.400.3.100.5.100.6-.1l.9-1.100c.2-.3.400-.2.600-.1l2 1c.3.100.5.200.5.300.1.200.1.800-.1 1.400z"/></svg>',
     lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'
   };
 
   var css = D.createElement('style');
   css.textContent = [
-    '#afl{position:fixed;inset:0;z-index:2147483647;overflow:auto;direction:rtl;font-family:"Cairo","Noto Naskh Arabic",sans-serif;color:#14213d;background:linear-gradient(180deg,#eaf6ff 0%,#f4f8ff 45%,#fff6dc 100%);-webkit-overflow-scrolling:touch}',
+    '#afl{position:fixed;inset:0;z-index:2147483647;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;max-width:100vw;direction:rtl;font-family:"Cairo","Noto Naskh Arabic",sans-serif;color:#14213d;background:linear-gradient(180deg,#eaf6ff 0%,#f4f8ff 45%,#fff6dc 100%);-webkit-overflow-scrolling:touch}',
     '#afl *{box-sizing:border-box}',
+    '#afl .bg{position:fixed;inset:0;overflow:hidden;pointer-events:none}',
     '#afl .bl{position:absolute;border-radius:50%;filter:blur(46px);opacity:.55;pointer-events:none}',
     '#afl .b1{width:260px;height:260px;background:#7fd3ff;top:-70px;right:-60px}',
     '#afl .b2{width:240px;height:240px;background:#ffd76a;bottom:-60px;left:-60px}',
@@ -56,6 +60,8 @@
     '#afl .i{background:#fff;color:#000;border:2px solid #14213d;box-shadow:0 8px 20px rgba(20,33,61,.18)}',
     '#afl .y{background:linear-gradient(135deg,#ffe066,#ffc107);color:#14213d;box-shadow:0 8px 20px rgba(255,193,7,.4)}',
     '#afl .g{background:rgba(255,255,255,.45);color:#7b88a3;border:1.5px dashed #b8c6df;cursor:default;box-shadow:none}',
+    '#afl .g.c{justify-content:center;gap:10px;padding:16px}',
+    '#afl .g .mid{font-weight:800;font-size:15px;color:#5a6b8c}',
     '#afl .g .lg2{background:rgba(255,255,255,.7);opacity:.6;box-shadow:none}',
     '#afl .g .bd{background:rgba(20,33,61,.08);color:#5a6b8c;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;white-space:nowrap}',
     '#afl .you{position:absolute;top:-9px;left:14px;background:#ffc107;color:#14213d;font-size:11px;font-weight:800;border-radius:999px;padding:2px 10px}',
@@ -108,6 +114,22 @@
     '#afl .cr b{color:#14213d}',
     '#afl .cr .ln{width:60px;height:4px;border-radius:9px;background:linear-gradient(90deg,#0aa6f5,#ffc107);margin:0 auto 10px}',
     '#afl .dn{text-align:center;font-size:12px;color:#6b7a98;margin:-2px 0 6px}',
+    '#afl .dc h3{margin:0 0 4px}',
+    '#afl .ac{width:100%;display:flex;align-items:center;gap:12px;border:2px solid #e1e8f4;background:#f6f9fd;border-radius:18px;padding:12px 14px;margin:0 0 10px;font:inherit;font-size:15.5px;font-weight:800;color:#14213d;text-align:right;text-decoration:none;cursor:pointer}',
+    '#afl .ac .t{flex:1;min-width:0}',
+    '#afl .ac small{display:block;font-size:12.5px;font-weight:600;color:#5a6b8c;margin-top:2px}',
+    '#afl .ac>svg{width:18px;height:18px;color:#9aa8c4;flex:none}',
+    '#afl .ai{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex:none}',
+    '#afl .ai svg{width:26px;height:26px}',
+    '#afl .ai.fb{background:linear-gradient(135deg,#1877f2,#0b5fd0)}',
+    '#afl .ai.ph{background:linear-gradient(135deg,#0aa6f5,#2a7de1)}',
+    '#afl .cr h3{margin:0 0 10px;font-size:18px}',
+    '#afl .cm{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px dashed #dbe5f3;font-size:13.5px;color:#5a6b8c}',
+    '#afl .cm b{font-size:16.5px;color:#14213d}',
+    '#afl .rw{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}',
+    '#afl .rw div{background:linear-gradient(135deg,#eaf6ff,#fff6dc);border:1.5px solid #e1e8f4;border-radius:16px;padding:10px 6px}',
+    '#afl .rw small{display:block;font-size:12px;color:#5a6b8c;margin-bottom:3px}',
+    '#afl .rw b{font-size:14.5px;color:#14213d;line-height:1.5}',
     '@keyframes afu{from{transform:translateY(100%)}to{transform:none}}@keyframes aff{from{opacity:0}to{opacity:1}}@keyframes afb{50%{transform:translateY(8px)}}'
   ].join('\n');
   D.head.appendChild(css);
@@ -115,11 +137,12 @@
   var root = D.createElement('div'); root.id = 'afl';
   var logo = BASE + 'logo.jpg', ico = BASE + 'icon-192.png';
   function badge(t) { return '<span class="you">' + t + '</span>'; }
-  root.innerHTML = '<i class="bl b1"></i><i class="bl b2"></i><i class="bl b3"></i><div class="wrap"><div class="card">' +
+  root.innerHTML = '<div class="bg"><i class="bl b1"></i><i class="bl b2"></i><i class="bl b3"></i></div><div class="wrap"><div class="card">' +
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<div class="hi">أهلاً وسهلاً</div><h1>ترحب بكم</h1><div class="sn">ثانوية الفارابي الأهلية للبنين</div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
-    '<button class="bt a" data-a="and">' + (isAnd ? badge('جهازك') : '') + '<span class="lg2">' + I.and + '</span>' + '<span class="t">تثبيت كتطبيق Android<small>ملف APK أو من المتصفح</small></span></button>' +
+    '<button class="bt a" data-a="pwa">' + (isAnd ? badge('جهازك') : '') + '<span class="lg2">' + I.and + '</span>' + '<span class="t">تثبيت كتطبيق Android<small>تثبيت مباشر من المتصفح بضغطة وحدة</small></span></button>' +
+    '<div class="bt g c"><span class="lg2">' + I.apk + '</span><span class="mid">تثبيت نسخة APK — قيد التطوير</span></div>' +
     '<button class="bt i" data-a="ios">' + (isIOS ? badge('جهازك') : '') + '<span class="lg2">' + I.app + '</span>' + '<span class="t">تثبيت كتطبيق Apple<small>iPhone و iPad من سفاري</small></span></button>' +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
     '<button class="sk" data-a="go">المتابعة من المتصفح بدون تثبيت</button>' +
@@ -145,9 +168,15 @@
       '<div class="lb">المرحلة المتوسطة</div><div class="gd g3">' + chips(STM) + '</div><div class="lb">المرحلة الإعدادية</div><div class="gd g2">' + chips(STP) + '</div><div class="lb">نوع الحساب</div><div class="gd g3 r">' + rc + '</div>' +
       '<ol class="st">' + steps(drl, dst).map(function (t) { return '<li><span>' + t + '</span></li>'; }).join('') + '</ol>' +
       '<div class="nt">المعرّف وكلمة السر تستلمهما من بطاقة المدرسة. إذا واجهتك مشكلة بالدخول راجع دعم المدرسة من صفحة الدخول.</div></div>' +
-      '<div class="dc cr"><div class="ln"></div>تم تطوير التطبيق من الإدارة المحترمة، ومن الأساتذة كادر التدريس المحترم.<br><b>المشرف:</b> الأستاذ زين العابدين<br><b>المصمم:</b> كرار حيدر</div>';
+      '<div class="dc"><h3>حسابات المدرسة</h3><p class="sb2">تابعنا وتواصل مع المشرف</p>' +
+      '<a class="ac" href="https://www.facebook.com/share/1EeerkPeNQ/" target="_blank" rel="noopener"><span class="ai fb">' + I.fb + '</span><span class="t">صفحة المدرسة<small>فيسبوك — ثانوية الفارابي الأهلية</small></span>' + I.chv + '</a>' +
+      '<button class="ac" data-a="ph"><span class="ai ph">' + I.ph + '</span><span class="t">رقم هاتف المشرف<small dir="ltr" style="text-align:right">+964 780 018 8441</small></span>' + I.chv + '</button></div>' +
+      '<div class="dc cr"><div class="ln"></div><h3>الشكر والتقدير</h3>' +
+      '<div class="cm"><span>تم تطوير التطبيق من</span><b>الإدارة المحترمة</b></div>' +
+      '<div class="cm"><span>وبجهود الأساتذة</span><b>كادر التدريس المحترم</b></div>' +
+      '<div class="rw"><div><small>المشرف</small><b>الأستاذ زين العابدين</b></div><div><small>المصمم</small><b>كرار حيدر</b></div></div></div>';
   }
-  function mount() { if (!D.body) return setTimeout(mount, 30); D.body.appendChild(root); D.documentElement.style.overflow = 'hidden'; }
+  function mount() { if (!D.body) return setTimeout(mount, 30); D.body.appendChild(root); D.documentElement.style.overflow = 'hidden'; D.documentElement.style.overflowX = 'hidden'; D.body.style.overflowX = 'hidden'; }
   mount();
   function renderDoc() { var d = root.querySelector('#afdoc'); if (d) d.innerHTML = docHtml(); }
   renderDoc();
@@ -190,6 +219,7 @@
     function ok() { var b = D.querySelector('#afs [data-a="copy"] .t'); if (b) b.textContent = 'تم نسخ الرابط ✓'; }
     try { navigator.clipboard.writeText(u).then(ok, function () { prompt('انسخ الرابط', u); }); } catch (e) { prompt('انسخ الرابط', u); }
   }
+  function toast(t) { var o = D.getElementById('aftoast'); if (o) o.remove(); o = D.createElement('div'); o.id = 'aftoast'; o.textContent = t; o.style.cssText = 'position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:2147483647;background:#14213d;color:#fff;border-radius:16px;padding:13px 16px;text-align:center;font:700 14px/1.7 Cairo,sans-serif;direction:rtl;box-shadow:0 8px 24px rgba(0,0,0,.3)'; D.body.appendChild(o); setTimeout(function () { o.remove(); }, 4500); }
   function act(a) {
     var ar = D.getElementById('afar'); if (ar && a !== 'share') ar.remove();
     if (a === 'and') return andSheet();
@@ -199,10 +229,21 @@
     if (a === 'apk') { var l = D.createElement('a'); l.href = apk.url; l.download = ''; l.rel = 'noopener'; D.body.appendChild(l); l.click(); l.remove(); var t = D.querySelector('#afs .sh'); if (t) { var n = D.createElement('div'); n.className = 'wn'; n.innerHTML = 'بدأ التنزيل. بعد ما ينتهي افتح الملف واسمح بالتثبيت من هذا المصدر عند ظهور الطلب، وبعدها افتح «الفارابي».'; t.insertBefore(n, t.querySelector('.cl')); } return; }
     if (a === 'pwa') {
       if (dip) { dip.prompt(); dip.userChoice.then(function (c) { dip = null; if (c && c.outcome === 'accepted') close(); }); return; }
-      var t2 = D.querySelector('#afs .sh'); if (t2 && !D.getElementById('afpn')) { var n2 = D.createElement('div'); n2.id = 'afpn'; n2.className = 'wn'; n2.innerHTML = 'اضغط زر القائمة <b>⋮</b> بأعلى المتصفح ثم اختر <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>.'; t2.insertBefore(n2, t2.querySelector('.cl')); } return;
+      toast(isIOS ? 'على آيفون افتح الموقع من سفاري واضغط تثبيت Apple.' : 'افتح الموقع من متصفح Chrome على أندرويد، وإذا كان مثبتاً أصلاً افتحه من الشاشة الرئيسية.'); return;
     }
     if (a === 'share') { var u = location.href.split('#')[0]; if (navigator.share) navigator.share({ title: 'الفارابي', url: u }).catch(function () { }); return; }
+    if (a === 'ph') {
+      sheet('<h2>اتصال بالمشرف</h2><p class="sb" dir="ltr">+964 780 018 8441</p>' +
+        '<a class="bt p" href="tel:+9647800188441" style="text-decoration:none">' + I.ph.replace('#fff', 'currentColor') + '<span class="t">اتصال هاتفي<small>اتصل بالمشرف مباشرة</small></span></a>' +
+        '<a class="bt" href="https://wa.me/9647800188441" target="_blank" rel="noopener" style="text-decoration:none">' + I.wa + '<span class="t">واتساب<small>أرسل رسالة للمشرف</small></span></a>');
+      return;
+    }
     if (a === 'copy') return copy();
   }
+  (function () { var sx = 0, sy = 0;
+    root.addEventListener('touchstart', function (e) { var t = e.touches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+    root.addEventListener('touchmove', function (e) { var t = e.touches[0]; if (Math.abs(t.clientX - sx) > Math.abs(t.clientY - sy) && e.cancelable) e.preventDefault(); }, { passive: false });
+    root.addEventListener('scroll', function () { if (root.scrollLeft) root.scrollLeft = 0; }, { passive: true });
+  })();
   root.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-a]'); if (b) act(b.getAttribute('data-a')); });
 })();
