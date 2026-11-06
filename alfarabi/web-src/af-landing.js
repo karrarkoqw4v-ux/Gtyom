@@ -11,6 +11,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
+  var VER = '2026.11.06-c';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-latest.apk', ver: '' };
   var dip = null;
   W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dip = e; refreshPwa(); });
@@ -146,7 +147,7 @@
     '<button class="bt i" data-a="ios">' + (isIOS ? badge('جهازك') : '') + '<span class="lg2">' + I.app + '</span>' + '<span class="t">تثبيت كتطبيق Apple<small>iPhone و iPad من سفاري</small></span></button>' +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
     '<button class="sk" data-a="go">المتابعة من المتصفح بدون تثبيت</button>' +
-    '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div>' +
+    '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div><div class="ft" style="opacity:.7;margin-top:2px">نسخة الموقع ' + VER + '</div>' +
     '</div><div class="doc" id="afdoc"></div></div>';
 
 

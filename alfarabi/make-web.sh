@@ -27,3 +27,6 @@ if pre:
     json.dump(m,open('web/manifest.webmanifest','w',encoding='utf8'),ensure_ascii=False,indent=2)
     t=open('web/sw.js',encoding='utf8').read().replace("openWindow('/')","openWindow('"+pre+"/')"); open('web/sw.js','w',encoding='utf8').write(t)
 P
+# رقم إصدار على روابط السكربتات حتى لا يعرض المتصفح نسخاً قديمة محفوظة
+V=$(date +%s)
+sed -i -E "s#(src=\"[^\"]*(af-webshim|af-landing|af-android|af-extra|af-handouts)\.js)\"#\1?v=$V\"#" web/index.html
