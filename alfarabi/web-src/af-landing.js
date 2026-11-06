@@ -11,7 +11,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.06-c';
+  var VER = '2026.11.06-d';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-latest.apk', ver: '' };
   var dip = null;
   W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dip = e; refreshPwa(); });
@@ -35,16 +35,18 @@
 
   var css = D.createElement('style');
   css.textContent = [
-    '#afl{position:fixed;inset:0;z-index:2147483647;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;max-width:100vw;direction:rtl;font-family:"Cairo","Noto Naskh Arabic",sans-serif;color:#14213d;background:linear-gradient(180deg,#eaf6ff 0%,#f4f8ff 45%,#fff6dc 100%);-webkit-overflow-scrolling:touch}',
+    '#afl{position:fixed;inset:0;z-index:2147483647;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;max-width:100vw;direction:rtl;font-family:"Cairo","Noto Naskh Arabic",sans-serif;color:#14213d;background:radial-gradient(420px 320px at 100% 0,rgba(127,211,255,.55),transparent 70%),radial-gradient(380px 300px at 0 100%,rgba(255,215,106,.5),transparent 70%),linear-gradient(180deg,#eaf6ff 0%,#f4f8ff 45%,#fff6dc 100%);background-attachment:local;-webkit-overflow-scrolling:touch}',
     '#afl *{box-sizing:border-box}',
+    'html.afl-on body>*:not(#afl):not(#afs):not(#aftoast):not(#afar){display:none!important}',
+    '#afl{contain:layout paint;will-change:scroll-position;-webkit-overflow-scrolling:touch}',
     '#afl .bg{position:fixed;inset:0;overflow:hidden;pointer-events:none}',
     '#afl .bl{position:absolute;border-radius:50%;filter:blur(46px);opacity:.55;pointer-events:none}',
     '#afl .b1{width:260px;height:260px;background:#7fd3ff;top:-70px;right:-60px}',
     '#afl .b2{width:240px;height:240px;background:#ffd76a;bottom:-60px;left:-60px}',
     '#afl .b3{width:200px;height:200px;background:#ffb3a7;bottom:30%;right:-90px;opacity:.35}',
     '#afl .wrap{position:relative;min-height:100%;display:flex;flex-direction:column;align-items:center;gap:16px;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(18px + env(safe-area-inset-bottom,0px))}',
-    '#afl .card{margin-top:auto;width:100%;max-width:420px;background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.9);border-radius:30px;padding:26px 20px 20px;box-shadow:0 18px 50px rgba(30,100,170,.18);text-align:center}',
-    '#afl .lgo{position:static;width:112px;height:112px;margin:0 auto 12px;border-radius:50%;background:#fff;box-shadow:0 8px 26px rgba(10,166,245,.35);overflow:hidden;display:grid;place-items:center}',
+    '#afl .card{margin-top:auto;width:100%;max-width:420px;background:#fdfeff;border:1.5px solid rgba(255,255,255,.9);border-radius:30px;padding:26px 20px 20px;box-shadow:0 6px 18px rgba(30,100,170,.14);text-align:center}',
+    '#afl .lgo{position:static;width:112px;height:112px;margin:0 auto 12px;border-radius:50%;background:#fff;box-shadow:0 4px 12px rgba(10,166,245,.3);overflow:hidden;display:grid;place-items:center}',
     '#afl .lgo img{width:100%;height:100%;object-fit:cover}',
     '#afl .hi{font-size:15px;color:#5a6b8c;font-weight:700}',
     '#afl h1{margin:2px 0 4px;font-size:32px;line-height:1.3;color:#1e90ff;font-weight:800}',
@@ -57,8 +59,8 @@
     '#afl .bt .t{flex:1;min-width:0}',
     '#afl .bt small{display:block;font-size:12px;font-weight:600;opacity:.85;margin-top:1px}',
     '#afl .bt:active{transform:scale(.98)}',
-    '#afl .a{background:linear-gradient(135deg,#0aa6f5,#2a7de1);color:#fff;box-shadow:0 8px 20px rgba(10,166,245,.38)}',
-    '#afl .i{background:#fff;color:#000;border:2px solid #14213d;box-shadow:0 8px 20px rgba(20,33,61,.18)}',
+    '#afl .a{background:linear-gradient(135deg,#0aa6f5,#2a7de1);color:#fff;box-shadow:0 4px 10px rgba(10,166,245,.3)}',
+    '#afl .i{background:#fff;color:#000;border:2px solid #14213d;box-shadow:0 3px 8px rgba(20,33,61,.14)}',
     '#afl .y{background:linear-gradient(135deg,#ffe066,#ffc107);color:#14213d;box-shadow:0 8px 20px rgba(255,193,7,.4)}',
     '#afl .g{background:rgba(255,255,255,.45);color:#7b88a3;border:1.5px dashed #b8c6df;cursor:default;box-shadow:none}',
     '#afl .g.c{justify-content:center;gap:10px;padding:16px}',
@@ -94,7 +96,7 @@
     '#afs .ar{position:fixed;bottom:12px;left:50%;margin-left:-14px;font-size:30px;color:#ffc107;animation:afb 1s infinite;pointer-events:none;text-shadow:0 2px 6px rgba(0,0,0,.4)}',
 
     '#afl .doc{width:100%;max-width:420px;margin-bottom:auto}',
-    '#afl .dc{background:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.95);border-radius:26px;padding:18px 16px;box-shadow:0 12px 36px rgba(30,100,170,.12);margin-bottom:14px}',
+    '#afl .dc{background:#fdfeff;border:1.5px solid rgba(255,255,255,.95);border-radius:26px;padding:18px 16px;box-shadow:0 4px 12px rgba(30,100,170,.1);margin-bottom:14px}',
     '#afl .dc h3{margin:0 0 4px;font-size:19px;text-align:center;color:#14213d;font-weight:800}',
     '#afl .dc .sb2{margin:0 0 12px;text-align:center;font-size:13px;color:#5a6b8c}',
     '#afl .lb{font-size:12.5px;font-weight:800;color:#5a6b8c;margin:8px 4px 6px;text-align:right}',
@@ -138,7 +140,7 @@
   var root = D.createElement('div'); root.id = 'afl';
   var logo = BASE + 'logo.jpg', ico = BASE + 'icon-192.png';
   function badge(t) { return '<span class="you">' + t + '</span>'; }
-  root.innerHTML = '<div class="bg"><i class="bl b1"></i><i class="bl b2"></i><i class="bl b3"></i></div><div class="wrap"><div class="card">' +
+  root.innerHTML = '<div class="wrap"><div class="card">' +
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<div class="hi">أهلاً وسهلاً</div><h1>ترحب بكم</h1><div class="sn">ثانوية الفارابي الأهلية للبنين</div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
@@ -178,12 +180,12 @@
       '<div class="rw"><div><small>المشرف</small><b>الأستاذ زين العابدين</b></div><div><small>المصمم</small><b>كرار حيدر</b></div></div></div>' +
       '<button class="ac" data-a="mnt" style="margin-top:2px"><span class="ai ph" style="background:linear-gradient(135deg,#1f2a44,#14213d)">' + I.lock.replace('<svg','<svg style="color:#fff"') + '</span><span class="t">صيانة التحديثات<small>للمشرف فقط</small></span>' + I.chv + '</button>';
   }
-  function mount() { if (!D.body) return setTimeout(mount, 30); D.body.appendChild(root); D.documentElement.style.overflow = 'hidden'; D.documentElement.style.overflowX = 'hidden'; D.body.style.overflowX = 'hidden'; }
+  function mount() { if (!D.body) return setTimeout(mount, 30); D.body.appendChild(root); D.documentElement.classList.add('afl-on'); D.documentElement.style.overflow = 'hidden'; D.documentElement.style.overflowX = 'hidden'; D.body.style.overflowX = 'hidden'; }
   mount();
   function renderDoc() { var d = root.querySelector('#afdoc'); if (d) d.innerHTML = docHtml(); }
   renderDoc();
   root.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-s],[data-r]'); if (!b) return; if (b.hasAttribute('data-s')) dst = b.getAttribute('data-s'); else drl = b.getAttribute('data-r'); renderDoc(); });
-  function close() { var s = D.getElementById('afs'); if (s) s.remove(); root.remove(); D.documentElement.style.overflow = ''; }
+  function close() { var s = D.getElementById('afs'); if (s) s.remove(); root.remove(); D.documentElement.classList.remove('afl-on'); D.documentElement.style.overflow = ''; }
   function skip() { try { LS && LS.setItem('af_land_skip', '1'); } catch (e) { } close(); }
 
   /* أحدث ملف APK من المستودع */
