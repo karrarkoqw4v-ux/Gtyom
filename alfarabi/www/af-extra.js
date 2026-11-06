@@ -8,8 +8,8 @@
   function s(k, v) { try { LS.setItem(k, v); } catch (e) {} }
   function J(k, d) { try { return JSON.parse(LS.getItem(k)) || d; } catch (e) { return d; } }
 
-  var THEME = g('af_theme', 'dark');             // light | dark
-  var GFX = g('af_gfx', 'mid');                   // static | lite | mid (متوازن) | full
+  var THEME = 'light'; try { LS.removeItem('af_theme'); } catch (e) {}             // light | dark
+  var GFX = g('af_gfx', 'lite');                  // static | lite (افتراضي) | mid | full
   var TIER = { static: 0, lite: 1, mid: 2, full: 3 };
 
   // نثبّت مستوى الرسوميات قبل ما يقرأه محرك الأداء
@@ -45,18 +45,8 @@
     'html.af-lite .a3 *,html.af-lite .a3 *:before,html.af-lite .a3 *:after{animation:none!important}',
     'html.af-lite .card{animation:none!important}',
 
-    /* --- الوضع الداكن: الخلفية والأشرطة داكنة، والبطاقات تبقى فاتحة وكتابتها سوداء ليظهر كل شي --- */
-    'html[data-aft=dark]{--afp-bg:#0b1322;--afp-card:#16233a;--afp-line:rgba(255,255,255,.10);--afp-tx:#e8eef9;--afp-mut:#9fb0cb}',
-    'html[data-aft=dark],html[data-aft=dark] body{background:#0b1220!important}',
-    'html[data-aft=dark] .bg{filter:blur(18px) brightness(.42) saturate(.9)!important}',
-    'html[data-aft=dark] .card{background:rgba(255,255,255,.95)!important;color:#14213d!important}',
-    'html[data-aft=dark] .nav{background:rgba(14,22,38,.94)!important;border-color:rgba(255,255,255,.08)!important}',
-    'html[data-aft=dark] .nb:not(.on){background:rgba(255,255,255,.08)!important;color:#c9d6ea!important}',
-    'html[data-aft=dark] .nb:not(.on) svg{stroke:#c9d6ea!important}',
-    'html[data-aft=dark] .burger{background:rgba(255,255,255,.14)!important}',
-    'html[data-aft=dark] .burger span{background:#fff!important}',
-    'html[data-aft=dark] .burger svg{stroke:#fff!important}',
-    'html[data-aft=dark] #afNet{background:#7f1d1d!important}',
+    /* صفحات الإضافات تبقى بألوان ثابتة فاتحة */
+    'html{--afp-bg:#f4f8ff;--afp-card:#fff;--afp-line:#e3eaf5;--afp-tx:#14213d;--afp-mut:#5b6b86}',
 
     /* --- ألوان المحادثة تتبع اختيارك والثيم --- */
     '#ch[data-afcp]{background:var(--chbg)!important;color:var(--chfg)!important}',
@@ -81,11 +71,13 @@
     'html .sp-tx{background:#f4f8fd!important;color:#14213d!important}',
     'html .sp-d,html .sp-cap{max-height:none!important;overflow:visible!important;-webkit-line-clamp:unset!important;white-space:pre-wrap;line-height:1.95}',
 
+    '.afck{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:8px 0;font-size:14px;line-height:2}',
+    '.afck input[type=checkbox]{width:20px;height:20px}',
     /* --- مساعد الدعم والإشعارات المهمة --- */
     '.afsup{display:grid;gap:10px;padding:10px 12px 18px;direction:rtl}',
     '.afsup-b{background:#fff;color:#16213a;border-radius:18px;border-top-right-radius:4px;padding:12px 14px;font-size:15px;line-height:1.8;box-shadow:0 1px 6px rgba(0,0,0,.18);max-width:88%}',
-    '.afsup-o{display:flex;flex-wrap:wrap;gap:8px}',
-    '.afsup-o button{border:0;border-radius:999px;padding:10px 16px;background:linear-gradient(135deg,#0aa6f5,#2f7fb0);color:#fff;font:inherit;font-size:14px;font-weight:600;box-shadow:0 3px 10px rgba(10,166,245,.35);cursor:pointer}',
+    '.afsup-o{display:grid;grid-template-columns:1fr 1fr;gap:8px}',
+    '.afsup-o button{border:0;border-radius:16px;min-height:62px;padding:8px 10px;background:linear-gradient(135deg,#0aa6f5,#2f7fb0);color:#fff;font:inherit;font-size:13.5px;font-weight:600;line-height:1.6;box-shadow:0 3px 10px rgba(10,166,245,.3);cursor:pointer}',
     '.afsup-o button:active{transform:scale(.96)}',
     '.afin{width:100%;box-sizing:border-box;border:1.5px solid var(--afp-line,#dbe3ef);border-radius:14px;padding:11px 13px;font:inherit;font-size:15px;background:#fff;color:#14213d;margin:0 0 10px;outline:0;direction:rtl}',
     '.afin:focus{border-color:#0aa6f5}',
@@ -183,8 +175,8 @@
   }
   function applyAll() {
     allDocs().forEach(applyDoc);
-    try { A.setBars(THEME === 'dark'); } catch (e) {}
-    try { var m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', THEME === 'dark' ? '#08101d' : '#ffffff'); } catch (e) {}
+    try { A.setBars(false); } catch (e) {}
+    try { var m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', '#ffffff'); } catch (e) {}
   }
   function setTheme(t) { THEME = t; s('af_theme', t); applyAll(); }
   function setGfx(x) { GFX = x; s('af_gfx', x); pinTier(); applyAll(); }
@@ -195,8 +187,8 @@
     return a ? { uid: String(a.createdAt || a.name), role: a.role } : { uid: 'guest', role: 'guest' };
   }
   function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function panel(doc, title, html, bind) {
-    var old = doc.querySelector('.afp'); if (old) old.remove();
+  function panel(doc, title, html, bind, stack) {
+    var old = doc.querySelector('.afp'); if (old && !stack) old.remove();
     var p = doc.createElement('div'); p.className = 'afp';
     p.innerHTML = '<div class="afp-h"><button class="afp-b" aria-label="رجوع">›</button><h2>' + esc(title) + '</h2></div><div class="afp-s">' + html + '</div>';
     doc.body.appendChild(p);
@@ -206,23 +198,16 @@
   }
   function on(root, sel, fn) { root.querySelectorAll(sel).forEach(function (n) { n.addEventListener('click', function (e) { fn(n, e); }); }); }
 
-  /* --- الثيمات والمظهر --- */
+  /* --- المظهر والأداء --- */
   function themePage(doc) {
     function html() {
-      return '<div class="afp-c"><h3>المظهر</h3><div class="aft-row">' +
-        '<button class="aft-card' + (THEME === 'light' ? ' on' : '') + '" data-t="light"><span class="aft-pv light"></span>نهاري</button>' +
-        '<button class="aft-card' + (THEME === 'dark' ? ' on' : '') + '" data-t="dark"><span class="aft-pv dark"></span>داكن</button></div>' +
-        '<p>يتغير شكل التطبيق فوراً، وشريط الحالة بأعلى وأسفل الجهاز يتبع نفس اللون.</p></div>' +
-        '<div class="afp-c"><h3>الرسوميات والأداء</h3><div class="afs" id="afg">' +
-        [['static', 'ثابت (الأخف)'], ['lite', 'خفيف'], ['mid', 'متوازن (موصى به)'], ['full', 'كامل']].map(function (x) { return '<button data-g="' + x[0] + '"' + (GFX === x[0] ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') +
-        '</div><p>إذا حسّيت بتقطيع اختر "خفيف" أو "ثابت". المستوى الجديد يكتمل بعد إعادة فتح التطبيق.</p></div>';
+      return '<div class="afp-c"><h3>الرسوميات والأداء</h3><div class="afs" id="afg">' +
+        [['static', 'ثابت (الأخف)'], ['lite', 'خفيف (موصى به)'], ['mid', 'متوازن'], ['full', 'كامل']].map(function (x) { return '<button data-g="' + x[0] + '"' + (GFX === x[0] ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') +
+        '</div><p>إذا حسّيت بتقطيع اختر «ثابت» أو «خفيف». المستوى الجديد يكتمل بعد إعادة فتح التطبيق.</p></div>' +
+        '<div class="afp-c"><h3>ألوان المحادثات</h3><p>المحادثات داكنة افتراضياً، وتقدر تغيّر ألوانها وخطوطها من «إعدادات المحادثة».</p></div>';
     }
-    panel(doc, 'الثيمات والمظهر', html(), function (p) {
-      function redraw() { p.querySelector('.afp-s').innerHTML = html(); wire(); }
-      function wire() {
-        on(p, '.aft-card', function (b) { setTheme(b.dataset.t); redraw(); });
-        on(p, '#afg button', function (b) { setGfx(b.dataset.g); redraw(); });
-      }
+    panel(doc, 'المظهر والأداء', html(), function (p) {
+      function wire() { on(p, '#afg button', function (b) { setGfx(b.dataset.g); p.querySelector('.afp-s').innerHTML = html(); wire(); }); }
       wire();
     });
   }
@@ -303,18 +288,75 @@
     ['نسيت المعرّف أو كلمة السر', 'من أول شاشة اضغط «معرفة حسابي»، ثم اكتب اسمك الثلاثي ورقم حسابك (مثل S266) أو امسح الباركود، واضغط «عرض معلومات حسابي». تظهر لك بياناتك. وإذا ما نفع، اختر «التواصل مع الإدارة».'],
     ['الدرجات والغيابات', 'من الصفحة الرئيسية افتح «درجات الامتحانات» أو «غيابات الطلبة». وتوصلك إشعارات مباشرة لما تنزل درجة أو يُسجَّل غياب.'],
     ['التحاضير والإعلانات', 'من الصفحة الرئيسية افتح «تحاضير الدروس» أو «الإعلانات المدرسية». وكل تحضير أو إعلان جديد يوصلك إشعار فيه العنوان والتفاصيل.'],
+    ['معلومات عن طالب', 'اكتب اسم الطالب الثلاثي هنا وأعرض لك: الاسم والصف ودروس اليوم. وبعدها اكتب معرّف حسابه (مثل S266) لأعرض مستواه ودرجاته وغياباته وتقييم المدرسين ومدة استخدامه للتطبيق.'],
     ['التواصل مع الإدارة', 'اكتب رسالتك هنا بالتفصيل (بدون كلمة السر) وتوصل للإدارة وتردّ عليك بنفس المحادثة. وتقدر تتواصل أيضاً عن طريق زر «الدعم» من أول الشاشة.']
   ];
   window.AF_SUP = SUP;
+  var GN5 = { 1: 'الأول متوسط', 2: 'الثاني متوسط', 3: 'الثالث متوسط', 4: 'الرابع العلمي', 5: 'الخامس العلمي' };
+  var EVL = { 5: 'ممتاز', 4: 'جيد جداً', 3: 'جيد', 2: 'متوسط', 1: 'ضعيف' };
+  var usageCache = {};
+  function nrm(t) { return String(t || '').replace(/[\sً-ْ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').toLowerCase(); }
+  function sameN(a, b) { var x = nrm(a), y = nrm(b); return x.length > 5 && y.length > 5 && (x === y || x.indexOf(y) > -1 || y.indexOf(x) > -1); }
+  function students() {
+    var roster = (J('alfarabi_school_v1', {}).students || []).filter(function (x) { return x && x.name; });
+    return roster;
+  }
+  function pct(v) { var m = String(v || '').match(/(\d+(?:\.\d+)?)\s*[\/من]\s*(\d+(?:\.\d+)?)/); if (m && +m[2] > 0) return +m[1] / +m[2] * 100; var n = parseFloat(v); return isNaN(n) ? null : (n <= 100 ? n : null); }
+  function accOfName(name) { return ((J('alfarabi_db_v1', { accounts: [] }).accounts) || []).filter(function (a) { return a.role === 'student' && sameN(a.name, name); })[0]; }
+  function fetchUsage(name) {
+    var a = accOfName(name); if (!a || !window.FBBASE) return;
+    var uid = String(a.createdAt || a.name);
+    fetch(window.FBBASE + '/usage/a' + uid.replace(/[.#$\[\]\/]/g, '_') + '.json').then(function (r) { return r.json(); }).then(function (d) { usageCache[nrm(name)] = d || {}; }).catch(function () {});
+  }
+  function usageText(name) {
+    var d = usageCache[nrm(name)]; if (!d) return 'جاري حسابها، اكتب المعرّف مرة ثانية بعد لحظات';
+    var days = Object.keys(d), tot = 0, today = 0, week = 0, now = new Date(), t0 = ymd(now), cut = Date.now() - 7 * 864e5;
+    days.forEach(function (k) { var sec = +d[k] || 0; tot += sec; if (k === t0) today = sec; var y = +k.slice(0, 4), m = +k.slice(4, 6) - 1, dd = +k.slice(6, 8); if (new Date(y, m, dd).getTime() >= cut) week += sec; });
+    if (!tot) return 'لا توجد بيانات استخدام بعد';
+    function f(sec) { var m = Math.round(sec / 60); return m < 60 ? m + ' دقيقة' : Math.floor(m / 60) + ' ساعة و' + (m % 60) + ' دقيقة'; }
+    return 'اليوم ' + f(today) + ' • آخر 7 أيام ' + f(week) + ' • المجموع ' + f(tot);
+  }
+  function ymd(d) { return d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
+  function todayLessons(grade) {
+    var D = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'], w = new Date().getDay(); if (w > 4) return 'لا توجد دروس اليوم (عطلة)';
+    var sc = (J('alfarabi_school_v1', {}).schedule || {})[grade], arr = sc && sc.days && sc.days[D[w]];
+    return Array.isArray(arr) && arr.length ? arr.join('، ') : 'غير محدد';
+  }
+  var lastStu = null;
+  function basicStudent(st) {
+    lastStu = st; fetchUsage(st.name);
+    return '👤 الطالب: ' + st.name + '\n🎓 الصف: ' + (GN5[st.grade] || st.grade || '—') + '\n📚 دروس اليوم: ' + todayLessons(st.grade) +
+      '\n\nلعرض مستوى الطالب والدرجات والغيابات وتقييم المدرسين ومدة استخدامه للتطبيق، اكتب معرّف حسابه (مثل S266).';
+  }
+  function fullStudent(st) {
+    var R = J('alfarabi_rec_v1', []) || [], g = R.filter(function (r) { return r && r.k === 'g' && sameN(r.n, st.name); }), a = R.filter(function (r) { return r && r.k === 'a' && sameN(r.n, st.name); }), ev = R.filter(function (r) { return r && r.k === 'ev' && sameN(r.n, st.name); });
+    var ps = g.map(function (r) { return pct(r.v); }).filter(function (x) { return x != null; }), avg = ps.length ? ps.reduce(function (x, y) { return x + y; }, 0) / ps.length : null;
+    var lvl = avg == null ? 'لا توجد درجات بعد' : (avg >= 90 ? 'ممتاز' : avg >= 80 ? 'جيد جداً' : avg >= 70 ? 'جيد' : avg >= 60 ? 'متوسط' : 'ضعيف') + ' (' + Math.round(avg) + '%)';
+    fetchUsage(st.name);
+    return '✅ تم التحقق من المعرّف\n👤 الطالب: ' + st.name + '\n🎓 الصف: ' + (GN5[st.grade] || '—') + '\n📊 مستوى الطالب: ' + lvl +
+      '\n📝 الدرجات: ' + (g.length ? g.slice(0, 6).map(function (r) { return (r.s || 'مادة') + ' ' + r.v; }).join(' • ') : 'لا توجد') +
+      '\n🚫 الغيابات: ' + (a.length ? a.length + ' (آخرها ' + (a[0].d || '') + ')' : 'لا توجد') +
+      '\n⭐ تقييم المدرسين: ' + (ev.length ? ev.slice(0, 6).map(function (r) { return (r.s || 'مادة') + ': ' + (EVL[r.lv] || r.lv) + (r.by ? ' (' + r.by + ')' : ''); }).join(' • ') : 'لا يوجد') +
+      '\n📚 دروس اليوم: ' + todayLessons(st.grade) + '\n⏱ استخدام التطبيق: ' + usageText(st.name);
+  }
   window.afSupReply = function (msg) {
     var t = String(msg || '').trim();
     for (var i = 0; i < SUP.length; i++) if (SUP[i][0] === t) return SUP[i][1];
+    // معرّف حساب (مثل S266): يكشف التفاصيل الكاملة
+    var idm = t.match(/^[A-Za-z]{0,2}\s?(\d{2,6})$/);
+    if (idm) {
+      var digits = String(idm[1]).replace(/^0+/, ''), st = students().filter(function (x) { return String(x.accountId || '').replace(/\D/g, '').replace(/^0+/, '') === digits; })[0];
+      if (st) return fullStudent(st);
+      return 'ما لقيت طالب بهذا المعرّف. تأكد منه واكتبه مثل S266.';
+    }
+    // اسم طالب
+    if (t.split(/\s+/).length >= 2) { var found = students().filter(function (x) { return sameN(x.name, t); })[0]; if (found) return basicStudent(found); }
     var l = t.toLowerCase();
     if (/نسيت|كلمة السر|كلمه السر|المعرف|المعرّف/.test(l)) return SUP[5][1];
     if (/تسجيل|دخول|login|حساب/.test(l)) return SUP[0][1];
     if (/درج|غياب/.test(l)) return SUP[6][1];
     if (/تحضير|اعلان|إعلان|درس/.test(l)) return SUP[7][1];
-    return 'تفضّل، اختر من الخيارات اللي تحت وأنا أساعدك:';
+    return 'تفضّل، اختر من الخيارات اللي تحت، أو اكتب اسم الطالب الثلاثي لأعرض معلوماته:';
   };
   function supTick(d) {
     try {
@@ -420,6 +462,91 @@
   };
   setInterval(function () { try { var p = A.pendingOpen && A.pendingOpen(); if (p) window.afOpenImportant(p); } catch (e) {} }, 1200);
 
+
+  /* ===================== تنظيف البيانات (للإدارة فقط) ===================== */
+  function cleanupPage(doc) {
+    var backed = false, plan = null;
+    function counts() {
+      var db = (J('alfarabi_db_v1', { accounts: [] }).accounts) || [], ch = J('alfarabi_chat_v2', {}), n = 0;
+      Object.keys(ch).forEach(function (k) { n += (ch[k] || []).length; });
+      function by(r) { return db.filter(function (a) { return a.role === r; }).length; }
+      return { st: by('student'), te: by('teacher'), pa: by('parent'), msgs: n };
+    }
+    function html() {
+      var c = counts();
+      return '<div class="afp-c"><h3>الموجود حالياً</h3><p>طلاب مسجلون: <b>' + c.st + '</b> • مدرسون: <b>' + c.te + '</b> • أولياء أمور: <b>' + c.pa + '</b> • رسائل المحادثات: <b>' + c.msgs + '</b></p><p>المدرسون والإدارة لا يُحذفون أبداً.</p></div>' +
+        '<div class="afp-c"><h3>خيارات التنظيف</h3>' +
+        '<label class="afck"><input type="checkbox" id="cu1" checked> حذف رسائل المحادثات الأقدم من <input type="number" id="cud" class="afin" style="width:80px;display:inline-block;margin:0 6px" value="30" min="1"> يوم</label>' +
+        '<label class="afck"><input type="checkbox" id="cu2"> إبقاء آخر <input type="number" id="cun" class="afin" style="width:90px;display:inline-block;margin:0 6px" value="200" min="1"> طالب مسجل فقط وحذف حسابات الباقين</label>' +
+        '<label class="afck"><input type="checkbox" id="cu3"> حذف حسابات أولياء الأمور المرتبطين بالطلاب المحذوفين</label>' +
+        '<div class="aft-row" style="margin-top:10px"><button class="afbtn gray" id="cup" style="flex:1">معاينة</button><button class="afbtn gray" id="cub" style="flex:1">نسخة احتياطية</button></div>' +
+        '<div class="afmsg" id="cum"></div><div class="hdpr" id="cupr" style="display:none"><i></i></div>' +
+        '<button class="afbtn" id="cux" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#ff5d6e,#d9283d)" disabled>تنفيذ التنظيف</button></div>' +
+        '<div class="afp-c"><p>خطوات الأمان: 1) اضغط «نسخة احتياطية» وتنزل ملف بكل البيانات. 2) اضغط «معاينة» لتشوف كم راح يتحذف. 3) بعدها يتفعل «تنفيذ التنظيف». الحذف نهائي ويطبّق على كل الأجهزة.</p></div>';
+    }
+    panel(doc, 'تنظيف البيانات', html(), function (p) {
+      var m = p.querySelector('#cum'), x = p.querySelector('#cux'), pr = p.querySelector('#cupr'), bar = pr.firstChild;
+      function msg(t, c) { m.className = 'afmsg ' + (c || ''); m.textContent = t; }
+      function arm() { x.disabled = !(backed && plan && (plan.msgs.length || plan.accs.length)); }
+      p.querySelector('#cub').onclick = function () {
+        var o = { when: new Date().toISOString(), accounts: J('alfarabi_db_v1', {}), chat: J('alfarabi_chat_v2', {}), records: J('alfarabi_rec_v1', []), school: J('alfarabi_school_v1', {}) };
+        var fr = new FileReader(); fr.onload = function () { var a = doc.createElement('a'); a.href = fr.result; a.download = 'alfarabi-backup-' + ymd(new Date()) + '.json'; doc.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 500); backed = true; msg('تم تنزيل النسخة الاحتياطية ✓ (تلقاها في التنزيلات)', 'ok'); arm(); };
+        fr.readAsDataURL(new Blob([JSON.stringify(o)], { type: 'application/json' }));
+      };
+      p.querySelector('#cup').onclick = function () {
+        var db = (J('alfarabi_db_v1', { accounts: [] }).accounts) || [], ch = J('alfarabi_chat_v2', {}), msgs = [], accs = [];
+        if (p.querySelector('#cu1').checked) {
+          var cut = Date.now() - Math.max(1, +p.querySelector('#cud').value || 30) * 864e5;
+          Object.keys(ch).forEach(function (k) { (ch[k] || []).forEach(function (mm) { if (mm && mm.ts && mm.ts < cut) msgs.push([k, mm.id]); }); });
+        }
+        if (p.querySelector('#cu2').checked) {
+          var keep = Math.max(1, +p.querySelector('#cun').value || 200), sts = db.filter(function (a) { return a.role === 'student'; }).sort(function (a, b) { return (+b.createdAt || 0) - (+a.createdAt || 0); });
+          sts.slice(keep).forEach(function (a) { accs.push(a); });
+          if (p.querySelector('#cu3').checked) {
+            var gone = accs.map(function (a) { return a.name; });
+            db.filter(function (a) { return a.role === 'parent' && gone.some(function (n) { return sameN(a.child, n); }); }).forEach(function (a) { accs.push(a); });
+          }
+        }
+        plan = { msgs: msgs, accs: accs }; msg('سيتم حذف ' + accs.length + ' حساب و ' + msgs.length + ' رسالة.' + (backed ? '' : ' (اعمل نسخة احتياطية أولاً)'), accs.length || msgs.length ? '' : 'ok'); arm();
+      };
+      x.onclick = function () {
+        if (!plan) return;
+        confirmDlg(doc, 'سيتم حذف ' + plan.accs.length + ' حساب و ' + plan.msgs.length + ' رسالة نهائياً من كل الأجهزة. هل أنت متأكد؟', 'نعم، احذف', function () {
+          x.disabled = true; pr.style.display = 'block'; var total = plan.accs.length + plan.msgs.length, done = 0;
+          function step() { bar.style.width = (total ? done / total * 100 : 100) + '%'; }
+          var jobs = [];
+          plan.accs.forEach(function (a) { jobs.push(function () { var id = 'a' + String(a.createdAt || a.email).replace(/[.#$\[\]\/]/g, '_'); return (window.FBBASE ? fetch(window.FBBASE + '/accounts/' + id + '.json', { method: 'DELETE' }) : Promise.resolve()).then(function () { var db = J('alfarabi_db_v1', { accounts: [] }); db.accounts = (db.accounts || []).filter(function (b) { return !(b.email === a.email && String(b.createdAt) === String(a.createdAt)); }); LS.setItem('alfarabi_db_v1', JSON.stringify(db)); }); }); });
+          plan.msgs.forEach(function (mm) { jobs.push(function () { try { window.chatDel(mm[0], mm[1]); } catch (e) {} return Promise.resolve(); }); });
+          (function run(i) { if (i >= jobs.length) { bar.style.width = '100%'; msg('تم التنظيف ✓ (الحذف من الخادم قد ياخذ دقائق للرسائل)', 'ok'); plan = null; return; } jobs[i]().catch(function () {}).then(function () { done++; if (done % 10 === 0) step(); setTimeout(function () { run(i + 1); }, 0); }); })(0);
+        });
+      };
+    });
+  }
+  function confirmDlg(doc, msg, okText, cb) {
+    var o = doc.createElement('div'); o.className = 'afcf';
+    o.innerHTML = '<div class="afcf-b"><p>' + esc(msg) + '</p><div><button class="afbtn gray" data-n>إلغاء</button><button class="afbtn" style="background:linear-gradient(135deg,#ff5d6e,#d9283d)" data-y>' + esc(okText) + '</button></div></div>';
+    doc.body.appendChild(o); o.querySelector('[data-n]').onclick = function () { o.remove(); }; o.querySelector('[data-y]').onclick = function () { o.remove(); cb(); };
+  }
+
+  /* ===================== مدة استخدام التطبيق (لكل حساب) ===================== */
+  (function () {
+    var key = null, acc = 0, last = 0;
+    setInterval(function () {
+      try {
+        var R = roleInfo(); if (R.role === 'guest' || R.role === 'admin' || !R.uid) return;
+        if (!A.isForeground || !A.isForeground()) return;
+        var day = ymd(new Date()), k = 'af_use_' + R.uid + '_' + day;
+        var cur = +g(k, '0') + 30; s(k, String(cur)); acc += 30;
+        if (acc >= 180 && window.FBBASE) {
+          acc = 0;
+          fetch(window.FBBASE + '/usage/a' + String(R.uid).replace(/[.#$\[\]\/]/g, '_') + '/' + day + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: String(cur) }).catch(function () {});
+        }
+      } catch (e) {}
+    }, 30000);
+  })();
+
+  window.AFX = { panel: function (d, t, h, b) { return panel(d, t, h, b, true); }, esc: esc, on: on, roleInfo: function () { return roleInfo(); }, J: J };
+
   /* ===================== إدراج الأزرار بقائمة الإعدادات ===================== */
   function injectEntries(doc) {
     var nbOn = doc.querySelector('.nb.on'), onSettings = nbOn && nbOn.getAttribute('data-v') === 'settings';
@@ -437,8 +564,10 @@
         b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); fn(doc); });
         sc.appendChild(b);
       }
+      var RI = roleInfo();
+      if (RI.role === 'admin') { add('📚 ملازم الثالث متوسط 2027', function (d) { if (window.afHandouts) window.afHandouts(d); }); add('🧹 تنظيف البيانات', cleanupPage); }
       add('📢 الإشعارات المهمة', importantPage);
-      add('🎨 الثيمات والمظهر', themePage);
+      add('🎨 المظهر والأداء', themePage);
       add('🔒 الأمان والبصمة', securityPage);
       // زر "إعدادات المحادثة" القديم يفتح الصفحة الجديدة
       opts.forEach(function (b) {
@@ -467,6 +596,6 @@
     setInterval(function () { allDocs().forEach(function (d) { if (d.documentElement && d.documentElement.getAttribute('data-aft') !== THEME) applyDoc(d); watchDoc(d); }); }, 2500);
   }
   // نظهر الثيم من أول لحظة
-  (function early() { var r = document.documentElement; r.setAttribute('data-aft', THEME); r.classList.toggle('af-lite', GFX === 'lite' || GFX === 'static'); r.classList.toggle('af-nofx', GFX !== 'full'); var st = document.createElement('style'); st.id = 'af-x'; st.textContent = CSS; (document.head || r).appendChild(st); try { A.setBars(THEME === 'dark'); } catch (e) {} })();
+  (function early() { var r = document.documentElement; r.setAttribute('data-aft', THEME); r.classList.toggle('af-lite', GFX === 'lite' || GFX === 'static'); r.classList.toggle('af-nofx', GFX !== 'full'); var st = document.createElement('style'); st.id = 'af-x'; st.textContent = CSS; (document.head || r).appendChild(st); try { A.setBars(false); } catch (e) {} })();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

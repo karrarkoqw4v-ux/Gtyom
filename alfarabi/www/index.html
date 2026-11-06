@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/fonts/fonts.css">
   <script src="/af-android.js"></script>
   <script src="/af-extra.js"></script>
+  <script src="/af-handouts.js"></script>
   <script src="/af-perf.js?v=20261104y" defer></script>
   <script src="/af-smooth.js?v=20261104y" defer></script>
   <script src="/af-3d.js?v=20261104y" defer></script>
@@ -2577,7 +2578,7 @@ var CHEV='<svg class="chev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
 var ARW='<svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',DOT='<svg viewBox="0 0 24 24"><path d="M12 5v.01M12 12v.01M12 19v.01"/></svg>';
 var CLP='<svg viewBox="0 0 24 24"><path d="M20 11l-8 8a5 5 0 01-7-7l8-8a3.500 3.500 0 015 5l-8 8a2 2 0 01-3-3l7-7"/></svg>',SND='<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>';
 var CHK='<svg viewBox="0 0 24 24"><path d="M2 13l4 4L14 8M10 15l2 2L22 8"/></svg>',TRASH='<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',PH='<svg viewBox="0 0 24 24"><path d="M6 3h4l2 5-2.5 1.5a11 11 0 005 5L16 12l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 013-2z"/></svg>';
-var MENU=[['schedule','جدول الأسبوع'],['announcements','الإعلانات المدرسية'],['plans','تحاضير الدروس'],['absence','غيابات الطلبة'],['grades','درجات الامتحانات'],['chat','محادثة المدرسين'],['support','الدعم'],['logout','تسجيل الخروج']];MENU.splice(MENU.length-2,0,['tools','أدوات مفيدة للطلبة']);if(U.role==='student'&&String(U.grade)==='3')MENU.splice(MENU.length-2,0,['ministryView','أسئلة وزارية']);
+var MENU=[['schedule','جدول الأسبوع'],['announcements','الإعلانات المدرسية'],['plans','تحاضير الدروس'],['handouts','ملازم الثالث متوسط 2027'],['absence','غيابات الطلبة'],['grades','درجات الامتحانات'],['chat','محادثة المدرسين'],['support','الدعم'],['logout','تسجيل الخروج']];MENU.splice(MENU.length-2,0,['tools','أدوات مفيدة للطلبة']);if(U.role==='student'&&String(U.grade)==='3')MENU.splice(MENU.length-2,0,['ministryView','أسئلة وزارية']);V.handouts=function(){mark('');try{parent.afHandouts(document)}catch(e){toast('تعذّر فتح الملازم')}};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tmr);tmr=setTimeout(function(){t.classList.remove('show')},2200)}
 function J(k,d){try{return JSON.parse(LS.getItem(k))||d}catch(e){return d}}
@@ -3288,9 +3289,7 @@ function push(m){var d=J(CK,{});(d[cg]=d[cg]||[]).push(m);return W(CK,d)}
 function base(m){return{id:Date.now(),u:uid,n:(cg&&cg.indexOf('dsup_')===0&&window.alfSupportDisplayName?window.alfSupportDisplayName:U.name),r:U.role,ts:Date.now()}}
 function afLum(h){var m=String(h).match(/#([0-9a-f]{6})/i);if(!m)return 0;var n=parseInt(m[1],16);return (0.299*(n>>16&255)+0.587*(n>>8&255)+0.114*(n&255))/255}
 function afPaint(p){try{ch.setAttribute('data-g',cg)}catch(e){}try{var g1=J('af_cp_g_'+uid,{}),g2=(J(PK,{})[cg]||{}),has=Object.keys(g1).length||Object.keys(g2).length,dk=document.documentElement.getAttribute('data-aft')==='dark';
- if(!has&&dk){ch.removeAttribute('data-afcp');return}
- if(!has&&document.documentElement.getAttribute('data-aft')){p.bub='#cfe8ff';p.tx='#0b3a5b';p.bg='linear-gradient(180deg,#f4faff,#e3f1ff)'}
- else if(!has){ch.removeAttribute('data-afcp');return}
+ if(!has){ch.removeAttribute('data-afcp');return}
  var light=afLum(p.bg)>.6;ch.setAttribute('data-afcp',light?'light':'dark');
  ch.style.setProperty('--chbg',p.bg);ch.style.setProperty('--chfg',light?'#16213a':'#eef1f7');ch.style.setProperty('--obb',light?'#ffffff':'#25272b')}catch(e){}}
 function paint(){var p=pf(cg);afPaint(p);ch.style.background=p.bg;wallApply();ch.style.setProperty('--bub',p.bub);ch.style.setProperty('--tx',p.tx);ch.style.setProperty('--fs',p.fs+'px');ch.style.setProperty('--ff',"'"+p.ff+"',sans-serif");ch.style.setProperty('--fw',p.fw)}
