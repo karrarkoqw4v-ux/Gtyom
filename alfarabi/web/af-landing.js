@@ -11,7 +11,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.06-g';
+  var VER = '2026.11.06-h';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null;
   W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dip = e; refreshPwa(); });
@@ -146,8 +146,8 @@
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<div class="hi">أهلاً وسهلاً</div><h1>ترحب بكم</h1><div class="sn">ثانوية الفارابي الأهلية للبنين</div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
-    '<button class="bt a" data-a="pwa">' + (isAnd ? badge('جهازك') : '') + '<span class="lg2">' + I.and + '</span>' + '<span class="t">تثبيت كتطبيق Android<small>تثبيت مباشر من المتصفح بضغطة وحدة</small></span></button>' +
-    '<button class="bt k" data-a="apk"><span class="lg2">' + I.apk + '</span><span class="t">تثبيت نسخة APK<small>تنزيل مباشر — يثبّت على أي جهاز أندرويد</small></span></button>' +
+    '<button class="bt a" data-a="apk">' + (isAnd ? badge('جهازك') : '') + '<span class="lg2">' + I.and + '</span>' + '<span class="t">تثبيت كتطبيق Android<small>تنزيل مباشر لنسخة APK</small></span></button>' +
+    '<button class="bt k" id="afpwa" data-a="pwa" style="display:none"><span class="lg2">' + I.web + '</span><span class="t">تثبيت من المتصفح<small>بدون ملفات، بضغطة وحدة</small></span></button>' +
     '<button class="bt i" data-a="ios">' + (isIOS ? badge('جهازك') : '') + '<span class="lg2">' + I.app + '</span>' + '<span class="t">تثبيت كتطبيق Apple<small>iPhone و iPad من سفاري</small></span></button>' +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
     '<button class="sk" data-a="go">المتابعة من المتصفح بدون تثبيت</button>' +
@@ -173,14 +173,10 @@
       '<div class="lb">المرحلة المتوسطة</div><div class="gd g3">' + chips(STM) + '</div><div class="lb">المرحلة الإعدادية</div><div class="gd g2">' + chips(STP) + '</div><div class="lb">نوع الحساب</div><div class="gd g3 r">' + rc + '</div>' +
       '<ol class="st">' + steps(drl, dst).map(function (t) { return '<li><span>' + t + '</span></li>'; }).join('') + '</ol>' +
       '<div class="nt">المعرّف وكلمة السر تستلمهما من بطاقة المدرسة. إذا واجهتك مشكلة بالدخول راجع دعم المدرسة من صفحة الدخول.</div></div>' +
-      '<div class="dc"><h3>حسابات المدرسة</h3><p class="sb2">تابعنا وتواصل مع المشرف</p>' +
-      '<a class="ac" href="https://www.facebook.com/share/1EeerkPeNQ/" target="_blank" rel="noopener"><span class="ai fb">' + I.fb + '</span><span class="t">صفحة المدرسة<small>فيسبوك — ثانوية الفارابي الأهلية</small></span>' + I.chv + '</a>' +
-      '<button class="ac" data-a="ph"><span class="ai ph">' + I.ph + '</span><span class="t">رقم هاتف المشرف<small dir="ltr" style="text-align:right">+964 780 018 8441</small></span>' + I.chv + '</button></div>' +
       '<div class="dc cr"><div class="ln"></div><h3>الشكر والتقدير</h3>' +
       '<div class="cm"><span>تم تطوير التطبيق من</span><b>الإدارة المحترمة</b></div>' +
       '<div class="cm"><span>وبجهود الأساتذة</span><b>كادر التدريس المحترم</b></div>' +
-      '<div class="rw"><div><small>المشرف</small><b>الأستاذ زين العابدين</b></div><div><small>المصمم</small><b>كرار حيدر</b></div></div></div>' +
-      '<button class="ac" data-a="mnt" style="margin-top:2px"><span class="ai ph" style="background:linear-gradient(135deg,#1f2a44,#14213d)">' + I.lock.replace('<svg','<svg style="color:#fff"') + '</span><span class="t">صيانة التحديثات<small>للمشرف فقط</small></span>' + I.chv + '</button>';
+      '<div class="rw"><div><small>المشرف</small><b>الأستاذ زين العابدين</b></div><div><small>المصمم</small><b>كرار حيدر</b></div></div></div>';
   }
   function mount() { if (!D.body) return setTimeout(mount, 30); D.body.appendChild(root); D.documentElement.classList.add('afl-on'); D.documentElement.style.overflow = 'hidden'; D.documentElement.style.overflowX = 'hidden'; D.body.style.overflowX = 'hidden'; }
   mount();
@@ -204,7 +200,7 @@
     o.addEventListener('click', function (e) { var t = e.target; if (t === o) { o.remove(); return; } var b = t.closest && t.closest('[data-a]'); if (!b) return; act(b.getAttribute('data-a')); });
     D.body.appendChild(o);
   }
-  function refreshPwa() { var s = D.getElementById('afpw'); if (s) s.querySelector('small').textContent = dip ? 'تثبيت مباشر بضغطة وحدة' : 'من قائمة المتصفح ⋮ ← تثبيت التطبيق'; }
+  function refreshPwa() { var c = D.getElementById('afpwa'); if (c && dip && !isIOS) c.style.display = '';  var s = D.getElementById('afpw'); if (s) s.querySelector('small').textContent = dip ? 'تثبيت مباشر بضغطة وحدة' : 'من قائمة المتصفح ⋮ ← تثبيت التطبيق'; }
 
   function andSheet() {
     sheet('<h2>تثبيت كتطبيق Android</h2><p class="sb">اختر الطريقة المناسبة</p>' +

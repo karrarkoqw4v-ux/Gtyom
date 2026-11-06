@@ -70,7 +70,8 @@ object WebHolder {
                     "ttf" -> "font/ttf"
                     else -> "application/octet-stream"
                 }
-                WebResourceResponse(mime, "utf-8", c.assets.open(p)).apply { responseHeaders = mapOf("Cache-Control" to "no-cache") }
+                val ota = Ota.open(c, p)
+                WebResourceResponse(mime, "utf-8", ota ?: c.assets.open(p)).apply { responseHeaders = mapOf("Cache-Control" to "no-cache") }
             } catch (e: IOException) {
                 WebResourceResponse("text/plain", "utf-8", 404, "Not Found", emptyMap(), "".byteInputStream())
             }
@@ -80,6 +81,7 @@ object WebHolder {
     @SuppressLint("SetJavaScriptEnabled")
     fun obtain(application: Application, act: MainActivity): WebView {
         app = application
+        try { Ota.startup(application) } catch (_: Throwable) {}
         ctx?.baseContext = act
         web?.let { return it }
         val cw = MutableContextWrapper(act); ctx = cw
@@ -296,6 +298,16 @@ object WebHolder {
 
         @JavascriptInterface
         fun setBio(on: Boolean) { activity?.runOnUiThread { activity?.setBioLock(on) } }
+
+        /** ===== تحديث الواجهة عن بعد ===== */
+        @JavascriptInterface fun otaVersion(): Long = Ota.version(app)
+        @JavascriptInterface fun otaBad(): Long = Ota.bad(app)
+        @JavascriptInterface fun otaOk() { Ota.ok(app) }
+        @JavascriptInterface fun otaBegin() { Ota.begin(app) }
+        @JavascriptInterface fun otaChunk(b64: String): Boolean = try { Ota.chunk(app, Base64.decode(b64, Base64.DEFAULT)) } catch (_: Throwable) { false }
+        @JavascriptInterface fun otaCommit(v: Long): Boolean = Ota.commit(app, v)
+        @JavascriptInterface fun appVersion(): String = try { app.packageManager.getPackageInfo(app.packageName, 0).versionName ?: "" } catch (_: Throwable) { "" }
+        @JavascriptInterface fun otaReload() { web?.post { web?.reload() } }
 
         /** وسيط لطلبات الصفحة لخادم المدرسة (رفع الصور والإشعارات) */
         @JavascriptInterface

@@ -14,6 +14,30 @@
   var TIER = { static: 0, lite: 1, mid: 2, full: 3 };
   var ORDER = ['static', 'lite', 'mid', 'full'];
   var AUTO = g('af_auto_lvl', 'lite'); if (ORDER.indexOf(AUTO) < 0) AUTO = 'lite';
+
+  /* فحص مواصفات الجهاز لاختيار أفضل مستوى رسوميات من أول تشغيل (يبقى بعدها مراقب السلاسة يعدّل) */
+  function specLevel() {
+    try {
+      var n = navigator, sc = 0, why = [];
+      var cores = n.hardwareConcurrency || 4, mem = n.deviceMemory || 4;
+      sc += cores >= 8 ? 3 : cores >= 6 ? 2 : cores >= 4 ? 1 : 0;
+      sc += mem >= 8 ? 3 : mem >= 6 ? 2 : mem >= 4 ? 1 : 0;
+      try {
+        var cv = document.createElement('canvas'), gl = cv.getContext('webgl') || cv.getContext('experimental-webgl');
+        if (gl) {
+          var ext = gl.getExtension('WEBGL_debug_renderer_info'), r = ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : '';
+          if (/Adreno\s*(7|8)\d\d|Mali-G(7[0-9]|[89]\d)|Apple|Xclipse|Immortalis/i.test(r)) sc += 3;
+          else if (/Adreno\s*6[3-9]\d|Mali-G(5[2-9]|6\d)|PowerVR.*(GE8|GM9)/i.test(r)) sc += 2;
+          else if (/Adreno\s*[45]\d\d|Adreno\s*6[0-2]\d|Mali-(T|G[0-4]\d|G5[01])|PowerVR|SwiftShader|llvmpipe/i.test(r)) sc += 0;
+          else sc += 1;
+        }
+      } catch (e) { }
+      try { var di = JSON.parse(A.deviceInfo()); if (di && di.os && parseFloat(di.os) && parseFloat(di.os) < 9) sc -= 2; } catch (e) { }
+      try { var c = n.connection; if (c && c.saveData) sc -= 3; if (matchMedia('(prefers-reduced-motion: reduce)').matches) sc -= 4; } catch (e) { }
+      return sc >= 8 ? 'full' : sc >= 6 ? 'mid' : sc >= 3 ? 'lite' : 'static';
+    } catch (e) { return 'lite'; }
+  }
+  if (g('af_auto_spec20', '') !== '1') { s('af_auto_spec20', '1'); var sl = specLevel(); if (sl === 'full') sl = 'mid'; AUTO = sl; s('af_auto_lvl', sl); }
   function lvl() { return GFX === 'auto' ? AUTO : GFX; }
 
   // نثبّت مستوى الرسوميات قبل ما يقرأه محرك الأداء
@@ -603,7 +627,7 @@
         sc.appendChild(b);
       }
       var RI = roleInfo();
-      if (RI.role === 'admin') { add('📚 ملازم الثالث متوسط 2027', function (d) { if (window.afHandouts) window.afHandouts(d); }); add('🧹 تنظيف البيانات', cleanupPage); }
+      if (RI.role === 'admin') { add('📚 ملازم الثالث متوسط 2027', function (d) { if (window.afHandouts) window.afHandouts(d); }); add('🧹 تنظيف البيانات', cleanupPage); add('الصيانة والتحديثات', function (d) { if (window.afMaint) window.afMaint(d); }); }
       add('📢 الإشعارات المهمة', importantPage);
       add('🎨 المظهر والأداء', themePage);
       add('🔒 الأمان والبصمة', securityPage);
