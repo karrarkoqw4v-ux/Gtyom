@@ -10,15 +10,15 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="format-detection" content="telephone=no">
   <title>بوابة الدخول الإلكترونية | ثانوية الفارابي الأهلية للبنين</title>
-  <link rel="stylesheet" href="/fonts/fonts.css">
-  <script src="/af-webshim.js?v=1793940907"></script>
-  <script src="/af-landing.js?v=1793940907"></script>
-  <script src="/af-android.js?v=1793940907"></script>
-  <script src="/af-extra.js?v=1793940907"></script>
-  <script src="/af-handouts.js?v=1793940907"></script>
-  <script src="/af-perf.js?v=20261104y" defer></script>
-  <script src="/af-smooth.js?v=20261104y" defer></script>
-  <script src="/af-3d.js?v=20261104y" defer></script>
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <script src="af-webshim.js?v=1793941169"></script>
+  <script src="af-landing.js?v=1793941169"></script>
+  <script src="af-android.js?v=1793941169"></script>
+  <script src="af-extra.js?v=1793941169"></script>
+  <script src="af-handouts.js?v=1793941169"></script>
+  <script src="af-perf.js?v=20261104y" defer></script>
+  <script src="af-smooth.js?v=20261104y" defer></script>
+  <script src="af-3d.js?v=20261104y" defer></script>
   <style>
 
 :root {
@@ -613,8 +613,10 @@ body.prep-section .option .opt-ico { background:linear-gradient(135deg,#eee5d3,#
 @media(max-width:420px){.sp-preview-btn{font-size:12px;padding:10px}.sp-h{font-size:19px!important;line-height:1.5!important}.sp-bio,.sp-dm{overflow-wrap:anywhere;line-height:1.75}.sp-tabs button{font-size:12px!important;padding:9px 7px!important}.sp-p{margin-left:8px!important;margin-right:8px!important}.sp-pt{font-size:14px;line-height:1.8;overflow-wrap:anywhere}}
 </style>
 
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="shortcut icon" href="favicon.ico">
 <script id="af-device-token">(function(){try{function ck(){var m=document.cookie.match(/(?:^|; )afdev_t=([a-f0-9]{32})/);return m?m[1]:null}
 var t=null;try{t=localStorage.getItem('afdev_t')}catch(e){}
 var q=(location.search.match(/[?&]dt=([a-f0-9]{32})/)||[])[1],s=null;try{s=localStorage.getItem('alfarabi_session')}catch(e){}
@@ -624,10 +626,9 @@ try{localStorage.setItem('afdev_t',t)}catch(e){}
 document.cookie='afdev_t='+t+';path=/;max-age=315360000;SameSite=Lax'+(location.protocol==='https:'?';Secure':'');
 window.AFDT=t;
 if(q){try{history.replaceState(null,'',location.pathname+location.search.replace(/([?&])dt=[a-f0-9]{32}&?/,'$1').replace(/[?&]$/,'')+location.hash)}catch(e){}}
-var m=document.querySelector('link[rel="manifest"]');if(m)m.href='/manifest.json?dt='+t;
+var m=document.querySelector('link[rel="manifest"]');if(m)m.href='manifest.json?dt='+t;
 }catch(e){}})();
 </script>
-<link rel="icon" href="/school-install-icon.svg" type="image/svg+xml">
 <meta name="application-name" content="ثانوية الفارابي الأهلية للبنين">
 <meta name="apple-mobile-web-app-title" content="ثانوية الفارابي">
 <style id="install-app-button-style">
@@ -2549,7 +2550,7 @@ function u8(s){s=s.replace(/-/g,'+').replace(/_/g,'/');var r=atob(s+'='.repeat((
 window.pushSetup=async function(ask){try{var C=window.CUR;if(!C||C.role==='admin'||!navigator.serviceWorker||!window.PushManager||!window.Notification)return;
 if(Notification.permission==='default'&&ask)await Notification.requestPermission();
 if(Notification.permission!=='granted'||subbed===uo(C))return;subbed=uo(C);
-var reg=await navigator.serviceWorker.register('/sw.js');await navigator.serviceWorker.ready;
+var reg=await navigator.serviceWorker.register('sw.js');await navigator.serviceWorker.ready;
 var s=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VP)});
 var r=await fetch('/push/sub',{method:'POST',body:JSON.stringify({uid:uo(C),sub:s.toJSON()})});if(!r.ok)subbed=''}catch(e){subbed=''}};
 setInterval(function(){if(window.CUR&&window.Notification&&Notification.permission==='granted')pushSetup()},4000);
@@ -3772,7 +3773,7 @@ if(modal){var cl=document.getElementById('installChoiceClose');if(cl)cl.addEvent
  if(platform==='apple'){closeModal();openGuide()}})})}
 b.addEventListener('click',function(){if(standalone())return;if(isIOS)openGuide();else openModal()});
 window.addEventListener('appinstalled',update);setInterval(update,700);
-if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})})}
+if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
 touchIcon();update();})();</script>
 <style id="alfarabi-main-dashboard-css">.alf-dash{display:grid;gap:10px;margin:14px 0;text-align:right;direction:rtl}.alf-dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.alf-dash-card{border:1px solid #d9e8f5;border-radius:16px;padding:12px;background:rgba(255,255,255,.86);box-shadow:0 6px 18px #2b609018}.alf-dash-card b{display:block;font-size:20px;color:#087fc4}.alf-dash-card small{color:#5b6b86}.alf-dash-title{font-weight:900;color:#14213d;margin:5px 0}.alf-dash-row{padding:9px 10px;border-radius:12px;background:#fff;color:#263b5c;font-size:13px;border:1px solid #e4edf7}.alf-dash-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.alf-dash-actions button{border:0;border-radius:13px;padding:11px 7px;font:inherit;font-weight:800;background:linear-gradient(135deg,#0aa6f5,#3f6fd6);color:#fff}.alf-dash-actions button.alt{background:#fff;color:#1678bd;border:1px solid #b9dcf4}@media(max-width:360px){.alf-dash-card{padding:9px}.alf-dash-card b{font-size:17px}.alf-dash-row{font-size:12px}}.alf-search-box{display:flex;gap:6px;margin:10px 0}.alf-search-box input{flex:1;min-width:0;border:1px solid #cbdceb;border-radius:11px;padding:10px;font:inherit}.alf-search-box button{border:0;border-radius:11px;padding:9px 12px;background:#0aa6f5;color:#fff;font:inherit;font-weight:800}</style><script id="alfarabi-dashboard-runtime">(function(){
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -4472,7 +4473,7 @@ window.USER_CSS=(window.USER_CSS||'')+RP_CSS;
 <script id="af-v1104o">
 /* v20261104y: الخط، ملف الطالب، مستوى ونجمة، حذف رسالتك للطالب */
 (function(){
-var FONT_LINK='<link rel="stylesheet" href="/fonts/fonts.css">';
+var FONT_LINK='<link rel="stylesheet" href="fonts/fonts.css">';
 var FONT_CSS=String.raw`<style id="af-font">
 :root{--af-font:-apple-system,BlinkMacSystemFont,"SF Arabic","SF Pro Text","IBM Plex Sans Arabic","Noto Sans Arabic","Segoe UI",Tahoma,sans-serif}
 html,body,body *,input,textarea,button,select{font-family:var(--af-font)!important;letter-spacing:0!important}
