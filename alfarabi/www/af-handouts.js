@@ -52,14 +52,25 @@
     if (doc.getElementById('af-hd')) return;
     var st = doc.createElement('style'); st.id = 'af-hd';
     st.textContent = [
-      '.hdgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}',
-      '.hdc{background:#fff;color:#14213d;border-radius:20px;padding:10px;box-shadow:0 2px 12px rgba(20,33,61,.1);display:flex;flex-direction:column;gap:6px;border:1px solid #e4ecf7}',
-      '.hdc-i{aspect-ratio:3/4;border-radius:14px;overflow:hidden;background:#e6eefb}.hdc-i img{width:100%;height:100%;object-fit:cover;display:block}',
-      '.hdc b{font-size:14.5px;line-height:1.6;min-height:46px}',
-      '.hdc .hr{font-size:12.5px;line-height:1.7;color:#4b5b78}.hdc .hr span{color:#8a98b2}',
-      '.hdst i{font-style:normal;color:#cdd6e4;font-size:15px}.hdst i.on{color:#f5a524}',
-      '.hdc .go{border:0;border-radius:14px;padding:11px 8px;font:inherit;font-size:13.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#0aa6f5,#2f7fb0);cursor:pointer}',
-      '.hdc .mg{display:flex;gap:6px}.hdc .mg button{flex:1;border:1px solid #d9e3f2;background:#f4f8fd;border-radius:10px;padding:7px 2px;font:inherit;font-size:11.5px;font-weight:600;color:#14213d;cursor:pointer}',
+      '.hdgrid{display:grid;gap:14px}',
+      '.hdc{background:#fff;color:#3c3c3c;border:3px solid #e5e7ee;border-radius:22px;padding:14px}',
+      '.hdc-top{display:flex;gap:12px;align-items:flex-start;direction:rtl}',
+      '.hdc-i{width:98px;flex:none;aspect-ratio:3/4;border-radius:8px;overflow:hidden;background:#e6eefb;box-shadow:0 2px 8px rgba(0,0,0,.22)}',
+      '.hdc-i img{width:100%;height:100%;object-fit:cover;display:block}',
+      '.hdc-inf{flex:1;min-width:0}',
+      '.hdc-inf b{display:block;font-size:15.5px;font-weight:800;line-height:1.6;margin-bottom:6px;color:#2b2b2b}',
+      '.hdc .hr{display:flex;align-items:center;gap:7px;font-size:13px;line-height:1.7;color:#4b4b4b;margin:3px 0}',
+      '.hdc .hr span{font-weight:700}',
+      '.hdc .hr svg{width:19px;height:19px;flex:none;color:#1cb0f6}',
+      '.hdc hr{border:0;border-top:2px solid #e8eaf0;margin:12px 0}',
+      '.hdc-m{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;font-weight:700;color:#4b4b4b}',
+      '.hdc-m span{display:flex;align-items:center;gap:6px}.hdc-m svg{width:19px;height:19px;color:#1cb0f6}',
+      '.hdc-r{margin-top:8px;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:6px}',
+      '.hdst i{font-style:normal;color:#d5dbe6;font-size:17px}.hdst i.on{color:#f5a524}',
+      '.hdc .go{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-bottom:4px solid #1288c4;background:#1cb0f6;color:#fff;border-radius:16px;padding:12px 8px;font:inherit;font-size:15px;font-weight:800;cursor:pointer}',
+      '.hdc .go:active{transform:translateY(3px);border-bottom-width:1px}',
+      '.hdc .go svg{width:22px;height:22px}',
+      '.hdc .mg{display:flex;gap:6px;margin-top:10px}.hdc .mg button{flex:1;border:1px solid #d9e3f2;background:#f4f8fd;border-radius:12px;padding:9px 2px;font:inherit;font-size:12px;font-weight:700;color:#14213d;cursor:pointer}',
       '.hdc .mg button.dn{color:#d9283d;border-color:#f3c9cf;background:#fff5f6}',
       '.hdv{position:fixed;inset:0;z-index:2147483200;background:#e9eef6;display:flex;flex-direction:column;direction:rtl;font-family:"Noto Naskh Arabic",sans-serif}',
       '.hdv.night{background:#0e1117}',
@@ -296,15 +307,25 @@
   /* ---------- القائمة ---------- */
   function listPage(doc) {
     css(doc);
-    var R = X.roleInfo(), mgr = R.role === 'admin' || R.role === 'teacher', items = [];
+    var R = X.roleInfo(), mgr = R.role === 'admin', items = [];
     X.panel(doc, 'ملازم الثالث متوسط 2027', (mgr ? '<button class="afbtn" id="hdadd" style="width:100%;margin-bottom:12px">➕ إضافة ملزمة</button>' : '') + '<div id="hdl"><p style="text-align:center;padding:30px 0">جاري التحميل...</p></div>', function (p) {
       var L = p.querySelector('#hdl');
       function draw() {
         if (!items.length) { L.innerHTML = '<div class="afp-c"><p style="text-align:center;font-size:15px;padding:24px 0">' + (mgr ? 'ما اكو ملازم بعد. اضغط «إضافة ملزمة».' : 'ما اكو ملازم منشورة بعد.') + '</p></div>'; return; }
+        var IC = {
+          u: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="12" opacity=".15"/><circle cx="12" cy="9" r="3.4"/><path d="M5.5 19c.8-3.2 3.4-4.6 6.5-4.6s5.7 1.4 6.5 4.6"/></svg>',
+          i: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M11 10h2v7h-2zM11 7h2v2h-2z" fill="#fff"/></svg>',
+          c: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 9.5h17" stroke="#fff" stroke-width="1.6"/><path d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><g fill="#fff"><circle cx="8" cy="13" r="1.1"/><circle cx="12" cy="13" r="1.1"/><circle cx="16" cy="13" r="1.1"/><circle cx="8" cy="17" r="1.1"/><circle cx="12" cy="17" r="1.1"/></g></svg>',
+          f: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h8l5 5v13a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/><path d="M14 2v5h5" fill="#fff" opacity=".5"/><path d="M8 15c2-4 3-6 3-8 0 3 2 6 5 7-3-1-6 0-8 1z" fill="#fff"/></svg>',
+          e: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
+        };
+        function mb(n) { return n < 1048576 ? Math.max(1, Math.round(n / 1024)) + 'KB' : (n / 1048576 >= 10 ? (n / 1048576).toFixed(1) : (n / 1048576).toFixed(2)) + 'MB'; }
         L.innerHTML = '<div class="hdgrid">' + items.map(function (h) {
-          return '<div class="hdc" data-id="' + h.id + '"><div class="hdc-i"><img src="' + (h.cover || NOCOVER) + '" alt=""></div><b>' + esc(h.name) + '</b>' +
-            '<div class="hr"><span>التصنيف:</span> ' + esc(h.cat || '') + '</div><div class="hr"><span>الأستاذ:</span> ' + esc(h.teacher || '') + '</div><div class="hr"><span>الصف:</span> الثالث المتوسط</div><div class="hr"><span>تاريخ التحديث:</span> ' + fmtDate(h.upd) + '</div>' +
-            '<div>' + stars(h) + '</div><button class="go" data-a="v">مشاهدة الملزمة والمتابعة</button>' +
+          return '<div class="hdc" data-id="' + h.id + '"><div class="hdc-top"><div class="hdc-i"><img src="' + (h.cover || NOCOVER) + '" alt=""></div><div class="hdc-inf"><b>' + esc(h.name) + '</b>' +
+            '<div class="hr"><span>التصنيف:</span> ' + esc(h.cat || '') + '</div><div class="hr">' + IC.u + '<span>اعداد:</span> ' + esc(h.teacher || '') + '</div><div class="hr">' + IC.i + '<span>الصف:</span> الثالث المتوسط</div><div class="hr">' + IC.c + '<span>تاريخ التحديث:</span> ' + fmtDate(h.upd) + '</div></div></div>' +
+            '<hr><div class="hdc-m">' + (h.pages ? '<span>' + IC.f + 'عدد الصفحات: ' + h.pages + '</span>' : '') + (h.size ? '<span>' + IC.f + 'حجم الملف: ' + mb(h.size) + '</span>' : '') + '</div>' +
+            '<div class="hdc-r">التقييم ' + stars(h) + '</div><hr>' +
+            '<button class="go" data-a="v">' + IC.e + 'مشاهدة الملزمة والمتابعة</button>' +
             (mgr ? '<div class="mg"><button data-a="e">تعديل المعلومات</button><button data-a="u">تحديث الملف</button><button class="dn" data-a="d">حذف الملف</button></div>' : '') + '</div>';
         }).join('') + '</div>';
       }
