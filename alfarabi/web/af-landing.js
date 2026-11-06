@@ -11,7 +11,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.06-d';
+  var VER = '2026.11.06-e';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-latest.apk', ver: '' };
   var dip = null;
   W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dip = e; refreshPwa(); });
@@ -266,6 +266,25 @@
     function ok() { var b = D.querySelector('#afs [data-a="copy"] .t'); if (b) b.textContent = 'تم نسخ الرابط ✓'; }
     try { navigator.clipboard.writeText(u).then(ok, function () { prompt('انسخ الرابط', u); }); } catch (e) { prompt('انسخ الرابط', u); }
   }
+
+  /* فحص سبب عدم ظهور التثبيت المباشر وعرضه بوضوح */
+  function diag() {
+    if (!W.isSecureContext) return Promise.resolve('الموقع لازم يُفتح عبر رابط HTTPS حتى يشتغل التثبيت.');
+    var l = D.querySelector('link[rel="manifest"]'), mu = l ? l.href : BASE + 'manifest.json';
+    return fetch(mu, { cache: 'no-store' }).then(function (r) {
+      if (!r.ok) return 'ملف manifest.json غير موجود أو محجوب على الاستضافة (الحالة ' + r.status + '). ارفعه مع باقي الملفات.';
+      return r.text().then(function (t) {
+        var m; try { m = JSON.parse(t); } catch (e) { return 'الاستضافة ترجع صفحة بدل ملف manifest.json. تأكد أنه مرفوع بنفس مكان index.html.'; }
+        var ic = (m.icons || []).filter(function (i) { return /png/.test(i.type || ''); })[0];
+        if (!ic) return 'ملف manifest.json ما فيه أيقونات PNG.';
+        return fetch(new URL(ic.src, mu).href, { cache: 'no-store' }).then(function (ri) {
+          if (!ri.ok || !/image/.test(ri.headers.get('content-type') || '')) return 'ملفات الأيقونات (icon-192.png و icon-512.png) غير مرفوعة أو محجوبة.';
+          if (!navigator.serviceWorker) return 'هذا المتصفح لا يدعم التثبيت.';
+          return navigator.serviceWorker.register(BASE + 'sw.js').then(function (reg) { return navigator.serviceWorker.ready.then(function () { return ''; }); }, function (e) { return 'ملف sw.js غير مرفوع أو محجوب على الاستضافة (' + (e && e.message ? e.message.slice(0, 60) : 'خطأ') + ').'; });
+        });
+      });
+    }).catch(function () { return 'تعذّر فحص ملفات التثبيت، تأكد من الاتصال.'; });
+  }
   function toast(t) { var o = D.getElementById('aftoast'); if (o) o.remove(); o = D.createElement('div'); o.id = 'aftoast'; o.textContent = t; o.style.cssText = 'position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:2147483647;background:#14213d;color:#fff;border-radius:16px;padding:13px 16px;text-align:center;font:700 14px/1.7 Cairo,sans-serif;direction:rtl;box-shadow:0 8px 24px rgba(0,0,0,.3)'; D.body.appendChild(o); setTimeout(function () { o.remove(); }, 4500); }
   function act(a) {
     var ar = D.getElementById('afar'); if (ar && a !== 'share') ar.remove();
@@ -276,7 +295,9 @@
     if (a === 'apk') { var l = D.createElement('a'); l.href = apk.url; l.download = ''; l.rel = 'noopener'; D.body.appendChild(l); l.click(); l.remove(); var t = D.querySelector('#afs .sh'); if (t) { var n = D.createElement('div'); n.className = 'wn'; n.innerHTML = 'بدأ التنزيل. بعد ما ينتهي افتح الملف واسمح بالتثبيت من هذا المصدر عند ظهور الطلب، وبعدها افتح «الفارابي».'; t.insertBefore(n, t.querySelector('.cl')); } return; }
     if (a === 'pwa') {
       if (dip) { dip.prompt(); dip.userChoice.then(function (c) { dip = null; if (c && c.outcome === 'accepted') close(); }); return; }
-      toast(isIOS ? 'على آيفون افتح الموقع من سفاري واضغط تثبيت Apple.' : 'افتح الموقع من متصفح Chrome على أندرويد، وإذا كان مثبتاً أصلاً افتحه من الشاشة الرئيسية.'); return;
+      if (isIOS) { toast('على آيفون افتح الموقع من سفاري واضغط تثبيت Apple.'); return; }
+      toast('جاري فحص التثبيت...');
+      diag().then(function (m) { if (dip) { dip.prompt(); return; } toast(m || 'المتصفح ما جهّز التثبيت بعد. انتظر ثواني ثم اضغط مرة ثانية، أو من قائمة ⋮ اختر «تثبيت التطبيق».'); }); return;
     }
     if (a === 'share') { var u = location.href.split('#')[0]; if (navigator.share) navigator.share({ title: 'الفارابي', url: u }).catch(function () { }); return; }
     if (a === 'mnt') return maintLogin();

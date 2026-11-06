@@ -29,11 +29,7 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "/school-install-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
