@@ -11,8 +11,8 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.06-f';
-  var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-latest.apk', ver: '' };
+  var VER = '2026.11.06-g';
+  var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null;
   W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dip = e; refreshPwa(); });
   W.addEventListener('appinstalled', function () { close(); });
@@ -63,6 +63,8 @@
     '#afl .i{background:#fff;color:#000;border:2px solid #14213d;box-shadow:0 3px 8px rgba(20,33,61,.14)}',
     '#afl .y{background:linear-gradient(135deg,#ffe066,#ffc107);color:#14213d;box-shadow:0 8px 20px rgba(255,193,7,.4)}',
     '#afl .g{background:rgba(255,255,255,.45);color:#7b88a3;border:1.5px dashed #b8c6df;cursor:default;box-shadow:none}',
+    '#afl .k{background:#fff;color:#14213d;border:2px solid #0aa6f5;box-shadow:0 3px 8px rgba(10,166,245,.18)}',
+    '#afl .k small{color:#5a6b8c}',
     '#afl .g.c{justify-content:center;gap:10px;padding:16px}',
     '#afl .g .mid{font-weight:800;font-size:15px;color:#5a6b8c}',
     '#afl .g .lg2{background:rgba(255,255,255,.7);opacity:.6;box-shadow:none}',
@@ -145,7 +147,7 @@
     '<div class="hi">أهلاً وسهلاً</div><h1>ترحب بكم</h1><div class="sn">ثانوية الفارابي الأهلية للبنين</div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
     '<button class="bt a" data-a="pwa">' + (isAnd ? badge('جهازك') : '') + '<span class="lg2">' + I.and + '</span>' + '<span class="t">تثبيت كتطبيق Android<small>تثبيت مباشر من المتصفح بضغطة وحدة</small></span></button>' +
-    '<div class="bt g c"><span class="lg2">' + I.apk + '</span><span class="mid">تثبيت نسخة APK — قيد التطوير</span></div>' +
+    '<button class="bt k" data-a="apk"><span class="lg2">' + I.apk + '</span><span class="t">تثبيت نسخة APK<small>تنزيل مباشر — يثبّت على أي جهاز أندرويد</small></span></button>' +
     '<button class="bt i" data-a="ios">' + (isIOS ? badge('جهازك') : '') + '<span class="lg2">' + I.app + '</span>' + '<span class="t">تثبيت كتطبيق Apple<small>iPhone و iPad من سفاري</small></span></button>' +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
     '<button class="sk" data-a="go">المتابعة من المتصفح بدون تثبيت</button>' +
@@ -292,12 +294,11 @@
     if (a === 'ios') return iosSheet();
     if (a === 'sc') { var s = D.getElementById('afs'); if (s) s.remove(); if (ar) ar.remove(); return; }
     if (a === 'go') return skip();
-    if (a === 'apk') { var l = D.createElement('a'); l.href = apk.url; l.download = ''; l.rel = 'noopener'; D.body.appendChild(l); l.click(); l.remove(); var t = D.querySelector('#afs .sh'); if (t) { var n = D.createElement('div'); n.className = 'wn'; n.innerHTML = 'بدأ التنزيل. بعد ما ينتهي افتح الملف واسمح بالتثبيت من هذا المصدر عند ظهور الطلب، وبعدها افتح «الفارابي».'; t.insertBefore(n, t.querySelector('.cl')); } return; }
+    if (a === 'apk') { if (!D.querySelector('#afs .sh')) toast('بدأ تنزيل التطبيق. افتح الملف بعد ما ينتهي واسمح بالتثبيت.'); var l = D.createElement('a'); l.href = apk.url; l.rel = 'noopener'; D.body.appendChild(l); l.click(); l.remove(); var t = D.querySelector('#afs .sh'); if (t) { var n = D.createElement('div'); n.className = 'wn'; n.innerHTML = 'بدأ التنزيل. بعد ما ينتهي افتح الملف واسمح بالتثبيت من هذا المصدر عند ظهور الطلب، وبعدها افتح «الفارابي».'; t.insertBefore(n, t.querySelector('.cl')); } return; }
     if (a === 'pwa') {
       if (dip) { dip.prompt(); dip.userChoice.then(function (c) { dip = null; if (c && c.outcome === 'accepted') close(); }); return; }
       if (isIOS) { toast('على آيفون افتح الموقع من سفاري واضغط تثبيت Apple.'); return; }
-      toast('جاري فحص التثبيت...');
-      diag().then(function (m) { if (dip) { dip.prompt(); return; } toast(m || 'المتصفح ما جهّز التثبيت بعد. انتظر ثواني ثم اضغط مرة ثانية، أو من قائمة ⋮ اختر «تثبيت التطبيق».'); }); return;
+      act('apk'); return;
     }
     if (a === 'share') { var u = location.href.split('#')[0]; if (navigator.share) navigator.share({ title: 'الفارابي', url: u }).catch(function () { }); return; }
     if (a === 'mnt') return maintLogin();
