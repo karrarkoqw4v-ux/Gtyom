@@ -7,7 +7,7 @@
   function show(title, body, tag, icon) {
     try {
       if (!RN || RN.permission !== 'granted' || !document.hidden) return;
-      var o = { body: body || '', tag: tag || undefined, icon: icon || '/icon-192.png', badge: '/icon-192.png', dir: 'rtl', lang: 'ar' };
+      var o = { body: body || '', tag: tag || undefined, icon: icon || '/Gtyom/icon-192.png', badge: '/Gtyom/icon-192.png', dir: 'rtl', lang: 'ar' };
       if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) navigator.serviceWorker.getRegistration().then(function (r) { if (r) r.showNotification(title, o); else new RN(title, o); });
       else new RN(title, o);
     } catch (e) { }

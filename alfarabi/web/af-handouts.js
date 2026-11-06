@@ -25,8 +25,8 @@
     if (window.__afPdf) return Promise.resolve(window.__afPdf);
     if (pdfP) return pdfP;
     pdfP = new Promise(function (res, rej) {
-      var s = document.createElement('script'); s.src = '/vendor/pdfjs/pdf.min.js';
-      s.onload = function () { try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs/pdf.worker.min.js'; window.__afPdf = window.pdfjsLib; res(window.pdfjsLib); } catch (e) { pdfP = null; rej(e); } };
+      var s = document.createElement('script'); s.src = '/Gtyom/vendor/pdfjs/pdf.min.js';
+      s.onload = function () { try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = '/Gtyom/vendor/pdfjs/pdf.worker.min.js'; window.__afPdf = window.pdfjsLib; res(window.pdfjsLib); } catch (e) { pdfP = null; rej(e); } };
       s.onerror = function () { pdfP = null; rej(new Error('تعذّر تحميل عارض PDF')); };
       document.head.appendChild(s);
     });
