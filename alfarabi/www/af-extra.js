@@ -541,6 +541,7 @@
         if (acc >= 180 && window.FBBASE) {
           acc = 0;
           fetch(window.FBBASE + '/usage/a' + String(R.uid).replace(/[.#$\[\]\/]/g, '_') + '/' + day + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: String(cur) }).catch(function () {});
+          fetch(window.FBBASE + '/usagesrc/a' + String(R.uid).replace(/[.#$\[\]\/]/g, '_') + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(A.__web ? 'web' : 'app') }).catch(function () {});
         }
       } catch (e) {}
     }, 30000);

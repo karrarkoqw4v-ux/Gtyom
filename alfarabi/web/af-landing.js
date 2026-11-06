@@ -174,7 +174,8 @@
       '<div class="dc cr"><div class="ln"></div><h3>الشكر والتقدير</h3>' +
       '<div class="cm"><span>تم تطوير التطبيق من</span><b>الإدارة المحترمة</b></div>' +
       '<div class="cm"><span>وبجهود الأساتذة</span><b>كادر التدريس المحترم</b></div>' +
-      '<div class="rw"><div><small>المشرف</small><b>الأستاذ زين العابدين</b></div><div><small>المصمم</small><b>كرار حيدر</b></div></div></div>';
+      '<div class="rw"><div><small>المشرف</small><b>الأستاذ زين العابدين</b></div><div><small>المصمم</small><b>كرار حيدر</b></div></div></div>' +
+      '<button class="ac" data-a="mnt" style="margin-top:2px"><span class="ai ph" style="background:linear-gradient(135deg,#1f2a44,#14213d)">' + I.lock.replace('<svg','<svg style="color:#fff"') + '</span><span class="t">صيانة التحديثات<small>للمشرف فقط</small></span>' + I.chv + '</button>';
   }
   function mount() { if (!D.body) return setTimeout(mount, 30); D.body.appendChild(root); D.documentElement.style.overflow = 'hidden'; D.documentElement.style.overflowX = 'hidden'; D.body.style.overflowX = 'hidden'; }
   mount();
@@ -214,6 +215,49 @@
       '<ol><li>اضغط زر المشاركة ' + I.shr + ' بأسفل سفاري</li><li>اختر «إضافة إلى الشاشة الرئيسية»</li><li>اضغط «إضافة» وافتح التطبيق من الشاشة</li></ol>');
     var ar = D.createElement('div'); ar.className = 'ar'; ar.textContent = '⬇'; ar.id = 'afar'; D.body.appendChild(ar);
   }
+
+  /* ===== صيانة التحديثات (للمشرف) ===== */
+  var MH = '82ac7a14b0a40085157b0176c8620d9396be1e0426566072b3b482d8c42c629f', MS = 'alfarabi-maint-v1';
+  function hex(buf) { return Array.prototype.map.call(new Uint8Array(buf), function (b) { return ('0' + b.toString(16)).slice(-2); }).join(''); }
+  function chk(email, pw) {
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey('raw', enc.encode(email.trim().toLowerCase() + ':' + pw), 'PBKDF2', false, ['deriveBits']).then(function (k) {
+      return crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: enc.encode(MS), iterations: 150000 }, k, 256);
+    }).then(function (b) { return hex(b) === MH; });
+  }
+  function fb(path) { var b = W.FBBASE; if (!b) return Promise.reject(new Error('no base')); return fetch(b + path).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+  function maintLogin() {
+    sheet('<h2>صيانة التحديثات</h2><p class="sb">أدخل بريد المشرف وكلمة السر</p>' +
+      '<input id="afme" type="email" dir="ltr" autocomplete="off" placeholder="البريد الإلكتروني" style="width:100%;border:2px solid #e1e8f4;border-radius:14px;padding:12px;font:inherit;margin:0 0 10px;background:#f6f9fd">' +
+      '<input id="afmp" type="password" dir="ltr" autocomplete="off" placeholder="كلمة السر" style="width:100%;border:2px solid #e1e8f4;border-radius:14px;padding:12px;font:inherit;margin:0 0 10px;background:#f6f9fd">' +
+      '<div id="afmm" style="color:#d9283d;font-weight:700;font-size:13px;min-height:20px;text-align:center"></div>' +
+      '<button class="bt p" data-a="mgo"><span class="t">دخول</span></button>');
+  }
+  function maintGo() {
+    var e = D.getElementById('afme').value, p = D.getElementById('afmp').value, m = D.getElementById('afmm');
+    m.textContent = 'جاري التحقق...';
+    chk(e, p).then(function (ok) { if (!ok) { m.textContent = 'البريد أو كلمة السر غير صحيحة'; return; } maintPanel(); }).catch(function () { m.textContent = 'تعذّر التحقق، افتح الموقع عبر رابط HTTPS'; });
+  }
+  function cnt(o) { return o && typeof o === 'object' ? Object.keys(o).length : 0; }
+  function fmt(sec) { sec = +sec || 0; var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return (h ? h + ' س ' : '') + m + ' د'; }
+  function maintPanel() {
+    sheet('<h2>صيانة التحديثات</h2><p class="sb">لوحة المشرف</p><div id="afmb"><div class="wn">جاري تحميل الإحصائيات...</div></div>');
+    var box = D.getElementById('afmb');
+    Promise.all([fb('/stats/visitors.json').catch(function () { return null; }), fb('/stats/installs.json').catch(function () { return null; }), fb('/usage.json').catch(function () { return null; }), fb('/usagesrc.json').catch(function () { return null; }), fb('/updates.json').catch(function () { return null; }), fb('/handouts.json?shallow=true').catch(function () { return null; }), fb('/plans.json?shallow=true').catch(function () { return null; })]).then(function (r) {
+      var vis = r[0] || {}, ins = r[1] || {}, use = r[2] || {}, src = r[3] || {}, upd = r[4] || {};
+      var tot = Object.keys(use).map(function (k) { var d = use[k] || {}, t = 0; Object.keys(d).forEach(function (x) { t += +d[x] || 0; }); return { k: k, t: t, s: src[k] || 'app' }; }).sort(function (a, b) { return b.t - a.t; }).slice(0, 10);
+      var ul = Object.keys(upd).map(function (k) { return upd[k]; }).filter(Boolean).sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(0, 8);
+      function card(n, l) { return '<div style="flex:1;background:linear-gradient(135deg,#eaf6ff,#fff6dc);border:1.5px solid #e1e8f4;border-radius:16px;padding:12px 6px;text-align:center"><b style="font-size:24px;display:block">' + n + '</b><small style="color:#5a6b8c;font-weight:700">' + l + '</small></div>'; }
+      var h = '<div style="display:flex;gap:10px;margin:0 0 10px">' + card(cnt(ins), 'ثبّتوا التطبيق من المتصفح') + card(cnt(vis), 'زوّار الموقع') + '</div>' +
+        '<div style="display:flex;gap:10px;margin:0 0 12px">' + card(cnt(r[5]), 'ملازم منشورة') + card(cnt(r[6]), 'تحاضير منشورة') + '</div>' +
+        '<h3 style="margin:8px 0;font-size:15px">الأكثر استخداماً</h3>';
+      h += tot.length ? '<ol class="st" id="aftop">' + tot.map(function (x) { return '<li><span id="n_' + esc(x.k) + '">' + esc(x.k.replace(/^a/, '')) + ' — ' + (x.s === 'web' ? 'الموقع' : 'التطبيق') + ' — <b>' + fmt(x.t) + '</b></span></li>'; }).join('') + '</ol>' : '<div class="wn">ما توجد بيانات استخدام بعد.</div>';
+      h += '<h3 style="margin:12px 0 8px;font-size:15px">آخر التحديثات</h3>' + (ul.length ? '<ol class="st">' + ul.map(function (x) { return '<li><span><b>' + esc(x.v || '') + '</b> ' + esc(x.note || '') + ' <small>' + new Date(x.ts || 0).toLocaleDateString('ar-IQ') + '</small></span></li>'; }).join('') + '</ol>' : '<div class="wn">لا توجد تحديثات منشورة بعد.</div>');
+      h += '<button class="bt" disabled style="opacity:.55;cursor:default"><span class="t">رفع ملفات التحديث (ZIP)<small>غير مفعّل بعد — يحتاج توقيعاً أمنياً</small></span></button>';
+      box.innerHTML = h;
+      tot.forEach(function (x) { fb('/accounts/' + x.k + '/name.json').then(function (n) { var e = D.getElementById('n_' + x.k); if (e && n) e.innerHTML = e.innerHTML.replace(esc(x.k.replace(/^a/, '')), esc(String(n))); }).catch(function () { }); });
+    });
+  }
   function copy() {
     var u = location.href.split('#')[0];
     function ok() { var b = D.querySelector('#afs [data-a="copy"] .t'); if (b) b.textContent = 'تم نسخ الرابط ✓'; }
@@ -232,6 +276,8 @@
       toast(isIOS ? 'على آيفون افتح الموقع من سفاري واضغط تثبيت Apple.' : 'افتح الموقع من متصفح Chrome على أندرويد، وإذا كان مثبتاً أصلاً افتحه من الشاشة الرئيسية.'); return;
     }
     if (a === 'share') { var u = location.href.split('#')[0]; if (navigator.share) navigator.share({ title: 'الفارابي', url: u }).catch(function () { }); return; }
+    if (a === 'mnt') return maintLogin();
+    if (a === 'mgo') return maintGo();
     if (a === 'ph') {
       sheet('<h2>اتصال بالمشرف</h2><p class="sb" dir="ltr">+964 780 018 8441</p>' +
         '<a class="bt p" href="tel:+9647800188441" style="text-decoration:none">' + I.ph.replace('#fff', 'currentColor') + '<span class="t">اتصال هاتفي<small>اتصل بالمشرف مباشرة</small></span></a>' +
