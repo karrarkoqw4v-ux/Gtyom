@@ -9,7 +9,8 @@
   function J(k, d) { try { return JSON.parse(LS.getItem(k)) || d; } catch (e) { return d; } }
 
   var THEME = 'light'; try { LS.removeItem('af_theme'); } catch (e) {}             // light | dark
-  var GFX = g('af_gfx', 'lite');                  // static | lite (افتراضي) | mid | full
+  if (g('af_gfx_mig19', '') !== '1') { s('af_gfx', 'full'); s('af_gfx_mig19', '1'); }
+  var GFX = g('af_gfx', 'full');                  // static | lite (افتراضي) | mid | full
   var TIER = { static: 0, lite: 1, mid: 2, full: 3 };
 
   // نثبّت مستوى الرسوميات قبل ما يقرأه محرك الأداء
@@ -202,7 +203,7 @@
   function themePage(doc) {
     function html() {
       return '<div class="afp-c"><h3>الرسوميات والأداء</h3><div class="afs" id="afg">' +
-        [['static', 'ثابت (الأخف)'], ['lite', 'خفيف (موصى به)'], ['mid', 'متوازن'], ['full', 'كامل']].map(function (x) { return '<button data-g="' + x[0] + '"' + (GFX === x[0] ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') +
+        [['static', 'ثابت (الأخف)'], ['lite', 'خفيف'], ['mid', 'متوازن'], ['full', 'كامل (موصى به)']].map(function (x) { return '<button data-g="' + x[0] + '"' + (GFX === x[0] ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') +
         '</div><p>إذا حسّيت بتقطيع اختر «ثابت» أو «خفيف». المستوى الجديد يكتمل بعد إعادة فتح التطبيق.</p></div>' +
         '<div class="afp-c"><h3>ألوان المحادثات</h3><p>المحادثات داكنة افتراضياً، وتقدر تغيّر ألوانها وخطوطها من «إعدادات المحادثة».</p></div>';
     }

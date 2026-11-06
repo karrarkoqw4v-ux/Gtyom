@@ -3,7 +3,7 @@
   'use strict';
   var A = window.Android;
   if (!A || !window.AFX) return;
-  var X = window.AFX, esc = X.esc, CHUNK = 700 * 1024, MAXMB = 60;
+  var X = window.AFX, esc = X.esc, CHUNK = 700 * 1024, MAXMB = 300;
   var CATS = ['ملزمة منهجية', 'ملزمة اختبارات', 'ملزمة مراجعة', 'أسئلة وزارية', 'أخرى'];
 
   /* ---------- شبكة (قاعدة بيانات المدرسة) ---------- */
@@ -12,7 +12,7 @@
   function req(path, opt, ms) {
     var b = base(); if (!b) return Promise.reject(new Error('ما اكو اتصال بقاعدة البيانات، تأكد من الإنترنت ثم حاول'));
     var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms || 25000); opt = opt || {}; opt.signal = c.signal;
-    return fetch(b + path, opt).then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('رفض الخادم (' + r.status + ')'); return r; }, function (e) { clearTimeout(t); throw e; });
+    return fetch(b + path, opt).then(function (r) { clearTimeout(t); if (!r.ok) throw new Error(r.status === 401 || r.status === 403 ? 'رفض الخادم (' + r.status + '): قواعد قاعدة البيانات (Rules) تمنع الكتابة على مسار handouts و handout_files، لازم مدير قاعدة البيانات يسمح بهذين المسارين' : 'رفض الخادم (' + r.status + ')'); return r; }, function (e) { clearTimeout(t); throw e; });
   }
   function getJ(p) { return req(p).then(function (r) { return r.json(); }); }
   function putJ(p, v) { return req(p, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(v) }, 90000); }
