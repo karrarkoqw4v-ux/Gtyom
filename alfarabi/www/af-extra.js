@@ -9,12 +9,15 @@
   function J(k, d) { try { return JSON.parse(LS.getItem(k)) || d; } catch (e) { return d; } }
 
   var THEME = 'light'; try { LS.removeItem('af_theme'); } catch (e) {}             // light | dark
-  if (g('af_gfx_mig19', '') !== '1') { s('af_gfx', 'full'); s('af_gfx_mig19', '1'); }
-  var GFX = g('af_gfx', 'full');                  // static | lite (افتراضي) | mid | full
+  if (g('af_gfx_mig20', '') !== '1') { s('af_gfx', 'auto'); s('af_gfx_mig20', '1'); }
+  var GFX = g('af_gfx', 'auto');                  // auto (افتراضي) | static | lite | mid | full
   var TIER = { static: 0, lite: 1, mid: 2, full: 3 };
+  var ORDER = ['static', 'lite', 'mid', 'full'];
+  var AUTO = g('af_auto_lvl', 'lite'); if (ORDER.indexOf(AUTO) < 0) AUTO = 'lite';
+  function lvl() { return GFX === 'auto' ? AUTO : GFX; }
 
   // نثبّت مستوى الرسوميات قبل ما يقرأه محرك الأداء
-  function pinTier() { s('af_tier_v1', JSON.stringify({ t: TIER[GFX] == null ? 1 : TIER[GFX], ts: Date.now() })); }
+  function pinTier() { var L = lvl(); s('af_tier_v1', JSON.stringify({ t: TIER[L] == null ? 1 : TIER[L], ts: Date.now() })); }
   pinTier();
 
   var FONTS = [
@@ -162,8 +165,9 @@
     try {
       var r = d.documentElement; if (!r) return;
       r.setAttribute('data-aft', THEME);
-      r.classList.toggle('af-lite', GFX === 'lite' || GFX === 'static');
-      r.classList.toggle('af-nofx', GFX !== 'full');
+      r.classList.toggle('af-lite', lvl() === 'lite' || lvl() === 'static');
+      r.classList.toggle('af-nofx', lvl() !== 'full');
+      try { r.setAttribute('data-af-tier', String(TIER[lvl()])); } catch (e) {}
       if (!d.getElementById('af-x')) {
         var st = d.createElement('style'); st.id = 'af-x'; st.textContent = CSS; (d.head || r).appendChild(st);
       }
@@ -203,8 +207,8 @@
   function themePage(doc) {
     function html() {
       return '<div class="afp-c"><h3>الرسوميات والأداء</h3><div class="afs" id="afg">' +
-        [['static', 'ثابت (الأخف)'], ['lite', 'خفيف'], ['mid', 'متوازن'], ['full', 'كامل (موصى به)']].map(function (x) { return '<button data-g="' + x[0] + '"' + (GFX === x[0] ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') +
-        '</div><p>إذا حسّيت بتقطيع اختر «ثابت» أو «خفيف». المستوى الجديد يكتمل بعد إعادة فتح التطبيق.</p></div>' +
+        [['auto', 'تلقائي (موصى به)'], ['static', 'ثابت (الأخف)'], ['lite', 'خفيف'], ['mid', 'متوازن'], ['full', 'كامل']].map(function (x) { return '<button data-g="' + x[0] + '"' + (GFX === x[0] ? ' class="on"' : '') + '>' + x[1] + '</button>'; }).join('') +
+        '</div><p>«تلقائي» يقيس سلاسة جوالك ويرفع الرسوميات إذا الجهاز قوي ويخفّضها فوراً إذا حسّ بتقطيع. إذا تحب تثبّت مستوى معيّن اختره بنفسك.</p></div>' +
         '<div class="afp-c"><h3>ألوان المحادثات</h3><p>المحادثات داكنة افتراضياً، وتقدر تغيّر ألوانها وخطوطها من «إعدادات المحادثة».</p></div>';
     }
     panel(doc, 'المظهر والأداء', html(), function (p) {
@@ -547,6 +551,38 @@
     }, 30000);
   })();
 
+
+  /* ===================== مراقب السلاسة (وضع تلقائي) ===================== */
+  (function () {
+    var bad = 0, good = 0, busy = false;
+    function setAuto(L) { AUTO = L; s('af_auto_lvl', L); pinTier(); applyAll(); }
+    function sample(cb) {
+      var n = 0, t0 = 0, last = 0, worst = 0;
+      function f(t) {
+        if (!t0) t0 = t; else { var d = t - last; if (d > worst) worst = d; }
+        last = t; n++;
+        if (n < 50) requestAnimationFrame(f); else cb((t - t0) / (n - 1), worst);
+      }
+      requestAnimationFrame(f);
+    }
+    function tick() {
+      if (GFX !== 'auto' || busy || document.hidden) return;
+      try { if (A.isForeground && !A.isForeground()) return; } catch (e) {}
+      busy = true;
+      sample(function (avg, worst) {
+        busy = false;
+        var i = ORDER.indexOf(AUTO), cap = ORDER.indexOf(g('af_auto_cap', 'full')); if (cap < 0) cap = 3;
+        var capTs = +g('af_auto_cap_ts', '0'); if (Date.now() - capTs > 2 * 864e5) { cap = 3; }
+        if (avg > 23 || worst > 120) {            // أقل من نحو 43 إطار/ثانية أو توقف ملحوظ
+          good = 0; if (++bad >= 2 && i > 0) { bad = 0; s('af_auto_cap', ORDER[i - 1]); s('af_auto_cap_ts', String(Date.now())); setAuto(ORDER[i - 1]); }
+        } else if (avg <= 18.5) {                  // قريب من 60 إطار/ثانية
+          bad = 0; if (++good >= 4 && i < cap) { good = 0; setAuto(ORDER[i + 1]); }
+        } else { bad = 0; good = 0; }
+      });
+    }
+    setTimeout(function () { tick(); setInterval(tick, 5000); }, 4000);
+  })();
+
   window.AFX = { panel: function (d, t, h, b) { return panel(d, t, h, b, true); }, esc: esc, on: on, roleInfo: function () { return roleInfo(); }, J: J };
 
   /* ===================== إدراج الأزرار بقائمة الإعدادات ===================== */
@@ -598,6 +634,6 @@
     setInterval(function () { allDocs().forEach(function (d) { if (d.documentElement && d.documentElement.getAttribute('data-aft') !== THEME) applyDoc(d); watchDoc(d); }); }, 2500);
   }
   // نظهر الثيم من أول لحظة
-  (function early() { var r = document.documentElement; r.setAttribute('data-aft', THEME); r.classList.toggle('af-lite', GFX === 'lite' || GFX === 'static'); r.classList.toggle('af-nofx', GFX !== 'full'); var st = document.createElement('style'); st.id = 'af-x'; st.textContent = CSS; (document.head || r).appendChild(st); try { A.setBars(false); } catch (e) {} })();
+  (function early() { var r = document.documentElement; r.setAttribute('data-aft', THEME); r.classList.toggle('af-lite', lvl() === 'lite' || lvl() === 'static'); r.classList.toggle('af-nofx', lvl() !== 'full'); var st = document.createElement('style'); st.id = 'af-x'; st.textContent = CSS; (document.head || r).appendChild(st); try { A.setBars(false); } catch (e) {} })();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
