@@ -175,6 +175,8 @@
       var m = r[0], u = r[1];
       last.textContent = m && m.ts ? new Date(m.ts).toLocaleString('ar-IQ', { dateStyle: 'medium', timeStyle: 'short' }) : 'لا يوجد';
       var l = u && typeof u === 'object' ? Object.keys(u).map(function (k) { return u[k]; }).filter(Boolean).sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(0, 8) : [];
+      var BUILTIN = [{ v: 'الإصدار 2.7', ts: Date.UTC(2026, 10, 9), note: 'الصفحة الرئيسية بخمسة أقسام (الجدول، الغيابات، الدرجات، التحاضير، المحادثات) وباقي الأقسام بالقائمة الجانبية · صفحة المدرسة بتصميم جديد · إشعارات جديدة: الإعلانات (بعنوان «إشعار» وعند تعديلها)، التحضير مع اسم المدرس، الجدول المدرسي، العطل والدوام، تقييم المدرس · الإدارة تعدّل الإعلانات والإشعارات بعد نشرها' }];
+      l = BUILTIN.concat(l);
       if (!l.length) { var li = mk('li', '', 'ما توجد تحديثات منشورة بعد.'); ul.appendChild(li); return; }
       l.forEach(function (it) { var li = mk('li', '', String(it.v || 'تحديث') + (it.note ? ' — ' + it.note : '')); li.appendChild(mk('small', '', it.ts ? new Date(it.ts).toLocaleString('ar-IQ', { dateStyle: 'medium', timeStyle: 'short' }) : '')); ul.appendChild(li); });
     });
