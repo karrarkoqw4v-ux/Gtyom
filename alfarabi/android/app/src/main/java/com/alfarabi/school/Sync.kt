@@ -239,6 +239,17 @@ object Sync {
                 }
             }
             "cp" -> channelPost(c, base, u, r, k)
+            "lp" -> {
+                // التحضير الجديد يُنشر كسجل k=lp (وليس في info/lessonPlans القديم)؛ نُشعر طلاب الصف وأولياء الأمور
+                val exp = r.optLong("exp", 0L)
+                val gOk = u.grade.isEmpty() || r.opt("gr")?.toString()?.take(1) == u.grade.take(1)
+                if ((u.role == "student" || u.role == "parent") && gOk && (exp == 0L || exp > System.currentTimeMillis())) {
+                    val by = r.optString("by", ""); val subj = r.optString("s", "")
+                    val sub = "تحضير" + (if (by.isNotEmpty()) " • " + (if (Regex("^(ال)?[أا]ستاذ|^أ\\.|^م\\.").containsMatchIn(by)) "" else "الأستاذ ") + by else "") + (if (subj.isNotEmpty()) " • $subj" else "")
+                    val d = r.optString("d", "").take(160)
+                    Notifier.school(c, "تحضير جديد", r.optString("title", "تحضير") + (if (d.isNotEmpty()) "\n$d" else ""), sub, "plan:$k", "")
+                }
+            }
             "cc" -> if (r.opt("to")?.toString() == u.uid && r.opt("u")?.toString() != u.uid)
                 Notifier.school(c, "تعليق جديد", r.optString("n", "") + ": " + r.optString("t", ""), "قناة " + r.optString("cn", ""), "cc:$k", "")
             "imp" -> if (r.opt("uid")?.toString() != u.uid)
