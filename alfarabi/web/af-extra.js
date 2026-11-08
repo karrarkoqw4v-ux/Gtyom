@@ -430,7 +430,7 @@
     try {
       window.recSet(r.id, 'title', t); window.recSet(r.id, 'body', b); window.recSet(r.id, 'edited', Date.now());
       var R = roleInfo();
-      window.addRec({ id: Date.now(), k: 'imp', ed: 1, upd: r.id, ts: Date.now(), title: '✏️ تعديل: ' + t, body: b, from: R.name, role: R.role, uid: R.uid });
+      window.addRec({ id: Date.now(), k: 'imp', ed: 1, upd: r.id, ts: Date.now(), title: 'تعديل: ' + t, body: b, from: R.name, role: R.role, uid: R.uid });
     } catch (e) { try { w.alert('تعذّر حفظ التعديل'); } catch (x) {} return; }
     try { var m = doc.querySelector('.afp-s'); if (m) { var nr = impList().filter(function (x) { return x.id === r.id; })[0]; if (nr) impDetail(doc, nr); } } catch (e) {}
   }
@@ -444,7 +444,7 @@
       (r.img ? '<img class="afimp-m" src="' + r.img + '" alt="">' : '') +
       (r.vid ? '<video class="afimp-m" src="' + r.vid + '" controls playsinline></video>' : '') +
       (r.hd ? '<button class="afbtn" data-hd="' + esc(r.hd) + '" style="width:100%;margin-top:12px">📖 افتح الملزمة</button>' : '') +
-      (canEditImp(r) ? '<button class="afbtn gray" data-ed="1" style="width:100%;margin-top:12px">✏️ تعديل الإشعار</button>' : '') + '</div>',
+      (canEditImp(r) ? '<button class="afbtn gray" data-ed="1" style="width:100%;margin-top:12px">تعديل الإشعار</button>' : '') + '</div>',
       function (pp) { var b = pp.querySelector('[data-hd]'); if (b) b.onclick = function () { if (window.afOpenHandout) window.afOpenHandout(b.getAttribute('data-hd'), doc); };
         var eb = pp.querySelector('[data-ed]'); if (eb) eb.onclick = function () { editImp(doc, r); }; });
   }

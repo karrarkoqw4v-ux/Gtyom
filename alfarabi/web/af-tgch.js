@@ -91,6 +91,42 @@
     + '.tg-land h2{margin:10px 16px 2px;font-size:22px;font-weight:900;color:#14213d}.tg-land p{margin:2px 18px;color:#5b6b86;font-size:14px;font-weight:700;line-height:1.7}'
     + '.tg-land .lbs{padding:14px 16px 18px;display:grid;gap:9px}.tg-land .lbs button{border:0;border-radius:18px;padding:14px;font:inherit;font-size:15.5px;font-weight:900;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0aa6f5,#1d4ed8);box-shadow:0 8px 20px rgba(10,166,245,.35)}.tg-land .lbs button.g{background:#e3f3ff;color:#0a86d6;box-shadow:none}'
     + '.tg-ring{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff;font-weight:800;font-size:14px}'
+    + '.tgi{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:middle}'
+    + '.tg .tg-top,.tg-cmw .tg-top{display:flex;align-items:center;gap:10px;direction:ltr;padding:calc(10px + var(--sa-top,env(safe-area-inset-top,0px))) 12px 8px;z-index:3}'
+    + '.tg .tg-rb,.tg-cmw .tg-rb{width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.96);color:#0a86d6;display:grid;place-items:center;cursor:pointer;flex:none;box-shadow:0 6px 18px rgba(20,45,90,.16)}'
+    + '.tg .tg-rb:active{transform:scale(.93)}.tg .tg-rb .tgi,.tg-cmw .tg-rb .tgi{width:23px;height:23px}.tg-cmw .tg-rb.ghost{visibility:hidden}'
+    + '.tg .tg-pill,.tg-cmw .tg-pill{flex:1;min-width:0;direction:rtl;display:flex;align-items:center;gap:11px;background:rgba(255,255,255,.96);border-radius:28px;padding:5px 8px 5px 16px;box-shadow:0 6px 18px rgba(20,45,90,.16);cursor:pointer;height:52px}'
+    + '.tg .tg-pill #tgav,.tg-cmw .tg-pill>span{order:2;flex:none;display:block;line-height:0}.tg .tg-pill #tgav .av,.tg .tg-pill #tgav img,.tg-cmw .tg-pill img,.tg-cmw .tg-pill .av{width:40px!important;height:40px!important;border-radius:50%!important;object-fit:cover}'
+    + '.tg .tg-pill .cx-t,.tg-cmw .tg-pill .cx-t{flex:1;min-width:0;order:1}.tg .tg-pill b,.tg-cmw .tg-pill b{display:block;font-size:16px;font-weight:900;color:#14213d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tg .tg-pill small,.tg-cmw .tg-pill small{display:block;color:#5b6b86;font-size:12.5px;font-weight:700}'
+    + '.tg .tg-pill input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:15.5px;color:#14213d;outline:0;font-weight:700}.tg .tg-x{border:0;background:transparent;color:#5b6b86;display:grid;place-items:center;cursor:pointer;padding:4px}'
+    + '.tg .tg-pin{margin:2px 12px 0;background:rgba(255,255,255,.96);border-radius:22px;padding:9px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 6px 18px rgba(20,45,90,.12);cursor:pointer;z-index:2}'
+    + '.tg .tg-pin .bar{width:3.5px;height:34px;border-radius:3px;background:#0aa6f5;flex:none}.tg .tg-pin>div{flex:1;min-width:0}.tg .tg-pin b{display:block;color:#0a86d6;font-size:14px;font-weight:900}.tg .tg-pin small{display:block;color:#33476b;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tg .tg-pin .pi{color:#5b6b86;flex:none}'
+    + '.tg .tg-p{border-radius:22px 22px 22px 8px;padding:12px 14px 10px;max-width:96%}'
+    + '.tg .tg-cn{font-size:15px;font-weight:900;color:#0a86d6;margin:0 0 6px;display:flex;align-items:center;gap:6px}.tg .tg-pn{color:#5b6b86;display:inline-flex}'
+    + '.tg .tg-t{font-size:16px;line-height:1.9;padding:2px 0 6px}'
+    + '.tg .tg-ft{display:flex;align-items:center;justify-content:flex-start;flex-direction:row-reverse;gap:2px;padding:4px 0 0;flex-wrap:wrap}'
+    + '.tg .tg-sm{border:0;background:transparent;color:#5b6b86;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex:none}.tg .tg-sm:active{background:#e3f3ff}'
+    + '.tg .tg-mt{margin-inline-start:auto;display:flex;align-items:center;gap:6px;color:#5b6b86;font-size:12.5px;font-weight:700;direction:rtl}.tg .tg-mt i{font-style:normal;opacity:.6}.tg .tg-mt .tgi{width:16px;height:16px}'
+    + '.tg .tg-cmr{display:flex;align-items:center;gap:10px;border-top:1px solid #e1ebf7;margin:8px -14px 0;padding:11px 14px 2px;color:#0a86d6;cursor:pointer}.tg .tg-cmr b{flex:1;font-size:15px;font-weight:800}.tg .tg-cmr .chv{color:#5b6b86;display:inline-flex}'
+    + '.tg .tg-rxs{margin:6px 0 0}'
+    + '.tg .tg-fi{border-radius:50%;width:56px;height:56px;box-shadow:none}.tg .tg-fi .tgi{width:26px;height:26px;stroke:#fff}.tg .tg-fl{background:transparent;border:0;padding:4px 0;margin-bottom:4px}.tg .tg-fa button,.tg .tg-ib{background:#e3f3ff;box-shadow:none;border-radius:50%}'
+    + '.tg .tg-li{color:#0a86d6;display:inline-flex;flex:none}.tg .tg-lk.tgbad .tg-li{color:#c62828}'
+    + '.tg .tg-pl i .tgi{width:26px;height:26px;stroke:#fff;fill:#fff}'
+    + '.tg .tg-bar{background:transparent;box-shadow:none;margin:0 12px calc(10px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));padding:0}'
+    + '.tg .tg-bt{display:flex;align-items:center;gap:10px;direction:ltr}.tg .tg-mp{flex:1;direction:rtl;height:52px;border:0;border-radius:28px;background:rgba(255,255,255,.96);color:#14213d;font:inherit;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:0 6px 18px rgba(20,45,90,.16)}.tg .tg-mp .tgi{color:#0a86d6}.tg .tg-mp.pri{background:linear-gradient(135deg,#0aa6f5,#1d4ed8);color:#fff}'
+    + '.tg .tg-bar:has(.tg-cp){background:rgba(255,255,255,.96);border-radius:26px;padding:9px;box-shadow:0 10px 28px rgba(20,45,90,.16)}'
+    + '.tg .tg-tray button i{background:#e3f3ff!important;box-shadow:none!important;color:#0a86d6;border-radius:50%}.tg .tg-tray svg{stroke:#0a86d6!important}.tg .tg-tray i{width:50px;height:50px}'
+    + '.tg-sh .tgrw .tgi{color:#0a86d6}.tg-sh .tgrw.red .tgi,.tg-sh .tgrw.warn .tgi{color:#c62828}.tg-sh .tgrw.pri .tgi{color:#fff}.tg-sh h4 button{display:grid;place-items:center}.tg-sh h4 button .tgi{width:18px;height:18px}'
+    + '.tg-cmw{position:absolute;inset:0;z-index:55;display:flex;flex-direction:column;background:linear-gradient(165deg,#d6ecff 0%,#eaf2ff 42%,#fff0f7 100%);animation:tgFd .2s both}.tg-cmw .tg-m{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}.tg-cmw .tg-bar{margin:0 12px calc(10px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));background:rgba(255,255,255,.96);border-radius:26px;padding:9px;box-shadow:0 10px 28px rgba(20,45,90,.16)}'
+    + '.tg-cmw .tg-cp{display:flex;align-items:flex-end;gap:8px}.tg-cmw .tg-cp textarea{flex:1;border:0;background:#eef5ff;border-radius:20px;padding:11px 15px;font:inherit;font-size:15px;max-height:120px;resize:none;outline:0;color:#14213d;line-height:1.5;font-weight:600}.tg-cmw .tg-sb{width:44px;height:44px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;flex:none;background:linear-gradient(135deg,#0aa6f5,#1d4ed8);box-shadow:0 6px 16px rgba(10,166,245,.4)}.tg-cmw .tg-sb svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}'
+    + '.tg-cmw .tg-dy{align-self:center;background:rgba(255,255,255,.85);color:#5b6b86;font-size:12.5px;font-weight:800;padding:4px 14px;border-radius:999px}'
+    + '.tg-qp{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.96);border-radius:20px;padding:10px 14px;box-shadow:0 6px 18px rgba(20,45,90,.1)}.tg-qp .bar{width:3.5px;height:32px;border-radius:3px;background:#0aa6f5;flex:none}.tg-qp b{display:block;color:#0a86d6;font-size:14px;font-weight:900}.tg-qp small{display:block;color:#33476b;font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px}'
+    + '.tg-cb{display:flex;align-items:flex-end;gap:8px;align-self:flex-end;max-width:88%}.tg-cb.me{align-self:flex-start}.tg-cb .bb{background:rgba(255,255,255,.97);border-radius:20px 20px 20px 6px;padding:8px 13px 6px;box-shadow:0 4px 12px rgba(20,45,90,.1);min-width:90px}.tg-cb.me .bb{background:linear-gradient(135deg,#0aa6f5,#1d4ed8);color:#fff;border-radius:20px 20px 6px 20px}'
+    + '.tg-cb .nm{display:block;font-size:13.5px;font-weight:900;color:#0a86d6;margin-bottom:2px}.tg-cb .nm .tc{display:inline-block;background:#e3f3ff;color:#0a86d6;font-size:11px;border-radius:999px;padding:0 8px;margin-inline-start:6px}.tg-cb p{color:#14213d;margin:0;font-size:15.5px;line-height:1.7;font-weight:600;white-space:pre-wrap;overflow-wrap:anywhere}.tg-cb.me p{color:#fff}'
+    + '.tg-cb small{display:flex;gap:10px;justify-content:flex-end;font-size:11.5px;font-weight:700;color:#5b6b86;margin-top:2px}.tg-cb.me small{color:rgba(255,255,255,.85)}.tg-cb small a{color:#0a86d6;cursor:pointer;font-weight:900}.tg-cb.me small a{color:#fff}.tg-cb .rq{border-right:3px solid #0aa6f5;background:rgba(10,166,245,.1);border-radius:8px;padding:2px 8px;font-size:12.5px;font-weight:800;color:#0a86d6;margin-bottom:3px}.tg-cb.me .rq{background:rgba(255,255,255,.2);color:#fff;border-color:#fff}'
+    + '.tg-rq{display:flex;align-items:center;justify-content:space-between;background:#e3f3ff;border-radius:14px;padding:6px 12px;margin-bottom:7px;font-size:13.5px;color:#0a86d6;font-weight:700}.tg-rq button{border:0;background:transparent;color:#0a86d6;display:grid;place-items:center}'
+    + '.tg-info .cd .tgi{width:20px;height:20px}.tg-info .ln .ci .tgi{stroke:#fff}.tg-info .ih .cx-b .tgi{stroke:#fff}.tg-gr div span .tgi{stroke:#fff;fill:#fff}.tg-sub .st .tgi{width:16px;height:16px}'
+    + '.tg-v .tgvh button .tgi{stroke:#fff;width:21px;height:21px}.tg-v .tgvh button{display:grid;place-items:center}'
     + '</style>';
 
   /* ===== الدالة التي تُحقن داخل userMain ===== */
@@ -98,7 +134,24 @@
     try {
       var RX = ['👍', '❤️', '🔥', '😂', '😮', '😢', '🎉', '👏'];
       var COLS = window.__afChCols || [['#0aa6f5', '#1d4ed8']];
-      var SEND = '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>', PLUS = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+      /* أيقونات مخططة (outline) موحّدة بدل الإيموجي الملوّنة */
+      var ICN = {
+        back: '<path d="M19 12H5M11 6l-6 6 6 6"/>', more: '<circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/>',
+        search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>', pin: '<path d="M12 17v5M9 3h6l-1 6 3 3H7l3-3z"/>',
+        edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>', users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+        img: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>', vid: '<rect x="2" y="5" width="14" height="14" rx="3"/><path d="M16 10l6-3v10l-6-3z"/>',
+        fl: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>', q: '<path d="M4 21V9M10 21V3M16 21v-8M22 21H2"/>',
+        lnk: '<path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/>',
+        dl: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>', share: '<path d="M20 12l-7-7v4C6 10 4 15 3 20c3-4 6-5 10-5v4z"/>', eye: '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
+        cm: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>', trash: '<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
+        smile: '<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>', bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>',
+        bellx: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0M2 2l20 20"/>', close: '<path d="M18 6L6 18M6 6l12 12"/>',
+        chev: '<path d="M15 6l-6 6 6 6"/>', camera: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+        warn: '<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/>', shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+        play: '<path d="M7 4l13 8-13 8z"/>', send: '<path d="M3 11l18-8-8 18-2-8z"/>', plus: '<path d="M12 5v14M5 12h14"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/>', msg: '<path d="M4 5h16v11H9l-5 4z"/>', check: '<path d="M20 6L9 17l-5-5"/>'
+      };
+      function ic(k, z) { return '<svg class="tgi" viewBox="0 0 24 24"' + (z ? ' style="width:' + z + 'px;height:' + z + 'px"' : '') + '>' + (ICN[k] || '') + '</svg>'; }
+      var SEND = ic('send'), PLUS = ic('plus');
       var MC = {};            // ذاكرة مؤقتة للملفات المنزّلة
       var BASE_DEF = 'https://shhb-1ae9e-default-rtdb.firebaseio.com';
 
@@ -133,8 +186,8 @@
         if (['xls', 'xlsx', 'csv', 'ods'].indexOf(e) > -1) return { k: 'xls', l: 'جدول Excel', c: '#1e9e5a', x: 'XLS' };
         if (['ppt', 'pptx', 'odp'].indexOf(e) > -1) return { k: 'ppt', l: 'عرض PowerPoint', c: '#e0692b', x: 'PPT' };
         if (['zip', 'rar', '7z', 'tar', 'gz'].indexOf(e) > -1) return { k: 'zip', l: 'ملف مضغوط', c: '#8a5cf6', x: 'ZIP' };
-        if (/^audio/.test(t) || ['mp3', 'm4a', 'wav', 'ogg', 'aac'].indexOf(e) > -1) return { k: 'aud', l: 'ملف صوتي', c: '#d6458f', x: '♪' };
-        if (/^video/.test(t) || ['mp4', 'mov', 'mkv', 'webm', 'avi', '3gp'].indexOf(e) > -1) return { k: 'vid', l: 'فيديو', c: '#0aa6f5', x: '▶' };
+        if (/^audio/.test(t) || ['mp3', 'm4a', 'wav', 'ogg', 'aac'].indexOf(e) > -1) return { k: 'aud', l: 'ملف صوتي', c: '#d6458f', x: 'AUDIO' };
+        if (/^video/.test(t) || ['mp4', 'mov', 'mkv', 'webm', 'avi', '3gp'].indexOf(e) > -1) return { k: 'vid', l: 'فيديو', c: '#0aa6f5', x: 'VIDEO' };
         if (/^image/.test(t) || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].indexOf(e) > -1) return { k: 'img', l: 'صورة', c: '#14a38b', x: 'IMG' };
         if (/^text/.test(t) || ['txt', 'md', 'log', 'json'].indexOf(e) > -1) return { k: 'txt', l: 'ملف نصي', c: '#64748b', x: 'TXT' };
         return { k: 'fl', l: e ? ('ملف ' + e.toUpperCase()) : 'ملف', c: '#475569', x: (e || 'FILE').slice(0, 4).toUpperCase() };
@@ -222,19 +275,27 @@
         var root = cxEl, first = 1, lastSig = '', pickerEl = null;
         try { if (isOwnCh(c) && !c.gr && U.grade) rs(id, 'gr', String(U.grade)); } catch (e) {}
         var g = gcol(c), grad = 'linear-gradient(135deg,#0aa6f5,#1d4ed8)';
-        root.innerHTML = '<div class="tg-h" id="tgh"><button class="cx-b" id="tgb">' + ARW + '</button><span id="tgav"></span><div class="cx-t"><b id="tgn"></b><small id="tgs"></small></div></div><div class="tg-m" id="tgm"></div><div class="tg-bar" id="tgbar"></div>';
+        var searching = false, qs = '';
+        root.innerHTML = '<div class="tg-top" id="tgh"><button class="tg-rb" id="tgb">' + ic('back') + '</button><div class="tg-pill" id="tgpl"><span id="tgav"></span><div class="cx-t"><b id="tgn"></b><small id="tgs"></small></div></div><button class="tg-rb" id="tgmn">' + ic('more') + '</button></div><div class="tg-pin" id="tgpin" style="display:none"></div><div class="tg-m" id="tgm"></div><div class="tg-bar" id="tgbar"></div>';
         function me() { c = chOne(id) || c; return mrole(c); }
         function memb() { return !!(c.m && c.m['u' + ok(uid)]) || me() > 0; }
         function canPost() { return me() > 0; }
         function head() {
           c = chOne(id); if (!c) { closeCh(); return; }
+          if (searching) return;
           var hk = [c.cn, (c.img || '').length, c.col, Object.keys(c.m || {}).length, c.on].join('|'); if (hk === head.k) return; head.k = hk;
           g = gcol(c);
           $('tgav').innerHTML = av(null, 40, c.img); $('tgn').textContent = c.cn;
-          $('tgs').textContent = Object.keys(c.m || {}).length + ' مشترك' + (c.on ? ' · ' + c.on : '');
+          $('tgs').textContent = Object.keys(c.m || {}).length + ' مشترك';
         }
         $('tgb').onclick = function (e) { e.stopPropagation(); closeCh(); };
-        $('tgh').onclick = function (e) { if (e.target.closest('#tgb')) return; showInfo('m'); };
+        $('tgpl').onclick = function (e) { if (e.target.closest('input')) return; showInfo('m'); };
+        $('tgmn').onclick = function (e) { e.stopPropagation(); channelMenu(); };
+        function toggleSearch() {
+          var pl = $('tgpl');
+          if (!searching) { searching = true; pl.innerHTML = '<input id="tgqi" placeholder="بحث في القناة..." autocomplete="off"><button class="tg-x" id="tgqx">' + ic('close') + '</button>'; var qi = $('tgqi'); qi.focus(); qi.oninput = function () { qs = this.value.trim(); lastSig = ''; render(); }; $('tgqx').onclick = function (e) { e.stopPropagation(); toggleSearch(); }; }
+          else { searching = false; qs = ''; pl.innerHTML = '<span id="tgav"></span><div class="cx-t"><b id="tgn"></b><small id="tgs"></small></div>'; head.k = ''; head(); lastSig = ''; render(); }
+        }
 
         /* ---- تفاعلات ---- */
         function rxMap(p) { var m = {}, mine = -1; var o = p.rx || {}; Object.keys(o).forEach(function (k) { var v = +o[k]; if (isNaN(v)) return; m[v] = (m[v] || 0) + 1; if (k === 'u' + ok(uid)) mine = v; }); return { m: m, mine: mine }; }
@@ -263,15 +324,15 @@
           var h = '';
           if (p.img) h += '<img class="tg-im" data-iv="' + p.id + '" src="' + p.img + '" loading="lazy" decoding="async">';
           if (p.md && p.md.k === 'img') h += '<div class="tg-vd" data-iv="' + p.id + '" style="min-height:0"><img src="' + (p.md.th || '') + '" decoding="async" style="max-height:340px"><span class="tg-bd">' + fsz(p.md.s) + '</span></div>';
-          if (p.vid) h += '<div class="tg-vd" data-vp="' + p.id + '"><video src="' + p.vid + '#t=0.3" preload="metadata" muted playsinline></video><div class="tg-pl"><i>▶</i></div></div>';
-          if (p.md && p.md.k === 'vid') h += '<div class="tg-vd" data-vp="' + p.id + '">' + (p.md.th ? '<img src="' + p.md.th + '">' : '') + '<div class="tg-pl"><i>▶</i></div><span class="tg-bd">' + fsz(p.md.s) + '</span></div>';
+          if (p.vid) h += '<div class="tg-vd" data-vp="' + p.id + '"><video src="' + p.vid + '#t=0.3" preload="metadata" muted playsinline></video><div class="tg-pl"><i>' + ic('play', 26) + '</i></div></div>';
+          if (p.md && p.md.k === 'vid') h += '<div class="tg-vd" data-vp="' + p.id + '">' + (p.md.th ? '<img src="' + p.md.th + '">' : '') + '<div class="tg-pl"><i>' + ic('play', 26) + '</i></div><span class="tg-bd">' + fsz(p.md.s) + '</span></div>';
           if (p.md && p.md.k === 'fl') h += fileCard(p, p.md);
           if (p.fl) h += fileCard(p, { n: p.fl.n, s: (p.fl.d || '').length * 0.75, t: p.fl.t || '', inline: p.fl.d });
           return h;
         }
         function fileCard(p, f) {
           var k = fkind(f.n, f.t);
-          return '<div class="tg-fl"><div class="tg-fi" style="background:' + k.c + '">' + esc(k.x) + '</div><div class="tg-fn"><b>' + esc(f.n || 'ملف') + '</b><small>' + k.l + ' · ' + fsz(f.s) + '</small></div><div class="tg-fa"><button data-fo="' + p.id + '" title="فتح">👁</button><button data-fd="' + p.id + '" title="تحميل">⬇</button><button data-fs="' + p.id + '" title="مشاركة">↗</button></div></div>';
+          return '<div class="tg-fl"><div class="tg-fi" style="background:' + k.c + '" data-fo="' + p.id + '">' + ic('fl', 26) + '</div><div class="tg-fn" data-fo="' + p.id + '"><b>' + esc(f.n || 'ملف') + '</b><small>' + fsz(f.s) + ' · ' + k.x + '</small></div><div class="tg-fa"><button data-fd="' + p.id + '" title="تحميل">' + ic('dl') + '</button><button data-fs="' + p.id + '" title="مشاركة">' + ic('share') + '</button></div></div>';
         }
         function pollHtml(p) {
           var o = arr(p.o), vt = p.vt || {}, tot = Object.keys(vt).length, mn = vt['u' + ok(uid)];
@@ -279,51 +340,55 @@
         }
         function linksHtml(p) {
           var us = urlsIn(p.t); if (p.lk && /^https?:\/\//i.test(p.lk) && us.indexOf(p.lk) < 0) us.push(p.lk);
-          return us.slice(0, 3).map(function (u) { var s = lsafe(u); return '<div class="tg-lk' + (s.ok ? '' : ' tgbad') + '" data-lk="' + esc(u) + '"><span style="font-size:20px">' + (s.ok ? '🔗' : '⚠️') + '</span><div><b>' + esc(s.h) + '</b><small>' + esc(u) + '</small></div><span class="tgb">' + (s.ok ? 'آمن' : (s.unk ? 'غير موثوق' : 'خطر')) + '</span></div>'; }).join('');
+          return us.slice(0, 3).map(function (u) { var s = lsafe(u); return '<div class="tg-lk' + (s.ok ? '' : ' tgbad') + '" data-lk="' + esc(u) + '"><span class="tg-li">' + ic(s.ok ? 'lnk' : 'warn', 22) + '</span><div><b>' + esc(s.h) + '</b><small>' + esc(u) + '</small></div><span class="tgb">' + (s.ok ? 'آمن' : (s.unk ? 'غير موثوق' : 'خطر')) + '</span></div>'; }).join('');
         }
         function postHtml(p, cn) {
           var v = Object.keys(p.vw || {}).length, rr = rxMap(p), canM = me() > 0;
           var chips = Object.keys(rr.m).sort(function (a, b) { return rr.m[b] - rr.m[a]; }).map(function (i) { return '<button class="tg-rx' + (rr.mine === +i ? ' on' : '') + '" data-rx="1" data-p="' + p.id + '" data-i="' + i + '"><span class="e">' + RX[i] + '</span><b>' + rr.m[i] + '</b></button>'; }).join('');
-          return '<div class="tg-p" data-id="' + p.id + '"><div class="tg-ph">' + av(null, 34, c.img) + '<div><b>' + esc(c.cn) + '</b><small>' + tmf(p.ts) + (p.edited ? ' · معدّل' : '') + '</small></div><span class="tc">' + esc(c.on || 'المدرس') + '</span></div>' + mediaHtml(p) + (p.q ? pollHtml(p) : '') + (p.t ? '<div class="tg-t">' + linkify(p.t) + '</div>' : '') + linksHtml(p)
-            + '<div class="tg-ft"><span>👁 ' + v + '</span>' + (canM ? '<a data-pm="' + p.id + '" style="cursor:pointer;font-size:16px">⋮</a>' : '') + '</div>'
-            + '<div class="tg-rxs">' + chips + '<button class="tg-rx tg-ad" data-rxp="' + p.id + '">☺</button></div>'
-            + '<div class="tg-act"><button data-cm="' + p.id + '">💬 ' + (cn ? cn + ' تعليق' : 'اكتب تعليقاً') + '</button><button data-sp="' + p.id + '">↗ مشاركة</button></div></div>';
+          return '<div class="tg-p" id="tgp' + p.id + '" data-id="' + p.id + '"><div class="tg-cn">' + esc(c.cn) + (c.pin === p.id ? '<span class="tg-pn">' + ic('pin', 15) + '</span>' : '') + '</div>' + mediaHtml(p) + (p.q ? pollHtml(p) : '') + (p.t ? '<div class="tg-t">' + linkify(p.t) + '</div>' : '') + linksHtml(p)
+            + (chips ? '<div class="tg-rxs">' + chips + '</div>' : '')
+            + '<div class="tg-ft"><button class="tg-sm" data-rxp="' + p.id + '" title="تفاعل">' + ic('smile', 18) + '</button><button class="tg-sm" data-sp="' + p.id + '" title="مشاركة">' + ic('share', 18) + '</button>' + (canM ? '<button class="tg-sm" data-pm="' + p.id + '" title="خيارات">' + ic('more', 18) + '</button>' : '') + '<span class="tg-mt">' + ic('eye', 15) + ' ' + v + '<i>•</i>' + esc(c.on || 'المدرس') + '<i>•</i>' + tmf(p.ts) + (p.edited ? ' · معدّل' : '') + '</span></div>'
+            + '<div class="tg-cmr" data-cm="' + p.id + '">' + ic('cm', 21) + '<b>' + (cn ? cn + ' تعليق' : 'كتابة تعليق') + '</b><span class="chv">' + ic('chev', 20) + '</span></div></div>';
         }
         function render() {
           c = chOne(id); if (!c) { closeCh(); return; } head();
           var m = memb(), ps = cposts(id), ccs = comments(id), cnt = {};
           ccs.forEach(function (x) { cnt[x.cp] = (cnt[x.cp] || 0) + 1; });
-          var sig = (m ? 1 : 0) + '|' + ps.map(function (p) { return p.id + ':' + (p.edited || 0) + ':' + Object.keys(p.rx || {}).map(function (k) { return k + p.rx[k]; }).join(',') + ':' + Object.keys(p.vt || {}).length + ':' + Object.keys(p.vw || {}).length + ':' + (cnt[p.id] || 0); }).join(';');
+          var sig = (m ? 1 : 0) + '|' + (c.pin || '') + '|' + qs + '|' + ps.map(function (p) { return p.id + ':' + (p.edited || 0) + ':' + Object.keys(p.rx || {}).map(function (k) { return k + p.rx[k]; }).join(',') + ':' + Object.keys(p.vt || {}).length + ':' + Object.keys(p.vw || {}).length + ':' + (cnt[p.id] || 0); }).join(';');
           if (sig !== lastSig) {
             lastSig = sig; var el = $('tgm'), end = el.scrollHeight - el.scrollTop - el.clientHeight < 120, h = '', lastD = '';
             if (!m) h = '<div class="tg-dy" style="align-self:center;margin-top:30px">انضم للقناة لمشاهدة منشورات المدرس</div>';
             else if (!ps.length) h = '<div class="tg-dy" style="margin-top:30px">لا توجد منشورات بعد</div>';
-            else ps.forEach(function (p) { var d = dyf(p.ts); if (d !== lastD) { lastD = d; h += '<div class="tg-dy">' + d + '</div>'; } h += postHtml(p, cnt[p.id]); });
+            else { var shown = qs ? ps.filter(function (p) { return nm((p.t || '') + ' ' + (p.q || '') + ' ' + ((p.md && p.md.n) || '') + ' ' + ((p.fl && p.fl.n) || '')).indexOf(nm(qs)) > -1; }) : ps;
+              if (!shown.length) h = '<div class="tg-dy" style="margin-top:30px">لا توجد نتائج</div>';
+              shown.forEach(function (p) { var d = dyf(p.ts); if (d !== lastD) { lastD = d; h += '<div class="tg-dy">' + d + '</div>'; } h += postHtml(p, cnt[p.id]); }); }
             el.innerHTML = h; if (end || first) el.scrollTop = el.scrollHeight; first = 0;
           }
+          var pb = $('tgpin'), pp = c.pin ? ps.filter(function (p) { return p.id === c.pin; })[0] : null;
+          if (m && pp) { var pt = (pp.t || pp.q || (pp.md && pp.md.n) || (pp.fl && pp.fl.n) || (pp.img ? 'صورة' : 'منشور')).replace(/\s+/g, ' ').slice(0, 80); var pk = pp.id + pt; if (pb.dataset.k !== pk) { pb.dataset.k = pk; pb.innerHTML = '<span class="bar"></span><div><b>رسالة مثبتة</b><small>' + esc(pt) + '</small></div><span class="pi">' + ic('pin', 22) + '</span>'; } pb.style.display = 'flex'; pb.dataset.p = pp.id; } else { pb.style.display = 'none'; pb.dataset.k = ''; }
           if (m && me() === 0) ps.forEach(function (p) { if (!(p.vw && p.vw['u' + ok(uid)])) rs(p.id, 'vw/u' + ok(uid), 1); });
         }
 
         /* ---- شريط الأسفل ---- */
         var barSt = '';
+        $('tgpin').onclick = function () { var el = document.getElementById('tgp' + this.dataset.p); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
         function bar() {
           var role = me(), m = memb(), mu = !!(c.mu && c.mu['u' + ok(uid)]), st = role + '|' + (m ? 1 : 0) + '|' + (mu ? 1 : 0); var b = $('tgbar');
           if (b.dataset.s === st && barSt === st) return; b.dataset.s = st; barSt = st;
           if (role > 0) {
-            var IC = { img: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>', vid: '<rect x="2" y="5" width="14" height="14" rx="3"/><path d="M16 10l6-3v10l-6-3z"/>', fl: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>', q: '<path d="M4 21V9M10 21V3M16 21v-8M22 21H2"/>', lnk: '<path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/>' };
-            var TL = [['img', 'صورة', '#38bdf8,#0a86d6'], ['vid', 'فيديو', '#fb923c,#ef4444'], ['fl', 'ملف', '#a78bfa,#7c3aed'], ['q', 'استطلاع', '#4ade80,#16a34a'], ['lnk', 'رابط', '#2dd4bf,#0d9488']];
-            b.innerHTML = '<div class="tg-tray" id="tgtr">' + TL.map(function (x) { return '<button data-a="' + x[0] + '"><i style="background:linear-gradient(135deg,' + x[2] + ')"><svg viewBox="0 0 24 24">' + IC[x[0]] + '</svg></i>' + x[1] + '</button>'; }).join('') + '</div><div class="tg-cp"><button class="tg-ab" id="tgat">' + PLUS + '</button><textarea id="tgin" rows="1" placeholder="اكتب منشوراً للقناة..."></textarea><button class="tg-sb" id="tgsn">' + SEND + '</button></div>';
+            var TL = [['img', 'صورة'], ['vid', 'فيديو'], ['fl', 'ملف'], ['q', 'استطلاع'], ['lnk', 'رابط']];
+            b.innerHTML = '<div class="tg-tray" id="tgtr">' + TL.map(function (x) { return '<button data-a="' + x[0] + '"><i>' + ic(x[0], 24) + '</i>' + x[1] + '</button>'; }).join('') + '</div><div class="tg-cp"><button class="tg-ab" id="tgat">' + PLUS + '</button><textarea id="tgin" rows="1" placeholder="اكتب منشوراً للقناة..."></textarea><button class="tg-sb" id="tgsn">' + SEND + '</button></div>';
             $('tgat').onclick = function () { var tr = $('tgtr'), on = !tr.classList.contains('on'); tr.classList.toggle('on', on); this.classList.toggle('on', on); };
             $('tgtr').onclick = function (e) { var bt = e.target.closest('[data-a]'); if (!bt) return; $('tgtr').classList.remove('on'); $('tgat').classList.remove('on'); attachDo(bt.dataset.a); };
             var ta = $('tgin'); ta.oninput = function () { this.style.height = 'auto'; this.style.height = Math.min(120, this.scrollHeight) + 'px'; };
             $('tgsn').onclick = function () { var t = ta.value.trim(); if (!t) return toast('اكتب نصاً أو أرفق ملفاً'); if (pub({ t: t }) !== false) { ta.value = ''; ta.style.height = 'auto'; } };
           } else if (m) {
-            b.innerHTML = '<div class="tg-jn"><button style="background:' + (mu ? '#8a99b3' : grad) + '" id="tgmu">' + (mu ? '🔔 إلغاء الكتم' : '🔕 كتم الصوت') + '</button><button class="g" id="tgsh">↗ مشاركة</button><button class="g" id="tgow">✉ مراسلة</button></div>';
+            b.innerHTML = '<div class="tg-bt"><button class="tg-rb" id="tgsr" title="بحث">' + ic('search') + '</button><button class="tg-mp" id="tgmu">' + (mu ? ic('bell', 20) + ' إلغاء كتم الصوت' : ic('bellx', 20) + ' كتم الصوت') + '</button><button class="tg-rb" id="tgsh" title="مشاركة">' + ic('share') + '</button></div>';
+            $('tgsr').onclick = toggleSearch;
             $('tgmu').onclick = function () { rs(id, 'mu/u' + ok(uid), mu ? null : 1); toast(mu ? 'تم إلغاء الكتم' : 'تم كتم الصوت'); barSt = ''; bar(); };
             $('tgsh').onclick = function () { shareText(c.cn + '\n' + chLink(c)); };
-            $('tgow').onclick = function () { var o = accOf(c.o); if (o) { closeCh(); openChat(dmKey(o)); } else toast('تعذّر العثور على المدرس'); };
           } else {
-            b.innerHTML = '<div class="tg-jn"><button style="background:' + grad + '" id="tgjn">انضمام للقناة</button></div>';
+            b.innerHTML = '<div class="tg-bt"><button class="tg-mp pri" id="tgjn">انضمام للقناة</button></div>';
             $('tgjn').onclick = function () { rs(id, 'm/u' + ok(uid), String(uid)); toast('تم الانضمام للقناة'); lastSig = ''; barSt = ''; render(); bar(); };
           }
         }
@@ -339,7 +404,7 @@
         /* ---- نوافذ سفلية ---- */
         function sheet(title, body, onReady) {
           var ov = document.createElement('div'); ov.className = 'tg-ov';
-          ov.innerHTML = '<div class="tg-sh"><h4><span>' + title + '</span><button data-x="1">✕</button></h4><div class="tgbd">' + body + '</div></div>';
+          ov.innerHTML = '<div class="tg-sh"><h4><span>' + title + '</span><button data-x="1">' + ic('close') + '</button></h4><div class="tgbd">' + body + '</div></div>';
           root.appendChild(ov);
           ov.onclick = function (e) { if (e.target === ov || e.target.closest('[data-x]')) ov.remove(); };
           if (onReady) onReady(ov, function () { ov.remove(); });
@@ -378,7 +443,7 @@
           if (kind === 'fl' && file.size > MAXF) return toast('الملف أكبر من 40 ميغا');
           var k = fkind(file.name, file.type);
           var prev = kind === 'img' ? '<img src="' + dataUrl + '" style="width:100%;border-radius:14px;max-height:260px;object-fit:cover;margin-bottom:8px">'
-            : '<div class="tg-fl"><div class="tg-fi" style="background:' + k.c + '">' + esc(kind === 'vid' ? '▶' : k.x) + '</div><div class="tg-fn"><b>' + esc(file.name) + '</b><small>' + (kind === 'vid' ? 'فيديو' : k.l) + ' · ' + fsz(file.size) + '</small></div></div>';
+            : '<div class="tg-fl"><div class="tg-fi" style="background:' + k.c + '">' + ic(kind === 'vid' ? 'vid' : 'fl', 26) + '</div><div class="tg-fn"><b>' + esc(file.name) + '</b><small>' + (kind === 'vid' ? 'فيديو' : k.l) + ' · ' + fsz(file.size) + '</small></div></div>';
           sheet(kind === 'img' ? 'نشر صورة' : kind === 'vid' ? 'نشر فيديو' : 'نشر ملف', prev + '<textarea id="cap" rows="2" placeholder="أضف وصفاً (اختياري)"></textarea><div class="tg-pgs" id="pg" style="display:none"><i></i></div><div class="tghint" id="pm"></div><button class="bt2" id="go">نشر</button>', function (ov, close) {
             var busy = 0, bar2 = ov.querySelector('#pg'), pm = ov.querySelector('#pm');
             ov.querySelector('#go').onclick = function () {
@@ -399,7 +464,7 @@
         /* ---- عارض الملفات داخل التطبيق ---- */
         function viewer(title, build, blobGetter, name) {
           var v = document.createElement('div'); v.className = 'tg-v';
-          v.innerHTML = '<div class="tgvh"><button data-x="1">✕</button><b>' + esc(title) + '</b><button data-dl="1" title="تحميل">⬇</button><button data-sh="1" title="مشاركة">↗</button></div><div class="tgvb" id="vb"></div>';
+          v.innerHTML = '<div class="tgvh"><button data-x="1">' + ic('close') + '</button><b>' + esc(title) + '</b><button data-dl="1" title="تحميل">' + ic('dl') + '</button><button data-sh="1" title="مشاركة">' + ic('share') + '</button></div><div class="tgvb" id="vb"></div>';
           document.body.appendChild(v); var vb = v.querySelector('#vb'), cur = null;
           function close() { v.remove(); }
           v.onclick = function (e) { if (e.target.closest('[data-x]')) return close(); if (e.target.closest('[data-dl]')) { if (cur) saveBlob(cur, name); else toast('انتظر اكتمال التحميل'); } if (e.target.closest('[data-sh]')) { if (cur) shareBlob(cur, name); else toast('انتظر اكتمال التحميل'); } };
@@ -436,7 +501,7 @@
                 vb.innerHTML = ''; var n = Math.min(pdf.numPages, 80), i = 1;
                 (function nx() { if (i > n) return; pdf.getPage(i++).then(function (pg) { var v0 = pg.getViewport({ scale: 1 }), sc = Math.min(2.2, (innerWidth * 2) / v0.width), vp = pg.getViewport({ scale: sc }), cv = document.createElement('canvas'); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height); vb.appendChild(cv); return pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise.then(nx); }); })();
               }).catch(function (e) { vb.className = 'tgvb'; vb.innerHTML = '<div class="tgvl">تعذّر عرض PDF داخل التطبيق: ' + esc((e && e.message) || e) + '<br><br>استعمل زر التحميل أو المشاركة في الأعلى</div>'; });
-            } else vb.innerHTML = '<div class="tgvl"><div class="tg-fi" style="background:' + f.k.c + ';margin:0 auto 14px;width:78px;height:78px;font-size:18px">' + esc(f.k.x) + '</div>' + esc(f.n) + '<br><small>' + f.k.l + ' · ' + fsz(b.size) + '</small><br><br>هذه الصيغة لا تُعرض داخل التطبيق.<br>استعمل ⬇ للتحميل أو ↗ للمشاركة وافتحها بتطبيق مناسب.</div>';
+            } else vb.innerHTML = '<div class="tgvl"><div class="tg-fi" style="background:' + f.k.c + ';margin:0 auto 14px;width:78px;height:78px">' + ic('fl', 38) + '</div>' + esc(f.n) + '<br><small>' + f.k.l + ' · ' + fsz(b.size) + '</small><br><br>هذه الصيغة لا تُعرض داخل التطبيق.<br>استعمل زر التحميل أو المشاركة في الأعلى وافتحها بتطبيق مناسب.</div>';
           }, f.get, f.n);
         }
         function openImg(p) { openFile(p); }
@@ -446,8 +511,8 @@
         function linkSheet(u) {
           var s = lsafe(u);
           var body = s.ok
-            ? '<div class="tghint">✅ الرابط آمن حسب الفحص (موقع معروف ومشفّر).<br><b dir="ltr">' + esc(u) + '</b></div><button class="tgrw pri" data-a="open">فتح الرابط</button><button class="tgrw" data-a="share">مشاركة الرابط</button><button class="tgrw" data-a="copy">نسخ الرابط</button>'
-            : '<div class="tghint" style="color:#c62828">⚠️ تنبيه: هذا الرابط غير آمن / غير موثوق.<br><b>السبب:</b> ' + esc(s.w) + '<br><b dir="ltr">' + esc(u) + '</b></div><button class="tgrw warn" data-a="open">أنا أتحمّل المسؤولية — فتح الرابط</button><button class="tgrw" data-a="share">مشاركة الرابط</button><button class="tgrw" data-a="copy">نسخ الرابط</button>';
+            ? '<div class="tghint">' + ic('shield', 20) + ' الرابط آمن حسب الفحص (موقع معروف ومشفّر).<br><b dir="ltr">' + esc(u) + '</b></div><button class="tgrw pri" data-a="open">فتح الرابط</button><button class="tgrw" data-a="share">مشاركة الرابط</button><button class="tgrw" data-a="copy">نسخ الرابط</button>'
+            : '<div class="tghint" style="color:#c62828">' + ic('warn', 20) + ' تنبيه: هذا الرابط غير آمن / غير موثوق.<br><b>السبب:</b> ' + esc(s.w) + '<br><b dir="ltr">' + esc(u) + '</b></div><button class="tgrw warn" data-a="open">أنا أتحمّل المسؤولية — فتح الرابط</button><button class="tgrw" data-a="share">مشاركة الرابط</button><button class="tgrw" data-a="copy">نسخ الرابط</button>';
           sheet(s.ok ? 'فتح رابط' : 'رابط غير آمن', body, function (ov, close) {
             ov.querySelector('.tgbd').onclick = function (e) { var b = e.target.closest('[data-a]'); if (!b) return; var a = b.dataset.a; close();
               if (a === 'open') { try { P.open(u, '_blank'); } catch (x) { toast('تعذّر فتح الرابط'); } }
@@ -455,42 +520,64 @@
           });
         }
 
-        /* ---- تعليقات ---- */
+        /* ---- تعليقات: نافذة مستقلة مثل الكروب ---- */
         function commentsSheet(pid) {
-          var p = cposts(id).filter(function (q) { return q.id === pid; })[0]; if (!p) return; var rp = null;
-          function listHtml() {
-            var cs = comments(id, pid); if (!cs.length) return '<div class="tghint" style="text-align:center;padding:24px 0">لا توجد تعليقات بعد. كن أول من يعلّق</div>';
-            var by = {}; cs.forEach(function (x) { by[x.id] = x; });
-            return cs.map(function (x) {
-              var a = accOf(x.u), isT = String(x.u) === String(c.o), canDel = me() > 0 || String(x.u) === String(uid);
-              return '<div class="tg-cm">' + av(a || null, 36, null) + '<div class="cb">' + (x.rp ? '<div class="rq">↩ ' + esc(x.rp.n || '') + '</div>' : '') + '<b>' + esc(x.n || 'مستخدم') + '</b>' + (isT ? '<span class="tc">المدرس</span>' : '') + '<p>' + linkify(x.t) + '</p><small>' + tmf(x.ts) + '</small>' + (me() > 0 ? '<button data-rp="' + x.id + '">رد</button>' : '') + (canDel ? '<button data-dc="' + x.id + '" style="color:#c62828">حذف</button>' : '') + '</div></div>';
-            }).join('');
+          var p = pbyid(pid); if (!p) return; var rp = null, firstC = 1, lastC = '';
+          var ttl = (p.t || p.q || (p.md && p.md.n) || (p.fl && p.fl.n) || ((p.img || (p.md && p.md.k === 'img')) ? 'صورة' : 'منشور')).replace(/\s+/g, ' ').slice(0, 70);
+          var w = document.createElement('div'); w.className = 'tg-cmw';
+          w.innerHTML = '<div class="tg-top"><button class="tg-rb" data-x="1">' + ic('back') + '</button><div class="tg-pill" style="cursor:default"><span>' + av(null, 40, c.img) + '</span><div class="cx-t"><b>التعليقات</b><small id="cmn"></small></div></div><span class="tg-rb ghost"></span></div><div class="tg-m" id="cml"></div><div class="tg-bar"><div id="rqb" class="tg-rq" style="display:none"></div><div class="tg-cp"><textarea id="ci" rows="1" placeholder="اكتب تعليقاً..."></textarea><button class="tg-sb" id="cs">' + SEND + '</button></div></div>';
+          root.appendChild(w);
+          var cl = w.querySelector('#cml'), rb = w.querySelector('#rqb'), ci = w.querySelector('#ci'), tm;
+          function close() { clearInterval(tm); w.remove(); lastSig = ''; render(); }
+          function draw(force) {
+            var cs = comments(id, pid), sg = cs.map(function (x) { return x.id; }).join(',');
+            if (!force && sg === lastC) return; lastC = sg;
+            w.querySelector('#cmn').textContent = cs.length + ' تعليق';
+            var h = '<div class="tg-qp"><span class="bar"></span><div><b>' + esc(c.cn) + '</b><small>' + esc(ttl) + '</small></div></div>';
+            if (!cs.length) h += '<div class="tg-dy" style="margin:24px auto">لا توجد تعليقات بعد. كن أول من يعلّق</div>';
+            cs.forEach(function (x) {
+              var mine = String(x.u) === String(uid), isT = String(x.u) === String(c.o), a = accOf(x.u), canDel = me() > 0 || mine;
+              h += '<div class="tg-cb' + (mine ? ' me' : '') + '">' + (mine ? '' : av(a || null, 36, null)) + '<div class="bb">' + (mine ? '' : '<b class="nm">' + esc(x.n || 'مستخدم') + (isT ? '<span class="tc">المدرس</span>' : '') + '</b>') + (x.rp ? '<div class="rq">' + esc(x.rp.n || '') + '</div>' : '') + '<p>' + linkify(x.t) + '</p><small>' + tmf(x.ts) + (me() > 0 && !mine ? '<a data-rp="' + x.id + '">رد</a>' : '') + (canDel ? '<a data-dc="' + x.id + '">حذف</a>' : '') + '</small></div></div>';
+            });
+            var end = cl.scrollHeight - cl.scrollTop - cl.clientHeight < 140; cl.innerHTML = h; if (end || firstC) cl.scrollTop = cl.scrollHeight; firstC = 0;
           }
-          var ov = sheet('التعليقات', '<div id="cl">' + listHtml() + '</div><div id="rqb" class="tghint" style="display:none"></div><div class="tg-cp"><textarea id="ci" rows="1" placeholder="اكتب تعليقك..."></textarea><button class="tg-sb" id="cs" style="background:' + grad + '">' + SEND + '</button></div>', function (ov2) {
-            var cl = ov2.querySelector('#cl'), rb = ov2.querySelector('#rqb'), ci = ov2.querySelector('#ci');
-            function redraw() { cl.innerHTML = listHtml(); }
-            ov2.querySelector('.tg-sh').style.maxHeight = '90%';
-            cl.onclick = function (e) {
-              var r = e.target.closest('[data-rp]'); if (r) { var x = comments(id, pid).filter(function (q) { return q.id === +r.dataset.rp; })[0]; if (x) { rp = { id: x.id, u: x.u, n: x.n }; rb.style.display = 'block'; rb.innerHTML = '↩ رد على <b>' + esc(x.n) + '</b> <a style="color:#c62828;cursor:pointer" id="rpx">إلغاء</a>'; rb.querySelector('#rpx').onclick = function () { rp = null; rb.style.display = 'none'; }; ci.focus(); } return; }
-              var d = e.target.closest('[data-dc]'); if (d && confirm('حذف التعليق؟')) { dr(+d.dataset.dc); redraw(); lastSig = ''; render(); }
-            };
-            ov2.querySelector('#cs').onclick = function () {
-              var t = ci.value.trim(); if (!t) return; if (!memb()) return toast('انضم للقناة أولاً');
-              var isOwner = me() > 0, to = rp ? String(rp.u) : (isOwner ? '' : String(c.o));
-              try { ar({ id: Date.now(), k: 'cc', ch: id, cp: pid, u: String(uid), n: U.name, ro: U.role, t: t, ts: Date.now(), rp: rp, to: to, cn: c.cn }); } catch (e) { return toast('تعذّر الإرسال'); }
-              ci.value = ''; rp = null; rb.style.display = 'none'; redraw(); lastSig = ''; render(); cl.parentNode.scrollTop = cl.parentNode.scrollHeight;
-            };
-          });
+          draw(true); tm = setInterval(function () { if (!document.hidden) draw(); }, 2000);
+          w.onclick = function (e) {
+            if (e.target.closest('[data-x]')) return close();
+            var r = e.target.closest('[data-rp]'); if (r) { var x = comments(id, pid).filter(function (q) { return q.id === +r.dataset.rp; })[0]; if (x) { rp = { id: x.id, u: x.u, n: x.n }; rb.style.display = 'flex'; rb.innerHTML = '<span>رد على <b>' + esc(x.n) + '</b></span><button id="rpx">' + ic('close', 18) + '</button>'; rb.querySelector('#rpx').onclick = function () { rp = null; rb.style.display = 'none'; }; ci.focus(); } return; }
+            var d = e.target.closest('[data-dc]'); if (d && confirm('حذف التعليق؟')) { dr(+d.dataset.dc); draw(true); }
+          };
+          ci.oninput = function () { this.style.height = 'auto'; this.style.height = Math.min(120, this.scrollHeight) + 'px'; };
+          w.querySelector('#cs').onclick = function () {
+            var t = ci.value.trim(); if (!t) return; if (!memb()) return toast('انضم للقناة أولاً');
+            var isOwner = me() > 0, to = rp ? String(rp.u) : (isOwner ? '' : String(c.o));
+            try { ar({ id: Date.now(), k: 'cc', ch: id, cp: pid, u: String(uid), n: U.name, ro: U.role, t: t, ts: Date.now(), rp: rp, to: to, cn: c.cn }); } catch (e) { return toast('تعذّر الإرسال'); }
+            ci.value = ''; ci.style.height = 'auto'; rp = null; rb.style.display = 'none'; draw(true);
+          };
         }
 
         /* ---- قائمة المنشور (للمدرس/المسؤول) ---- */
         function postMenu(pid) {
           var p = cposts(id).filter(function (q) { return q.id === pid; })[0]; if (!p) return;
-          var items = (p.t ? '<button class="tgrw" data-a="edit">✏️ تعديل النص</button>' : '') + '<button class="tgrw red" data-a="del">🗑 حذف المنشور</button>';
+          var items = '<button class="tgrw" data-a="pin">' + ic('pin', 22) + (c.pin === pid ? 'إلغاء تثبيت المنشور' : 'تثبيت المنشور') + '</button>' + (p.t ? '<button class="tgrw" data-a="edit">' + ic('edit', 22) + 'تعديل النص</button>' : '') + '<button class="tgrw red" data-a="del">' + ic('trash', 22) + 'حذف المنشور</button>';
           sheet('المنشور', items, function (ov, close) {
             ov.querySelector('.tgbd').onclick = function (e) { var b = e.target.closest('[data-a]'); if (!b) return; close();
-              if (b.dataset.a === 'del') { if (confirm('حذف المنشور؟')) { dr(pid); if (p.md) { P.fetch(fbase() + '/handout_files/' + p.md.id + '.json', { method: 'DELETE' }).catch(function () {}); } lastSig = ''; render(); } }
+              if (b.dataset.a === 'pin') { rs(id, 'pin', c.pin === pid ? null : pid); lastSig = ''; render(); toast(c.pin === pid ? 'تم إلغاء التثبيت' : 'تم تثبيت المنشور'); }
+              else if (b.dataset.a === 'del') { if (confirm('حذف المنشور؟')) { dr(pid); if (c.pin === pid) rs(id, 'pin', null); if (p.md) { P.fetch(fbase() + '/handout_files/' + p.md.id + '.json', { method: 'DELETE' }).catch(function () {}); } lastSig = ''; render(); } }
               else { var nt = prompt('تعديل نص المنشور', p.t || ''); if (nt !== null) { rs(pid, 't', nt.trim()); rs(pid, 'edited', Date.now()); lastSig = ''; render(); } } };
+          });
+        }
+        function channelMenu() {
+          var role = me(), m = memb(), mu = !!(c.mu && c.mu['u' + ok(uid)]);
+          var rows = '<button class="tgrw" data-a="info">' + ic('info', 22) + 'معلومات القناة</button><button class="tgrw" data-a="search">' + ic('search', 22) + 'بحث في القناة</button><button class="tgrw" data-a="share">' + ic('share', 22) + 'مشاركة رابط القناة</button>';
+          if (role > 0) rows += '<button class="tgrw" data-a="edit">' + ic('edit', 22) + 'تعديل القناة</button><button class="tgrw" data-a="subs">' + ic('users', 22) + 'المشتركون والتفاعل</button>' + (c.pin ? '<button class="tgrw" data-a="unpin">' + ic('pin', 22) + 'إلغاء تثبيت الرسالة</button>' : '');
+          else if (m) rows += '<button class="tgrw" data-a="mute">' + ic(mu ? 'bell' : 'bellx', 22) + (mu ? 'إلغاء كتم الصوت' : 'كتم الصوت') + '</button><button class="tgrw" data-a="own">' + ic('msg', 22) + 'مراسلة المدرس</button>';
+          sheet('خيارات القناة', rows, function (ov, close) {
+            ov.querySelector('.tgbd').onclick = function (e) { var b = e.target.closest('[data-a]'); if (!b) return; close(); var a = b.dataset.a;
+              if (a === 'info') showInfo('m'); else if (a === 'search') { if (!searching) toggleSearch(); } else if (a === 'share') shareText(c.cn + '\n' + chLink(c));
+              else if (a === 'edit') editSheet(null); else if (a === 'subs') showInfo('s'); else if (a === 'unpin') { rs(id, 'pin', null); lastSig = ''; render(); }
+              else if (a === 'mute') { rs(id, 'mu/u' + ok(uid), mu ? null : 1); toast(mu ? 'تم إلغاء الكتم' : 'تم كتم الصوت'); barSt = ''; bar(); }
+              else if (a === 'own') { var o = accOf(c.o); if (o) { closeCh(); openChat(dmKey(o)); } else toast('تعذّر العثور على المدرس'); } };
           });
         }
 
@@ -504,20 +591,20 @@
           function draw() {
             c = chOne(id); if (!c) return closeInfo(); var ps = cposts(id), n = Object.keys(c.m || {}).length;
             var lks = arr(c.lks), socs = arr(c.so), ownerAcc = accOf(c.o);
-            var head = '<div class="ban"><div class="ih"><button class="cx-b" data-x="1">' + ARW + '</button><b>معلومات القناة</b>' + (role > 0 ? '<button class="cx-b" data-edit="1" title="تعديل القناة">✏️</button>' : '') + '</div><div class="ic">' + av(null, 96, c.img) + '<h3>' + esc(c.cn) + '</h3><p>' + n + ' مشترك' + (c.sj ? ' · ' + esc(c.sj) : '') + '</p></div></div>';
+            var head = '<div class="ban"><div class="ih"><button class="cx-b" data-x="1">' + ARW + '</button><b>معلومات القناة</b>' + (role > 0 ? '<button class="cx-b" data-edit="1" title="تعديل القناة">' + ic('edit', 20) + '</button>' : '') + '</div><div class="ic">' + av(null, 96, c.img) + '<h3>' + esc(c.cn) + '</h3><p>' + n + ' مشترك' + (c.sj ? ' · ' + esc(c.sj) : '') + '</p></div></div>';
             var about = '<div class="cd"><h5>الوصف</h5><p>' + esc(c.cd || 'قناة مادة ' + (c.sj || '')) + '</p></div>'
-              + '<div class="cd"><h5>رابط القناة</h5><div class="ln" data-lk="' + esc(chLink(c)) + '"><span class="ci" style="background:#1d6fd6">🔗</span><span style="direction:ltr;font-size:12.5px;word-break:break-all">' + esc(chLink(c)) + '</span></div><div class="ln" data-sharech="1"><span class="ci" style="background:#14a38b">↗</span>مشاركة رابط القناة</div></div>'
+              + '<div class="cd"><h5>رابط القناة</h5><div class="ln" data-lk="' + esc(chLink(c)) + '"><span class="ci" style="background:#1d6fd6">' + ic('lnk', 20) + '</span><span style="direction:ltr;font-size:12.5px;word-break:break-all">' + esc(chLink(c)) + '</span></div><div class="ln" data-sharech="1"><span class="ci" style="background:#14a38b">' + ic('share', 20) + '</span>مشاركة رابط القناة</div></div>'
               + '<div class="cd"><h5>المدرس</h5><div class="ln" data-own="1"><span class="ci" style="background:' + g2[1] + '">' + esc((c.on || '؟').trim()[0] || '؟') + '</span>' + esc(c.on || '') + (role === 0 ? '<span style="margin-inline-start:auto;color:#1d6fd6">مراسلة</span>' : '') + '</div></div>';
             var extra = '';
-            if (lks.length) extra += '<div class="cd"><h5>روابط القناة</h5>' + lks.map(function (x, i) { return '<div class="ln" data-lk="' + esc(x.u) + '"><span class="ci" style="background:#1d6fd6">🔗</span><div><div>' + esc(x.t || lsafe(x.u).h) + '</div><small style="color:#6b7c99;direction:ltr;display:block;font-weight:600">' + esc(x.u) + '</small></div></div>'; }).join('') + '</div>';
+            if (lks.length) extra += '<div class="cd"><h5>روابط القناة</h5>' + lks.map(function (x, i) { return '<div class="ln" data-lk="' + esc(x.u) + '"><span class="ci" style="background:#1d6fd6">' + ic('lnk', 20) + '</span><div><div>' + esc(x.t || lsafe(x.u).h) + '</div><small style="color:#6b7c99;direction:ltr;display:block;font-weight:600">' + esc(x.u) + '</small></div></div>'; }).join('') + '</div>';
             if (socs.length) extra += '<div class="cd"><h5>حسابات القناة</h5>' + socs.map(function (x) { var s = SOC[x.p] || ['رابط', '#475569', function (u) { return u; }]; return '<div class="ln" data-lk="' + esc(s[2](x.u || '')) + '"><span class="ci" style="background:' + s[1] + ';' + (x.p === 'snapchat' ? 'color:#000' : '') + '">' + s[0].slice(0, 2) + '</span><div><div>' + s[0] + '</div><small style="color:#6b7c99;direction:ltr;display:block;font-weight:600">' + esc(x.u) + '</small></div></div>'; }).join('') + '</div>';
             var tabs = '<div class="tb">' + T.map(function (x) { return '<button data-tb="' + x[0] + '" class="' + (x[0] === tab ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>';
             var body = '';
             var show = memb();
             if (!show) body = '<div class="cd"><p style="text-align:center;color:#6b7c99">انضم للقناة لعرض المحتوى</p></div>';
-            else if (tab === 'm') { var ms = ps.filter(function (p) { return p.img || p.vid || (p.md && (p.md.k === 'vid' || p.md.k === 'img')); }); body = ms.length ? '<div class="tg-gr">' + ms.map(function (p) { var th = p.img || (p.md && p.md.th) || ''; return '<div data-iv="' + p.id + '" style="' + (th ? 'background-image:url(' + th + ')' : '') + '">' + ((p.vid || (p.md && p.md.k === 'vid')) ? '<span>▶</span>' : '') + '</div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد صور أو فيديوهات</p></div>'; }
-            else if (tab === 'f') { var fs = ps.filter(function (p) { return p.fl || (p.md && p.md.k === 'fl'); }); body = fs.length ? '<div class="cd">' + fs.map(function (p) { var f = p.md || p.fl, k = fkind(f.n, f.t); return '<div class="tg-fl" style="background:none;padding:6px 0"><div class="tg-fi" style="background:' + k.c + '">' + esc(k.x) + '</div><div class="tg-fn"><b>' + esc(f.n) + '</b><small>' + k.l + ' · ' + fsz(f.s || ((f.d || '').length * 0.75)) + ' · ' + dyf(p.ts) + '</small></div><div class="tg-fa"><button data-fo="' + p.id + '">👁</button><button data-fd="' + p.id + '">⬇</button><button data-fs="' + p.id + '">↗</button></div></div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد ملفات</p></div>'; }
-            else if (tab === 'l') { var us = []; ps.forEach(function (p) { urlsIn(p.t).concat(p.lk ? [p.lk] : []).forEach(function (u) { if (us.indexOf(u) < 0) us.push(u); }); }); body = us.length ? '<div class="cd">' + us.map(function (u) { var s = lsafe(u); return '<div class="ln" data-lk="' + esc(u) + '"><span class="ci" style="background:' + (s.ok ? '#14a38b' : '#e5484d') + '">' + (s.ok ? '🔗' : '⚠') + '</span><div style="min-width:0"><div>' + esc(s.h) + '</div><small style="color:#6b7c99;direction:ltr;display:block;font-weight:600;word-break:break-all">' + esc(u) + '</small></div></div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد روابط</p></div>'; }
+            else if (tab === 'm') { var ms = ps.filter(function (p) { return p.img || p.vid || (p.md && (p.md.k === 'vid' || p.md.k === 'img')); }); body = ms.length ? '<div class="tg-gr">' + ms.map(function (p) { var th = p.img || (p.md && p.md.th) || ''; return '<div data-iv="' + p.id + '" style="' + (th ? 'background-image:url(' + th + ')' : '') + '">' + ((p.vid || (p.md && p.md.k === 'vid')) ? '<span>' + ic('play', 24) + '</span>' : '') + '</div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد صور أو فيديوهات</p></div>'; }
+            else if (tab === 'f') { var fs = ps.filter(function (p) { return p.fl || (p.md && p.md.k === 'fl'); }); body = fs.length ? '<div class="cd">' + fs.map(function (p) { var f = p.md || p.fl, k = fkind(f.n, f.t); return '<div class="tg-fl" style="background:none;padding:6px 0"><div class="tg-fi" style="background:' + k.c + '">' + ic('fl', 26) + '</div><div class="tg-fn"><b>' + esc(f.n) + '</b><small>' + fsz(f.s || ((f.d || '').length * 0.75)) + ' · ' + k.x + ' · ' + dyf(p.ts) + '</small></div><div class="tg-fa"><button data-fo="' + p.id + '">' + ic('eye') + '</button><button data-fd="' + p.id + '">' + ic('dl') + '</button><button data-fs="' + p.id + '">' + ic('share') + '</button></div></div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد ملفات</p></div>'; }
+            else if (tab === 'l') { var us = []; ps.forEach(function (p) { urlsIn(p.t).concat(p.lk ? [p.lk] : []).forEach(function (u) { if (us.indexOf(u) < 0) us.push(u); }); }); body = us.length ? '<div class="cd">' + us.map(function (u) { var s = lsafe(u); return '<div class="ln" data-lk="' + esc(u) + '"><span class="ci" style="background:' + (s.ok ? '#14a38b' : '#e5484d') + '">' + ic(s.ok ? 'lnk' : 'warn', 20) + '</span><div style="min-width:0"><div>' + esc(s.h) + '</div><small style="color:#6b7c99;direction:ltr;display:block;font-weight:600;word-break:break-all">' + esc(u) + '</small></div></div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد روابط</p></div>'; }
             else if (tab === 's') body = subsHtml();
             el.innerHTML = head + about + extra + tabs + body;
             var si = el.querySelector('#sq'); if (si) { si.value = q; si.oninput = function () { q = this.value; var pos = this.selectionStart; draw(); var s2 = el.querySelector('#sq'); if (s2) { s2.focus(); try { s2.setSelectionRange(pos, pos); } catch (e) {} } }; }
@@ -530,7 +617,7 @@
             }).sort(function (a, b) { return b.s - a.s; });
             var f = q.trim() ? rows.filter(function (r) { return nm(r.n).indexOf(nm(q)) > -1; }) : rows;
             return '<div class="cd"><h5>المشتركون (' + rows.length + ') — مرتّبون حسب التفاعل</h5><input id="sq" placeholder="ابحث باسم الطالب..." style="width:100%;border:1.5px solid #dbe5f2;background:#f8fafd;border-radius:14px;padding:10px 13px;font:inherit;margin-bottom:8px;outline:0">'
-              + (f.length ? f.map(function (r, i) { return '<div class="tg-sub">' + (i < 3 && r.s > 0 && !q ? '<span class="rk">' + (i + 1) + '</span>' : av(accOf(r.u) || null, 34, null)) + '<div><b>' + esc(r.n) + '</b><small>' + esc(r.g) + (r.s ? ' · نقاط التفاعل ' + r.s : ' · لا تفاعل بعد') + '</small></div><div class="st"><span>👁 ' + r.v + '</span><span>☺ ' + r.r + '</span><span>💬 ' + r.c + '</span></div></div>'; }).join('') : '<p style="text-align:center;color:#6b7c99">لا يوجد مشتركون' + (q ? ' بهذا الاسم' : ' بعد') + '</p>') + '</div>';
+              + (f.length ? f.map(function (r, i) { return '<div class="tg-sub">' + (i < 3 && r.s > 0 && !q ? '<span class="rk">' + (i + 1) + '</span>' : av(accOf(r.u) || null, 34, null)) + '<div><b>' + esc(r.n) + '</b><small>' + esc(r.g) + (r.s ? ' · نقاط التفاعل ' + r.s : ' · لا تفاعل بعد') + '</small></div><div class="st"><span>' + ic('eye', 16) + ' ' + r.v + '</span><span>' + ic('smile', 16) + ' ' + r.r + '</span><span>' + ic('cm', 16) + ' ' + r.c + '</span></div></div>'; }).join('') : '<p style="text-align:center;color:#6b7c99">لا يوجد مشتركون' + (q ? ' بهذا الاسم' : ' بعد') + '</p>') + '</div>';
           }
           el.onclick = function (e) {
             if (e.target.closest('[data-x]')) return closeInfo();
@@ -554,18 +641,16 @@
         /* ---- تعديل القناة (للمدرس) ---- */
         function editSheet(after) {
           c = chOne(id); var img = c.img, col = c.col || 0, lks = arr(c.lks).map(function (x) { return { t: x.t || '', u: x.u || '' }; }), socs = arr(c.so).map(function (x) { return { p: x.p, u: x.u }; });
-          function rowsL() { return lks.map(function (x, i) { return '<div style="display:flex;gap:6px"><input data-lt="' + i + '" placeholder="العنوان" value="' + esc(x.t) + '" style="flex:1"><input data-lu="' + i + '" placeholder="https://..." value="' + esc(x.u) + '" style="flex:2;direction:ltr"><button class="tg-ib" data-ld="' + i + '">✕</button></div>'; }).join(''); }
-          function rowsS() { return socs.map(function (x, i) { return '<div style="display:flex;gap:6px"><select data-sp="' + i + '" style="flex:1">' + Object.keys(SOC).map(function (k) { return '<option value="' + k + '"' + (x.p === k ? ' selected' : '') + '>' + SOC[k][0] + '</option>'; }).join('') + '</select><input data-su="' + i + '" placeholder="اسم الحساب أو الرقم" value="' + esc(x.u) + '" style="flex:2;direction:ltr"><button class="tg-ib" data-sd="' + i + '">✕</button></div>'; }).join(''); }
-          var ov = sheet('تعديل القناة', '<div style="text-align:center;margin-bottom:8px"><span id="eav">' + av(null, 84, img) + '</span><br><button class="tgrw" id="eim" style="width:auto;display:inline-flex;margin-top:6px">📷 تغيير صورة القناة</button></div>'
+          function rowsL() { return lks.map(function (x, i) { return '<div style="display:flex;gap:6px"><input data-lt="' + i + '" placeholder="العنوان" value="' + esc(x.t) + '" style="flex:1"><input data-lu="' + i + '" placeholder="https://..." value="' + esc(x.u) + '" style="flex:2;direction:ltr"><button class="tg-ib" data-ld="' + i + '">' + ic('close', 18) + '</button></div>'; }).join(''); }
+          function rowsS() { return socs.map(function (x, i) { return '<div style="display:flex;gap:6px"><select data-sp="' + i + '" style="flex:1">' + Object.keys(SOC).map(function (k) { return '<option value="' + k + '"' + (x.p === k ? ' selected' : '') + '>' + SOC[k][0] + '</option>'; }).join('') + '</select><input data-su="' + i + '" placeholder="اسم الحساب أو الرقم" value="' + esc(x.u) + '" style="flex:2;direction:ltr"><button class="tg-ib" data-sd="' + i + '">' + ic('close', 18) + '</button></div>'; }).join(''); }
+          var ov = sheet('تعديل القناة', '<div style="text-align:center;margin-bottom:8px"><span id="eav">' + av(null, 84, img) + '</span><br><button class="tgrw" id="eim" style="width:auto;display:inline-flex;margin-top:6px">' + ic('camera', 20) + ' تغيير صورة القناة</button></div>'
             + '<input id="en" maxlength="40" placeholder="اسم القناة" value="' + esc(c.cn) + '"><textarea id="ed" rows="3" maxlength="300" placeholder="وصف القناة">' + esc(c.cd || '') + '</textarea>'
-            + '<div class="tghint">لون القناة</div><div class="afch-cols" id="ecol">' + COLS.map(function (g3, i) { return '<button type="button" data-c="' + i + '" class="' + (i === col ? 'on' : '') + '" style="background:linear-gradient(135deg,' + g3[0] + ',' + g3[1] + ')"></button>'; }).join('') + '</div>'
             + '<div class="tghint">روابط القناة</div><div id="el">' + rowsL() + '</div><button class="tgrw" id="ela">+ إضافة رابط</button>'
             + '<div class="tghint">حسابات القناة (تيك توك، انستغرام، ...)</div><div id="es">' + rowsS() + '</div><button class="tgrw" id="esa">+ إضافة حساب</button>'
-            + '<button class="tgrw" id="eadm">👥 مسؤولو القناة</button><button class="bt2" id="esv">حفظ التعديلات</button>', function (ov2, close) {
+            + '<button class="tgrw" id="eadm">' + ic('users', 20) + ' مسؤولو القناة</button><button class="bt2" id="esv">حفظ التعديلات</button>', function (ov2, close) {
             ov2.querySelector('.tg-sh').style.maxHeight = '92%';
             function sync() { ov2.querySelectorAll('[data-lt]').forEach(function (x) { lks[+x.dataset.lt].t = x.value; }); ov2.querySelectorAll('[data-lu]').forEach(function (x) { lks[+x.dataset.lu].u = x.value; }); ov2.querySelectorAll('[data-sp]').forEach(function (x) { socs[+x.dataset.sp].p = x.value; }); ov2.querySelectorAll('[data-su]').forEach(function (x) { socs[+x.dataset.su].u = x.value; }); }
             ov2.querySelector('#eim').onclick = function () { pick('image/*', function (f) { shrink(f, 400, function (d) { img = d; ov2.querySelector('#eav').innerHTML = av(null, 84, d); }); }); };
-            ov2.querySelector('#ecol').onclick = function (e) { var b = e.target.closest('[data-c]'); if (!b) return; col = +b.dataset.c; this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); }); };
             ov2.querySelector('#ela').onclick = function () { sync(); if (lks.length >= 8) return; lks.push({ t: '', u: '' }); ov2.querySelector('#el').innerHTML = rowsL(); };
             ov2.querySelector('#esa').onclick = function () { sync(); if (socs.length >= 8) return; socs.push({ p: 'tiktok', u: '' }); ov2.querySelector('#es').innerHTML = rowsS(); };
             ov2.querySelector('#el').onclick = function (e) { var d = e.target.closest('[data-ld]'); if (d) { sync(); lks.splice(+d.dataset.ld, 1); this.innerHTML = rowsL(); } };
@@ -577,7 +662,7 @@
               lks.filter(function (x) { return x.u.trim(); }).forEach(function (x, i) { var u = x.u.trim(); if (!/^https?:\/\//i.test(u)) u = 'https://' + u; if (!/^https?:\/\/[^\s.]+\.[^\s]+/i.test(u)) bad = u; L[i] = { t: x.t.trim(), u: u }; });
               if (bad) return toast('رابط غير صالح: ' + bad);
               socs.filter(function (x) { return x.u.trim(); }).forEach(function (x, i) { S[i] = { p: x.p, u: x.u.trim() }; });
-              rs(id, 'cn', n); rs(id, 'cd', ov2.querySelector('#ed').value.trim()); rs(id, 'col', col); if (img) rs(id, 'img', img);
+              rs(id, 'cn', n); rs(id, 'cd', ov2.querySelector('#ed').value.trim()); if (img) rs(id, 'img', img);
               rs(id, 'lks', Object.keys(L).length ? L : null); rs(id, 'so', Object.keys(S).length ? S : null);
               toast('تم حفظ تعديلات القناة'); close(); head(); lastSig = ''; render(); if (after) setTimeout(after, 60);
               var inf = root.querySelector('#tgi'); if (inf) { closeInfo(); showInfo(tab0()); }

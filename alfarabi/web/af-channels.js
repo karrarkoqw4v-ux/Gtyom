@@ -16,6 +16,9 @@
     + '.afch-cols button{width:38px;height:38px;border-radius:50%;border:3px solid #fff;box-shadow:0 3px 10px rgba(20,45,90,.25);cursor:pointer;padding:0}'
     + '.afch-cols button.on{outline:3px solid #0a86d6;outline-offset:2px}'
     + '.afch-lk{direction:ltr;text-align:left;font-size:12.5px;font-weight:800;color:#0a86d6;word-break:break-all;margin:0 2px 10px;min-height:18px}'
+    + '.afch-list{background:rgba(255,255,255,.95);border-radius:22px;padding:10px 12px;margin-bottom:12px;box-shadow:0 6px 18px rgba(20,45,90,.08)}'
+    + '.afch-lh{display:flex;justify-content:space-between;align-items:center;margin:2px 2px 6px;color:#14213d}.afch-lh b{font-size:15px;font-weight:900}.afch-lh span{background:#e3f3ff;color:#0a86d6;border-radius:999px;padding:2px 12px;font-weight:900;font-size:13px}'
+    + '.afch-row{display:flex;align-items:center;gap:11px;width:100%;border:0;background:#f1f7ff;border-radius:16px;padding:8px 10px;margin-bottom:7px;font:inherit;cursor:pointer;text-align:right}.afch-row b{display:block;font-size:14.5px;color:#14213d;font-weight:800}.afch-row small{display:block;color:#5b6b86;font-size:12px;font-weight:700;direction:ltr;text-align:right}'
     + '</style>';
 
   function DEC(SITE) {
@@ -63,24 +66,29 @@
 
       // إنشاء قناة: اسم + وصف + يوزر نيم + لون + صورة
       V.mkch = function () {
-        var img = '', col = 0;
-        shell('إنشاء قناة مادة', '',
-          '<div class="sc"><div class="fd"><input id="cn" placeholder="اسم القناة" maxlength="40"></div>'
+        var img = '', MAXCH = 5;
+        var mine = chans().filter(function (x) { return isOwnCh(x); }), full = mine.length >= MAXCH;
+        var listH = '<div class="afch-list"><div class="afch-lh"><b>قنواتك</b><span>' + mine.length + ' / ' + MAXCH + '</span></div>'
+          + (mine.length ? mine.map(function (x) { return '<button type="button" class="afch-row" data-ch="' + x.id + '">' + av(null, 40, x.img) + '<span><b>' + esc(x.cn) + '</b><small>@' + esc(x.s || '') + ' · ' + Object.keys(x.m || {}).length + ' مشترك</small></span></button>'; }).join('') : '<p class="hint" style="margin:6px 2px">لا توجد قنوات بعد</p>')
+          + (full ? '<p class="hint" style="margin:8px 2px;color:#c62828">وصلت الحد الأقصى (5 قنوات). عدّل إحدى قنواتك بدل إنشاء قناة جديدة.</p>' : '') + '</div>';
+        var formH = full ? '' : ('<div class="fd"><input id="cn" placeholder="اسم القناة" maxlength="40"></div>'
           + '<div class="fd"><input id="cd" placeholder="وصف القناة" maxlength="160"></div>'
           + '<div class="fd" style="direction:ltr"><b style="color:#5b6b86">@</b><input id="cs2" placeholder="username" maxlength="30" style="direction:ltr;text-align:left" autocapitalize="off" autocomplete="off"></div>'
           + '<div id="cst" class="hint" style="font-size:12.5px;margin:2px 0 6px;min-height:20px"></div>'
-          + '<p class="qn-lb" style="margin:4px 2px">لون القناة</p><div class="afch-cols" id="chcol">' + COLS.map(function (g, i) { return '<button type="button" data-c="' + i + '" class="' + (i === 0 ? 'on' : '') + '" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"></button>'; }).join('') + '</div>'
-          + '<div class="afch-lk" id="chlk"></div><button class="bt" id="cgo">إنشاء القناة</button></div>',
+          + '<div class="afch-lk" id="chlk"></div><button class="bt" id="cgo">إنشاء القناة</button>');
+        shell('إنشاء قناة مادة', '', '<div class="sc">' + listH + formH + '</div>',
           V.settings, { img: ini(U.subject || U.name), edit: function () { pick('image/*', function (x) { shrink(x, 400, function (d) { img = d; var im = $('lg').querySelector('img'); if (im) im.src = d; }); }); } });
+        card.querySelectorAll('.afch-row').forEach(function (b) { b.onclick = function () { openCh(+b.dataset.ch); }; });
+        if (full) return;
         function msg(v) { var r = chkSlug(v); r[0] = String(r[0]).replace('الرابط', 'اليوزر نيم'); return r; }
         $('cs2').oninput = function () { var r = msg(this.value); $('cst').textContent = r[0]; $('cst').style.color = r[1] ? '#1a9d55' : '#d33a3a'; $('chlk').textContent = r[1] ? chLink({ s: this.value.trim().toLowerCase() }) : ''; };
-        $('chcol').onclick = function (e) { var b = e.target.closest('[data-c]'); if (!b) return; col = +b.dataset.c; this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); }); };
         $('cgo').onclick = function () {
+          if (chans().filter(function (x) { return isOwnCh(x); }).length >= MAXCH) return toast('وصلت الحد الأقصى: 5 قنوات');
           var n = $('cn').value.trim(), r = msg($('cs2').value);
           if (n.length < 2) return toast('اكتب اسم القناة');
           if (!r[1]) return toast(r[0] || 'اكتب يوزر نيم القناة');
           var id = Date.now(), m = {}; m['u' + ok(uid)] = String(uid);
-          P.addRec({ id: id, k: 'ch', ts: id, cn: n, cd: $('cd').value.trim(), s: $('cs2').value.trim().toLowerCase(), col: col, gr: String(U.grade || ''), img: img || ini(U.subject || U.name), o: String(uid), on: U.name, sj: U.subject || '', m: m });
+          P.addRec({ id: id, k: 'ch', ts: id, cn: n, cd: $('cd').value.trim(), s: $('cs2').value.trim().toLowerCase(), gr: String(U.grade || ''), img: img || ini(U.subject || U.name), o: String(uid), on: U.name, sj: U.subject || '', m: m });
           toast('تم إنشاء القناة'); V.parents(); setTimeout(function () { openCh(id); }, 250);
         };
       };

@@ -280,7 +280,7 @@ object Sync {
             val edited = seen.any { it.startsWith("ann:$id:") }
             val title = a.optString("title", "")
             val desc = a.optString("desc", "")
-            val body = (if (edited) "✏️ تم تعديل الإشعار\n" else "") + (if (title.isNotEmpty() && desc.isNotEmpty()) "$title — $desc" else title + desc)
+            val body = (if (edited) "تم تعديل الإشعار\n" else "") + (if (title.isNotEmpty() && desc.isNotEmpty()) "$title — $desc" else title + desc)
             fresh.add(Fresh(sg) { Notifier.school(c, "إشعار", body, "الإدارة • ثانوية الفارابي", "ann:$id", "") })
         }
 

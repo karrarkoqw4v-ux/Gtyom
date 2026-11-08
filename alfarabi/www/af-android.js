@@ -196,7 +196,7 @@
     arr(info.announcements).forEach(function (a) {
       var mine = a.target === 'all' || String(a.target) === u.grade || (a.target === 'student' && (same(a.student, u.name) || (u.role === 'parent' && same(a.student, u.child))));
       var id = 'ann:' + (a.id || a.createdAt || a.title);
-      items.push({ id: id, sig: id + ':' + hsh(a), mine: mine, fire: function (ed) { NA.notifySchool('إشعار', (ed ? '✏️ تم تعديل الإشعار\n' : '') + (a.title && a.desc ? a.title + ' — ' + a.desc : (a.title || '') + (a.desc || '')), 'الإدارة • ثانوية الفارابي', id, ''); } });
+      items.push({ id: id, sig: id + ':' + hsh(a), mine: mine, fire: function (ed) { NA.notifySchool('إشعار', (ed ? 'تم تعديل الإشعار\n' : '') + (a.title && a.desc ? a.title + ' — ' + a.desc : (a.title || '') + (a.desc || '')), 'الإدارة • ثانوية الفارابي', id, ''); } });
     });
     if (u.role !== 'teacher') arr(info.lessonPlans).forEach(function (p) {
       var id = 'plan:' + (p.id || p.title), g = String(p.grade || '');
