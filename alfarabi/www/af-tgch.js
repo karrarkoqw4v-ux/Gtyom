@@ -71,10 +71,10 @@
     + '.tg-sub{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #eef2f8}.tg-sub:first-of-type{border-top:0}.tg-sub b{font-size:14px;color:#12203a}.tg-sub small{display:block;color:#6b7c99;font-size:11.5px}.tg-sub .st{margin-inline-start:auto;display:flex;gap:8px;font-size:12px;font-weight:800;color:#33476b}'
     + '.tg-sub .rk{width:26px;height:26px;border-radius:50%;background:#ffe9a8;color:#8a5a00;display:grid;place-items:center;font-weight:900;font-size:12px;flex:none}'
     + '.tg-v{position:fixed;inset:0;z-index:99;background:#000;display:flex;flex-direction:column;direction:rtl;animation:tgFd .2s both}'
-    + '.tg-v .vh{display:flex;align-items:center;gap:8px;padding:calc(8px + var(--sa-top,env(safe-area-inset-top,0px))) 10px 8px;color:#fff;background:rgba(0,0,0,.6)}.tg-v .vh b{flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:right}.tg-v .vh button{border:0;background:rgba(255,255,255,.16);color:#fff;border-radius:50%;width:38px;height:38px;font-size:17px;cursor:pointer}'
-    + '.tg-v .vb{flex:1;display:grid;place-items:center;overflow:auto;position:relative}.tg-v .vb img,.tg-v .vb video{max-width:100%;max-height:100%;transition:transform .2s}.tg-v .vb audio{width:90%}'
-    + '.tg-v .vb canvas{display:block;width:100%;margin:0 0 8px;background:#fff}.tg-v .vb.pdf{display:block;background:#2b2f36;padding:8px}.tg-v .vb pre{color:#e6edf7;white-space:pre-wrap;font:13px/1.7 monospace;padding:14px;direction:ltr;text-align:left;align-self:start}'
-    + '.tg-v .vl{color:#fff;text-align:center;padding:20px;font-weight:700}'
+    + '.tg-v .tgvh{display:flex;align-items:center;gap:8px;padding:calc(8px + var(--sa-top,env(safe-area-inset-top,0px))) 10px 8px;color:#fff;background:rgba(0,0,0,.6)}.tg-v .tgvh b{flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:right}.tg-v .tgvh button{border:0;background:rgba(255,255,255,.16);color:#fff;border-radius:50%;width:38px;height:38px;font-size:17px;cursor:pointer}'
+    + '.tg-v .tgvb{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;overflow:auto;position:relative}.tg-v .tgvb img,.tg-v .tgvb video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transition:transform .2s}.tg-v .tgvb audio{width:90%}'
+    + '.tg-v .tgvb canvas{display:block;width:100%;margin:0 0 8px;background:#fff}.tg-v .tgvb.pdf{display:block;align-items:initial;background:#2b2f36;padding:8px}.tg-v .tgvb pre{color:#e6edf7;white-space:pre-wrap;font:13px/1.7 monospace;padding:14px;direction:ltr;text-align:left;align-self:start}'
+    + '.tg-v .tgvl{color:#fff;text-align:center;padding:20px;font-weight:700}'
     + '.tg-ring{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff;font-weight:800;font-size:14px}'
     + '</style>';
 
@@ -87,6 +87,21 @@
       var MC = {};            // ذاكرة مؤقتة للملفات المنزّلة
       var BASE_DEF = 'https://shhb-1ae9e-default-rtdb.firebaseio.com';
 
+      /* ===== أداء: قراءة السجلات من التخزين مرة كل 600ms كحد أقصى (التحليل المتكرر لملف كبير كان سبب التقطيع) ===== */
+      var _rawC = null, _recC = [], _tC = 0;
+      function recs() {
+        var n = Date.now(); if (n - _tC < 600) return _recC; _tC = n;
+        var raw = null; try { raw = P.localStorage.getItem('alfarabi_rec_v1'); } catch (e) {}
+        if (raw !== _rawC) { _rawC = raw; try { _recC = JSON.parse(raw) || []; } catch (e) { _recC = []; } }
+        return _recC;
+      }
+      function inv() { _tC = 0; }
+      function rs() { inv(); return P.recSet.apply(P, arguments); }
+      function ar(r) { inv(); return P.addRec(r); }
+      function dr(i) { inv(); return P.delRec(i); }
+      chans = function () { return recs().filter(function (r) { return r.k === 'ch'; }).sort(function (a, b) { return a.ts - b.ts; }); };
+      chOne = function (i) { var a = recs(); for (var k = 0; k < a.length; k++) if (a[k].k === 'ch' && a[k].id === i) return a[k]; return undefined; };
+      cposts = function (i) { return recs().filter(function (r) { return r.k === 'cp' && r.ch === i; }).sort(function (a, b) { return a.ts - b.ts; }); };
       function arr(o) { return Array.isArray(o) ? o.filter(Boolean) : (o && typeof o === 'object' ? Object.keys(o).map(function (k) { return o[k]; }) : []); }
       function fsz(n) { n = +n || 0; return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
       function tmf(ts) { return new Date(ts).toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' }); }
@@ -183,14 +198,14 @@
       /* ---- بيانات القناة ---- */
       function mrole(c) { return isOwnCh(c) ? 2 : (c.ad && c.ad['u' + ok(uid)] ? 1 : 0); }
       function accOf(u) { try { return DB().accounts.find(function (a) { return String(a.createdAt || a.name) === String(u); }); } catch (e) { return null; } }
-      function comments(chId, pid) { return J('alfarabi_rec_v1', []).filter(function (r) { return r.k === 'cc' && r.ch === chId && (pid == null || r.cp === pid); }).sort(function (a, b) { return a.ts - b.ts; }); }
+      function comments(chId, pid) { return recs().filter(function (r) { return r.k === 'cc' && r.ch === chId && (pid == null || r.cp === pid); }).sort(function (a, b) { return a.ts - b.ts; }); }
 
       /* ===================== فتح القناة ===================== */
       openCh = function (id) {
         closeCh(); var c = chOne(id); if (!c) return;
         cxEl = document.createElement('div'); cxEl.className = 'cx tg'; cxEl.dataset.id = id; document.body.appendChild(cxEl);
         var root = cxEl, first = 1, lastSig = '', pickerEl = null;
-        try { if (isOwnCh(c) && !c.gr && U.grade) P.recSet(id, 'gr', String(U.grade)); } catch (e) {}
+        try { if (isOwnCh(c) && !c.gr && U.grade) rs(id, 'gr', String(U.grade)); } catch (e) {}
         var g = gcol(c), grad = 'linear-gradient(135deg,' + g[0] + ',' + g[1] + ')';
         root.innerHTML = '<div class="tg-h" id="tgh" style="background:' + grad + '"><button class="cx-b" id="tgb">' + ARW + '</button><span id="tgav"></span><div class="cx-t"><b id="tgn"></b><small id="tgs"></small></div></div><div class="tg-m" id="tgm"></div><div class="tg-bar" id="tgbar"></div>';
         function me() { c = chOne(id) || c; return mrole(c); }
@@ -198,6 +213,7 @@
         function canPost() { return me() > 0; }
         function head() {
           c = chOne(id); if (!c) { closeCh(); return; }
+          var hk = [c.cn, (c.img || '').length, c.col, Object.keys(c.m || {}).length, c.on].join('|'); if (hk === head.k) return; head.k = hk;
           g = gcol(c); grad = 'linear-gradient(135deg,' + g[0] + ',' + g[1] + ')'; $('tgh').style.background = grad;
           $('tgav').innerHTML = av(null, 40, c.img); $('tgn').textContent = c.cn;
           $('tgs').textContent = Object.keys(c.m || {}).length + ' مشترك' + (c.on ? ' · ' + c.on : '');
@@ -212,7 +228,7 @@
           if (!memb()) return toast('انضم للقناة أولاً');
           var p = cposts(id).filter(function (q) { return q.id === pid; })[0]; if (!p) return;
           var cur = rxMap(p).mine; var nv = (cur === i) ? null : i;
-          P.recSet(pid, 'rx/u' + ok(uid), nv);
+          rs(pid, 'rx/u' + ok(uid), nv);
           if (nv !== null) burst(x || innerWidth / 2, y || innerHeight / 2, RX[i]);
           lastSig = ''; render(); if (nv !== null) { var chip = root.querySelector('.tg-rx[data-p="' + pid + '"][data-i="' + i + '"]'); if (chip) chip.classList.add('pop'); }
         }
@@ -230,7 +246,8 @@
         /* ---- عرض منشور ---- */
         function mediaHtml(p) {
           var h = '';
-          if (p.img) h += '<img class="tg-im" data-iv="' + p.id + '" src="' + p.img + '" loading="lazy">';
+          if (p.img) h += '<img class="tg-im" data-iv="' + p.id + '" src="' + p.img + '" loading="lazy" decoding="async">';
+          if (p.md && p.md.k === 'img') h += '<div class="tg-vd" data-iv="' + p.id + '" style="min-height:0"><img src="' + (p.md.th || '') + '" decoding="async" style="max-height:340px"><span class="tg-bd">' + fsz(p.md.s) + '</span></div>';
           if (p.vid) h += '<div class="tg-vd" data-vp="' + p.id + '"><video src="' + p.vid + '#t=0.3" preload="metadata" muted playsinline></video><div class="tg-pl"><i>▶</i></div></div>';
           if (p.md && p.md.k === 'vid') h += '<div class="tg-vd" data-vp="' + p.id + '">' + (p.md.th ? '<img src="' + p.md.th + '">' : '') + '<div class="tg-pl"><i>▶</i></div><span class="tg-bd">' + fsz(p.md.s) + '</span></div>';
           if (p.md && p.md.k === 'fl') h += fileCard(p, p.md);
@@ -269,7 +286,7 @@
             else ps.forEach(function (p) { var d = dyf(p.ts); if (d !== lastD) { lastD = d; h += '<div class="tg-dy">' + d + '</div>'; } h += postHtml(p, cnt[p.id]); });
             el.innerHTML = h; if (end || first) el.scrollTop = el.scrollHeight; first = 0;
           }
-          if (m && me() === 0) ps.forEach(function (p) { if (!(p.vw && p.vw['u' + ok(uid)])) P.recSet(p.id, 'vw/u' + ok(uid), 1); });
+          if (m && me() === 0) ps.forEach(function (p) { if (!(p.vw && p.vw['u' + ok(uid)])) rs(p.id, 'vw/u' + ok(uid), 1); });
         }
 
         /* ---- شريط الأسفل ---- */
@@ -284,19 +301,19 @@
             $('tgsn').onclick = function () { var t = ta.value.trim(); if (!t) return toast('اكتب نصاً أو أرفق ملفاً'); if (pub({ t: t }) !== false) { ta.value = ''; ta.style.height = 'auto'; } };
           } else if (m) {
             b.innerHTML = '<div class="tg-jn"><button style="background:' + (mu ? '#8a99b3' : grad) + '" id="tgmu">' + (mu ? '🔔 إلغاء الكتم' : '🔕 كتم الصوت') + '</button><button class="g" id="tgsh">↗ مشاركة</button><button class="g" id="tgow">✉ مراسلة</button></div>';
-            $('tgmu').onclick = function () { P.recSet(id, 'mu/u' + ok(uid), mu ? null : 1); toast(mu ? 'تم إلغاء الكتم' : 'تم كتم الصوت'); barSt = ''; bar(); };
+            $('tgmu').onclick = function () { rs(id, 'mu/u' + ok(uid), mu ? null : 1); toast(mu ? 'تم إلغاء الكتم' : 'تم كتم الصوت'); barSt = ''; bar(); };
             $('tgsh').onclick = function () { shareText(c.cn + '\n' + chLink(c)); };
             $('tgow').onclick = function () { var o = accOf(c.o); if (o) { closeCh(); openChat(dmKey(o)); } else toast('تعذّر العثور على المدرس'); };
           } else {
             b.innerHTML = '<div class="tg-jn"><button style="background:' + grad + '" id="tgjn">انضمام للقناة</button></div>';
-            $('tgjn').onclick = function () { P.recSet(id, 'm/u' + ok(uid), String(uid)); toast('تم الانضمام للقناة'); lastSig = ''; barSt = ''; render(); bar(); };
+            $('tgjn').onclick = function () { rs(id, 'm/u' + ok(uid), String(uid)); toast('تم الانضمام للقناة'); lastSig = ''; barSt = ''; render(); bar(); };
           }
         }
 
         /* ---- نشر ---- */
         function pub(o) {
           var r = Object.assign({ id: Date.now(), k: 'cp', ch: id, ts: Date.now() }, o);
-          try { P.addRec(r); } catch (e) { toast('تعذّر الحفظ: مساحة التخزين ممتلئة'); return false; }
+          try { ar(r); } catch (e) { toast('تعذّر الحفظ: مساحة التخزين ممتلئة'); return false; }
           try { notifyCh(c, o.t || o.q || (o.md ? (o.md.k === 'vid' ? 'فيديو جديد' : (o.md.n || 'ملف جديد')) : 'صورة جديدة')); } catch (e) {}
           lastSig = ''; render(); var el = $('tgm'); el.scrollTop = el.scrollHeight; return r;
         }
@@ -345,14 +362,14 @@
             var busy = 0, bar2 = ov.querySelector('#pg'), pm = ov.querySelector('#pm');
             ov.querySelector('#go').onclick = function () {
               if (busy) return; var cap = ov.querySelector('#cap').value.trim();
-              if (kind === 'img') { if (pub({ img: dataUrl, t: cap }) !== false) close(); return; }
               busy = 1; this.disabled = true; bar2.style.display = 'block'; pm.textContent = 'جاري الرفع... لا تغلق الشاشة';
-              var mid = 'chm_' + Date.now(), self = this;
-              (kind === 'vid' ? vthumb(file) : Promise.resolve('')).then(function (th) {
-                return upMedia(file, mid, function (f) { bar2.firstChild.style.width = Math.round(f * 100) + '%'; pm.textContent = 'جاري الرفع ' + Math.round(f * 100) + '% (' + fsz(file.size * f) + ' من ' + fsz(file.size) + ')'; }).then(function (n) {
-                  var md = { id: mid, n: file.name, t: file.type || '', s: file.size, c: n, k: kind === 'vid' ? 'vid' : 'fl' }; if (th) md.th = th;
-                  if (pub({ md: md, t: cap }) !== false) { MC[mid] = file; close(); }
-                });
+              var mid = 'chm_' + Date.now(), self = this, upF = file;
+              (kind === 'vid' ? vthumb(file) : kind === 'img' ? new Promise(function (res) { shrink(file, 560, function (d) { res(d); }); }) : Promise.resolve('')).then(function (th) {
+                var pf = kind === 'img' ? dataToBlob(dataUrl).then(function (b) { upF = b; return b; }) : Promise.resolve(file);
+                return pf.then(function () { return upMedia(upF, mid, function (f) { bar2.firstChild.style.width = Math.round(f * 100) + '%'; pm.textContent = 'جاري الرفع ' + Math.round(f * 100) + '% (' + fsz(upF.size * f) + ' من ' + fsz(upF.size) + ')'; }).then(function (n) {
+                  var md = { id: mid, n: file.name, t: kind === 'img' ? 'image/jpeg' : (file.type || ''), s: upF.size, c: n, k: kind === 'vid' ? 'vid' : kind === 'img' ? 'img' : 'fl' }; if (th) md.th = th;
+                  if (pub({ md: md, t: cap }) !== false) { MC[mid] = upF; close(); }
+                }); });
               }).catch(function (e) { busy = 0; self.disabled = false; bar2.style.display = 'none'; pm.textContent = 'تعذّر الرفع: ' + ((e && e.message) || e) + ' — تأكد من الاتصال ثم أعد المحاولة'; });
             };
           });
@@ -361,12 +378,12 @@
         /* ---- عارض الملفات داخل التطبيق ---- */
         function viewer(title, build, blobGetter, name) {
           var v = document.createElement('div'); v.className = 'tg-v';
-          v.innerHTML = '<div class="vh"><button data-x="1">✕</button><b>' + esc(title) + '</b><button data-dl="1" title="تحميل">⬇</button><button data-sh="1" title="مشاركة">↗</button></div><div class="vb" id="vb"></div>';
+          v.innerHTML = '<div class="tgvh"><button data-x="1">✕</button><b>' + esc(title) + '</b><button data-dl="1" title="تحميل">⬇</button><button data-sh="1" title="مشاركة">↗</button></div><div class="tgvb" id="vb"></div>';
           document.body.appendChild(v); var vb = v.querySelector('#vb'), cur = null;
           function close() { v.remove(); }
           v.onclick = function (e) { if (e.target.closest('[data-x]')) return close(); if (e.target.closest('[data-dl]')) { if (cur) saveBlob(cur, name); else toast('انتظر اكتمال التحميل'); } if (e.target.closest('[data-sh]')) { if (cur) shareBlob(cur, name); else toast('انتظر اكتمال التحميل'); } };
-          vb.innerHTML = '<div class="vl" id="vl">جاري التحميل...</div>';
-          blobGetter(function (f) { var l = v.querySelector('#vl'); if (l) l.textContent = 'جاري التحميل ' + Math.round(f * 100) + '%'; }).then(function (b) { cur = b; vb.innerHTML = ''; build(vb, b); }).catch(function (e) { vb.innerHTML = '<div class="vl">تعذّر التحميل: ' + esc((e && e.message) || e) + '</div>'; });
+          vb.innerHTML = '<div class="tgvl" id="vl">جاري التحميل...</div>';
+          blobGetter(function (f) { var l = v.querySelector('#vl'); if (l) l.textContent = 'جاري التحميل ' + Math.round(f * 100) + '%'; }).then(function (b) { cur = b; vb.innerHTML = ''; build(vb, b); }).catch(function (e) { vb.innerHTML = '<div class="tgvl">تعذّر التحميل: ' + esc((e && e.message) || e) + '</div>'; });
           return v;
         }
         function loadPdfLib() {
@@ -393,12 +410,12 @@
             else if (f.k.k === 'aud') vb.innerHTML = '<audio src="' + u + '" controls autoplay></audio>';
             else if (f.k.k === 'txt') { b.text().then(function (t) { vb.innerHTML = '<pre>' + esc(t.slice(0, 200000)) + '</pre>'; }); }
             else if (f.k.k === 'pdf') {
-              vb.className = 'vb pdf'; vb.innerHTML = '<div class="vl">جاري تجهيز الصفحات...</div>';
+              vb.className = 'tgvb pdf'; vb.innerHTML = '<div class="tgvl">جاري تجهيز الصفحات...</div>';
               loadPdfLib().then(function (lib) { return b.arrayBuffer().then(function (buf) { return lib.getDocument({ data: buf }).promise; }); }).then(function (pdf) {
                 vb.innerHTML = ''; var n = Math.min(pdf.numPages, 80), i = 1;
                 (function nx() { if (i > n) return; pdf.getPage(i++).then(function (pg) { var v0 = pg.getViewport({ scale: 1 }), sc = Math.min(2.2, (innerWidth * 2) / v0.width), vp = pg.getViewport({ scale: sc }), cv = document.createElement('canvas'); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height); vb.appendChild(cv); return pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise.then(nx); }); })();
-              }).catch(function (e) { vb.className = 'vb'; vb.innerHTML = '<div class="vl">تعذّر عرض PDF داخل التطبيق: ' + esc((e && e.message) || e) + '<br><br>استعمل زر التحميل أو المشاركة في الأعلى</div>'; });
-            } else vb.innerHTML = '<div class="vl"><div class="tg-fi" style="background:' + f.k.c + ';margin:0 auto 14px;width:78px;height:78px;font-size:18px">' + esc(f.k.x) + '</div>' + esc(f.n) + '<br><small>' + f.k.l + ' · ' + fsz(b.size) + '</small><br><br>هذه الصيغة لا تُعرض داخل التطبيق.<br>استعمل ⬇ للتحميل أو ↗ للمشاركة وافتحها بتطبيق مناسب.</div>';
+              }).catch(function (e) { vb.className = 'tgvb'; vb.innerHTML = '<div class="tgvl">تعذّر عرض PDF داخل التطبيق: ' + esc((e && e.message) || e) + '<br><br>استعمل زر التحميل أو المشاركة في الأعلى</div>'; });
+            } else vb.innerHTML = '<div class="tgvl"><div class="tg-fi" style="background:' + f.k.c + ';margin:0 auto 14px;width:78px;height:78px;font-size:18px">' + esc(f.k.x) + '</div>' + esc(f.n) + '<br><small>' + f.k.l + ' · ' + fsz(b.size) + '</small><br><br>هذه الصيغة لا تُعرض داخل التطبيق.<br>استعمل ⬇ للتحميل أو ↗ للمشاركة وافتحها بتطبيق مناسب.</div>';
           }, f.get, f.n);
         }
         function openImg(p) { openFile(p); }
@@ -434,12 +451,12 @@
             ov2.querySelector('.tg-sh').style.maxHeight = '90%';
             cl.onclick = function (e) {
               var r = e.target.closest('[data-rp]'); if (r) { var x = comments(id, pid).filter(function (q) { return q.id === +r.dataset.rp; })[0]; if (x) { rp = { id: x.id, u: x.u, n: x.n }; rb.style.display = 'block'; rb.innerHTML = '↩ رد على <b>' + esc(x.n) + '</b> <a style="color:#c62828;cursor:pointer" id="rpx">إلغاء</a>'; rb.querySelector('#rpx').onclick = function () { rp = null; rb.style.display = 'none'; }; ci.focus(); } return; }
-              var d = e.target.closest('[data-dc]'); if (d && confirm('حذف التعليق؟')) { P.delRec(+d.dataset.dc); redraw(); lastSig = ''; render(); }
+              var d = e.target.closest('[data-dc]'); if (d && confirm('حذف التعليق؟')) { dr(+d.dataset.dc); redraw(); lastSig = ''; render(); }
             };
             ov2.querySelector('#cs').onclick = function () {
               var t = ci.value.trim(); if (!t) return; if (!memb()) return toast('انضم للقناة أولاً');
               var isOwner = me() > 0, to = rp ? String(rp.u) : (isOwner ? '' : String(c.o));
-              try { P.addRec({ id: Date.now(), k: 'cc', ch: id, cp: pid, u: String(uid), n: U.name, ro: U.role, t: t, ts: Date.now(), rp: rp, to: to, cn: c.cn }); } catch (e) { return toast('تعذّر الإرسال'); }
+              try { ar({ id: Date.now(), k: 'cc', ch: id, cp: pid, u: String(uid), n: U.name, ro: U.role, t: t, ts: Date.now(), rp: rp, to: to, cn: c.cn }); } catch (e) { return toast('تعذّر الإرسال'); }
               ci.value = ''; rp = null; rb.style.display = 'none'; redraw(); lastSig = ''; render(); cl.parentNode.scrollTop = cl.parentNode.scrollHeight;
             };
           });
@@ -451,8 +468,8 @@
           var items = (p.t ? '<button class="tgrw" data-a="edit">✏️ تعديل النص</button>' : '') + '<button class="tgrw red" data-a="del">🗑 حذف المنشور</button>';
           sheet('المنشور', items, function (ov, close) {
             ov.querySelector('.tgbd').onclick = function (e) { var b = e.target.closest('[data-a]'); if (!b) return; close();
-              if (b.dataset.a === 'del') { if (confirm('حذف المنشور؟')) { P.delRec(pid); if (p.md) { P.fetch(fbase() + '/handout_files/' + p.md.id + '.json', { method: 'DELETE' }).catch(function () {}); } lastSig = ''; render(); } }
-              else { var nt = prompt('تعديل نص المنشور', p.t || ''); if (nt !== null) { P.recSet(pid, 't', nt.trim()); P.recSet(pid, 'edited', Date.now()); lastSig = ''; render(); } } };
+              if (b.dataset.a === 'del') { if (confirm('حذف المنشور؟')) { dr(pid); if (p.md) { P.fetch(fbase() + '/handout_files/' + p.md.id + '.json', { method: 'DELETE' }).catch(function () {}); } lastSig = ''; render(); } }
+              else { var nt = prompt('تعديل نص المنشور', p.t || ''); if (nt !== null) { rs(pid, 't', nt.trim()); rs(pid, 'edited', Date.now()); lastSig = ''; render(); } } };
           });
         }
 
@@ -477,7 +494,7 @@
             var body = '';
             var show = memb();
             if (!show) body = '<div class="cd"><p style="text-align:center;color:#6b7c99">انضم للقناة لعرض المحتوى</p></div>';
-            else if (tab === 'm') { var ms = ps.filter(function (p) { return p.img || p.vid || (p.md && p.md.k === 'vid'); }); body = ms.length ? '<div class="tg-gr">' + ms.map(function (p) { var th = p.img || (p.md && p.md.th) || ''; return '<div data-iv="' + p.id + '" style="' + (th ? 'background-image:url(' + th + ')' : '') + '">' + ((p.vid || (p.md && p.md.k === 'vid')) ? '<span>▶</span>' : '') + '</div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد صور أو فيديوهات</p></div>'; }
+            else if (tab === 'm') { var ms = ps.filter(function (p) { return p.img || p.vid || (p.md && (p.md.k === 'vid' || p.md.k === 'img')); }); body = ms.length ? '<div class="tg-gr">' + ms.map(function (p) { var th = p.img || (p.md && p.md.th) || ''; return '<div data-iv="' + p.id + '" style="' + (th ? 'background-image:url(' + th + ')' : '') + '">' + ((p.vid || (p.md && p.md.k === 'vid')) ? '<span>▶</span>' : '') + '</div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد صور أو فيديوهات</p></div>'; }
             else if (tab === 'f') { var fs = ps.filter(function (p) { return p.fl || (p.md && p.md.k === 'fl'); }); body = fs.length ? '<div class="cd">' + fs.map(function (p) { var f = p.md || p.fl, k = fkind(f.n, f.t); return '<div class="tg-fl" style="background:none;padding:6px 0"><div class="tg-fi" style="background:' + k.c + '">' + esc(k.x) + '</div><div class="tg-fn"><b>' + esc(f.n) + '</b><small>' + k.l + ' · ' + fsz(f.s || ((f.d || '').length * 0.75)) + ' · ' + dyf(p.ts) + '</small></div><div class="tg-fa"><button data-fo="' + p.id + '">👁</button><button data-fd="' + p.id + '">⬇</button><button data-fs="' + p.id + '">↗</button></div></div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد ملفات</p></div>'; }
             else if (tab === 'l') { var us = []; ps.forEach(function (p) { urlsIn(p.t).concat(p.lk ? [p.lk] : []).forEach(function (u) { if (us.indexOf(u) < 0) us.push(u); }); }); body = us.length ? '<div class="cd">' + us.map(function (u) { var s = lsafe(u); return '<div class="ln" data-lk="' + esc(u) + '"><span class="ci" style="background:' + (s.ok ? '#14a38b' : '#e5484d') + '">' + (s.ok ? '🔗' : '⚠') + '</span><div style="min-width:0"><div>' + esc(s.h) + '</div><small style="color:#6b7c99;direction:ltr;display:block;font-weight:600;word-break:break-all">' + esc(u) + '</small></div></div>'; }).join('') + '</div>' : '<div class="cd"><p style="text-align:center;color:#6b7c99">لا توجد روابط</p></div>'; }
             else if (tab === 's') body = subsHtml();
@@ -539,8 +556,8 @@
               lks.filter(function (x) { return x.u.trim(); }).forEach(function (x, i) { var u = x.u.trim(); if (!/^https?:\/\//i.test(u)) u = 'https://' + u; if (!/^https?:\/\/[^\s.]+\.[^\s]+/i.test(u)) bad = u; L[i] = { t: x.t.trim(), u: u }; });
               if (bad) return toast('رابط غير صالح: ' + bad);
               socs.filter(function (x) { return x.u.trim(); }).forEach(function (x, i) { S[i] = { p: x.p, u: x.u.trim() }; });
-              P.recSet(id, 'cn', n); P.recSet(id, 'cd', ov2.querySelector('#ed').value.trim()); P.recSet(id, 'col', col); if (img) P.recSet(id, 'img', img);
-              P.recSet(id, 'lks', Object.keys(L).length ? L : null); P.recSet(id, 'so', Object.keys(S).length ? S : null);
+              rs(id, 'cn', n); rs(id, 'cd', ov2.querySelector('#ed').value.trim()); rs(id, 'col', col); if (img) rs(id, 'img', img);
+              rs(id, 'lks', Object.keys(L).length ? L : null); rs(id, 'so', Object.keys(S).length ? S : null);
               toast('تم حفظ تعديلات القناة'); close(); head(); lastSig = ''; render(); if (after) setTimeout(after, 60);
               var inf = root.querySelector('#tgi'); if (inf) { closeInfo(); showInfo(tab0()); }
             };
@@ -563,12 +580,12 @@
           var fo = t.closest('[data-fo]'); if (fo) return openFile(pbyid(+fo.dataset.fo));
           var fd = t.closest('[data-fd]'); if (fd) return fileAct(pbyid(+fd.dataset.fd), 'd');
           var fs = t.closest('[data-fs]'); if (fs) return fileAct(pbyid(+fs.dataset.fs), 's');
-          var vt = t.closest('[data-vt]'); if (vt) { if (!memb()) return toast('انضم للقناة أولاً'); P.recSet(+vt.dataset.vt, 'vt/u' + ok(uid), +vt.dataset.k); lastSig = ''; render(); return; }
+          var vt = t.closest('[data-vt]'); if (vt) { if (!memb()) return toast('انضم للقناة أولاً'); rs(+vt.dataset.vt, 'vt/u' + ok(uid), +vt.dataset.k); lastSig = ''; render(); return; }
           var pb = t.closest('.tg-p'); if (pb && !t.closest('button,a,.tg-rxs')) { var now = Date.now(), pid = +pb.dataset.id; if (now - lastTap < 350 && lastP === pid) { react(pid, 1, e.clientX, e.clientY); lastTap = 0; } else { lastTap = now; lastP = pid; } }
         };
 
         head(); render(); bar();
-        cxT = setInterval(function () { if (!cxEl) return; render(); bar(); var inf = root.querySelector('#tgi'); }, 1500);
+        cxT = setInterval(function () { if (!cxEl || document.hidden) return; render(); bar(); }, 2000);
       };
     } catch (e) { try { console.warn('af-tgch', e); } catch (x) {} }
   }
