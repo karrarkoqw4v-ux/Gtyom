@@ -30,20 +30,20 @@
   };
   // [ألوان التدرج، وصف قصير]
   var META = {
-    schedule: [['#38bdf8', '#0a86d6'], '', 'الجدول الأسبوعي'],
-    announcements: [['#fb923c', '#ef4444'], '', 'الإعلانات'],
-    plans: [['#a78bfa', '#7c3aed'], '', 'التحاضير'],
+    schedule: [['#38bdf8', '#0a86d6'], 'جدول الحصص والدوام', 'الجدول الأسبوعي'],
+    announcements: [['#fb923c', '#ef4444'], 'إشعارات الإدارة', 'الإعلانات'],
+    plans: [['#a78bfa', '#7c3aed'], 'تحاضير الدروس اليومية', 'التحاضير'],
     handouts: [['#2dd4bf', '#0d9488'], 'ملازم ومذكرات'],
-    evals: [['#fbbf24', '#f59e0b'], ''],
-    grades: [['#4ade80', '#16a34a'], '', 'الدرجات'],
-    absence: [['#fb7185', '#e11d48'], '', 'الغيابات'],
+    evals: [['#fbbf24', '#f59e0b'], 'تقييم مستوى الطلاب'],
+    grades: [['#4ade80', '#16a34a'], 'درجات الامتحانات', 'الدرجات'],
+    absence: [['#fb7185', '#e11d48'], 'سجل الغيابات', 'الغيابات'],
     chat: [['#60a5fa', '#2563eb'], 'المحادثات والكروبات', 'المحادثات'],
     support: [['#22d3ee', '#0891b2'], 'تواصل مع الدعم'],
     tools: [['#818cf8', '#4f46e5'], 'مترجم ورياضيات', 'الأدوات'],
     afupd: [['#34d399', '#059669'], 'ما الجديد في التطبيق'],
     logout: [['#f87171', '#dc2626'], ''],
     kid: [['#38bdf8', '#2563eb'], 'تفاصيل الطالب'],
-    mylevel: [['#fcd34d', '#f59e0b'], ''],
+    mylevel: [['#fcd34d', '#f59e0b'], 'المستوى والتقييمات'],
     ministryView: [['#d6b88a', '#a16207'], 'أسئلة وزارية'],
     ministry: [['#d6b88a', '#a16207'], 'أسئلة وزارية'],
     reports: [['#fdba74', '#ea580c'], 'بلاغات الطلبة'],
@@ -63,25 +63,23 @@
   var CSS = '<style id="af-menu-css">'
     + '#drawer .afm-sec{font-size:12px;font-weight:800;color:#64748b;margin:14px 6px 6px;letter-spacing:.2px;display:flex;align-items:center;gap:8px}'
     + '#drawer .afm-sec:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(100,116,139,.28),transparent)}'
-    + 'html #drawer .option.afm-opt{background:#fff!important;border:1.5px solid #000!important;color:#000!important;box-shadow:none}'
-    + 'html #drawer .option.afm-opt .opt-text{color:#000!important;font-family:system-ui,-apple-system,Roboto,\"Noto Sans Arabic\",\"Segoe UI\",sans-serif!important}'
-    + 'html #drawer .option.afm-opt .chev,html #drawer .option.afm-opt .chev *{color:#000!important;stroke:#000!important}'
+    + 'html #drawer .option.afm-opt{background:#fff!important;border:1px solid rgba(15,23,42,.06)!important;color:#14213d!important;box-shadow:0 3px 10px rgba(20,45,90,.06)}'
+    + 'html #drawer .option.afm-opt .opt-text{color:#14213d!important}'
+    + 'html #drawer .option.afm-opt .chev,html #drawer .option.afm-opt .chev *{color:#94a3b8!important;stroke:#94a3b8!important}'
     + '#drawer .option.afm-opt{display:flex;align-items:center;gap:12px;padding:9px 10px;margin-bottom:6px;border-radius:18px}'
-    + 'html #drawer .option.afm-opt .afm-ic{background:#fff!important;border:1.5px solid #000!important;box-shadow:none!important}'
-    + 'html #drawer .option.afm-opt .afm-ic svg,html #drawer .option.afm-opt .afm-ic svg *{stroke:#000!important;fill:none!important;opacity:1!important;color:#000!important}'
-    + '.af-hq-btn:last-child:nth-child(odd){grid-column:1 / -1;flex-direction:row!important;align-items:center!important;min-height:78px!important}'
-    + '#drawer .afm-ic{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;flex:none;box-shadow:none;color:#000;animation:none!important}'
-    + '#drawer .afm-ic svg{width:21px;height:21px;fill:none;stroke:#000!important;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;animation:none!important}'
+    + 'html #drawer .option.afm-opt .afm-ic{background:var(--afg)!important}'
+    + '#drawer .afm-ic{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;flex:none;box-shadow:0 5px 12px rgba(20,45,90,.18);color:#fff;animation:none!important}'
+    + '#drawer .afm-ic svg{width:21px;height:21px;fill:none;stroke:#fff!important;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;animation:none!important}'
     + '#drawer .option.afm-opt .opt-text{font-weight:800;font-size:15px}'
     + '#drawer .option.afm-out{margin-top:6px}'
-    + 'html #drawer .option.afm-out .opt-text{color:#000!important}'
+    + 'html #drawer .option.afm-out .opt-text{color:#dc2626!important}'
     + '.af-hq-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;margin:14px 0 8px;direction:rtl}'
-    + '.af-hq-btn{position:relative;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:9px!important;min-height:108px!important;padding:13px 13px 12px!important;border-radius:22px!important;border:1.5px solid #000!important;background:#fff!important;color:#000!important;box-shadow:none!important;text-align:right!important;overflow:hidden;font-family:system-ui,-apple-system,Roboto,\"Noto Sans Arabic\",\"Segoe UI\",sans-serif!important}'
+    + '.af-hq-btn{position:relative;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:9px!important;min-height:108px!important;padding:13px 13px 12px!important;border-radius:22px!important;border:1px solid rgba(15,23,42,.06)!important;background:#fff!important;color:#14213d!important;box-shadow:0 6px 18px rgba(20,45,90,.09)!important;text-align:right!important;overflow:hidden}'
     + '.af-hq-btn:active{transform:scale(.96)}'
-    + '.af-hq-btn .af-hq-ic{width:46px!important;height:46px!important;border-radius:16px!important;display:grid;place-items:center;flex:none;color:#000!important;box-shadow:none;background:#fff!important}'
-    + '.af-hq-btn .af-hq-ic svg{width:25px!important;height:25px!important;fill:none!important;stroke:#000!important;stroke-width:1.9!important;stroke-linecap:round;stroke-linejoin:round}'
+    + '.af-hq-btn .af-hq-ic{width:46px!important;height:46px!important;border-radius:16px!important;display:grid;place-items:center;flex:none;color:#fff!important;box-shadow:0 6px 14px rgba(20,45,90,.2)}'
+    + '.af-hq-btn .af-hq-ic svg{width:25px!important;height:25px!important;fill:none!important;stroke:#fff!important;stroke-width:2!important;stroke-linecap:round;stroke-linejoin:round}'
     + '.af-hq-btn>div{width:100%}'
-    + '.af-hq-btn b{display:block;font-size:15px!important;font-weight:800!important;line-height:1.3;color:#000}'
+    + '.af-hq-btn b{display:block;font-size:15px!important;font-weight:800!important;line-height:1.3;color:#14213d}'
     + '.af-hq-btn small{display:block;font-size:11px!important;font-weight:700;opacity:.7!important;margin-top:2px;line-height:1.3;color:#475569}'
     + '.af-hq-btn:nth-last-child(2):nth-child(odd){grid-column:1 / -1;flex-direction:row!important;align-items:center!important;min-height:78px!important}'
     + '.af-hq-btn.wide{grid-column:1 / -1;flex-direction:row!important;align-items:center!important;gap:12px!important;background:linear-gradient(135deg,#0aa6f5,#1d4ed8)!important;border-color:transparent!important;min-height:72px!important;box-shadow:0 10px 24px rgba(10,166,245,.3)!important}'
@@ -105,6 +103,7 @@
     + 'html body .sp-p{background:#fff!important;color:#050505!important;border-radius:0!important;margin:8px 0!important;box-shadow:none!important}'
     + 'html body .sp-d,html body .sp-d *{color:#050505!important}html body .sp-d{background:#fff;margin-top:8px;padding:12px 16px}'
     + 'html body .sp-top{background:#fff!important;color:#050505!important}'
+    + '.af-hq-btn:last-child:nth-child(odd){grid-column:1 / -1;flex-direction:row!important;align-items:center!important;min-height:78px!important}'
     + '</style>';
 
   /* ---- الكود الذي يُحقن داخل الواجهة (يُنفّذ داخل نطاق userMain / تطبيق الإدارة فيرى MENU وV) ---- */
@@ -133,13 +132,11 @@
       MENU.forEach(function (m) { if (!used[m[0]] && m[0] !== 'logout') { out.splice(out.length, 0, m); used[m[0]] = 1; } });
       // أي عنصر غير معروف يُوضع قبل مجموعة الحساب
       var lo = by.logout; if (lo) { out = out.filter(function (m) { return m[0] !== 'logout'; }); out.push(lo); }
-      // القائمة الجانبية فيها كل الأقسام؛ الصفحة الرئيسية فيها 5 فقط (HOME)
-      var evId = by.evals ? 'evals' : 'mylevel';
-      out.forEach(function (m) { if (m[0] === evId) m[1] = 'تقييم الطالب'; });
       MENU.length = 0; out.forEach(function (m) { MENU.push(m); });
 
       var groupOf = function (id) {
-        return '';
+        for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i][1].indexOf(id) > -1) return GROUPS[i][0];
+        return GROUPS[1][0];
       };
 
       // 2) تجميل الدرج بعد كل رسم
@@ -151,7 +148,7 @@
           if (ic) { ic.innerHTML = svg(id); ic.className = 'opt-ico afm-ic'; ic.style.setProperty('--afg', grad(id)); }
           b.classList.add('afm-opt'); if (id === 'logout') b.classList.add('afm-out');
           var g = groupOf(id);
-          if (g !== last) { last = g; b.insertAdjacentHTML('beforebegin', '<div class="afm-sec" style="margin:0;height:0"></div>'); }
+          if (g !== last) { last = g; b.insertAdjacentHTML('beforebegin', '<div class="afm-sec">' + g + '</div>'); }
         });
       };
       var dr = document.getElementById('drawer');
