@@ -157,8 +157,9 @@
       else if (r.k === 'imp' && String(r.uid) !== u.uid) list.push({ id: 'i' + r.id, r: r, t: 'imp' });
       else if (r.k === 'cp') {
         var c = chans.filter(function (x) { return x.id === r.ch; })[0];
-        if (c && c.m && c.m['u' + okk(u.uid)] && String(c.o) !== u.uid && !(c.mu && c.mu['u' + okk(u.uid)])) list.push({ id: 'p' + r.id, r: r, c: c, t: 'cp' });
+        if (c && ((c.m && c.m['u' + okk(u.uid)]) || (u.role === 'student' && c.gr && String(c.gr) === u.grade)) && String(c.o) !== u.uid && !(c.mu && c.mu['u' + okk(u.uid)])) list.push({ id: 'p' + r.id, r: r, c: c, t: 'cp' });
       }
+      else if (r.k === 'cc' && String(r.to) === u.uid && String(r.u) !== u.uid) list.push({ id: 'c' + r.id, r: r, t: 'cc' });
     });
     var key = 'af_rec_seen_' + u.uid, old = J(key, null), ids = list.map(function (x) { return x.id; });
     if (old === null) { try { LS.setItem(key, JSON.stringify(ids)); } catch (e) {} recSeen = ids; return; }
@@ -171,6 +172,7 @@
       try {
         if (x.t === 'g') NA.notifySchool(x.r.n || 'طالب', (x.r.s || 'المادة') + ': ' + x.r.v + (x.r.nt ? ' · ' + x.r.nt : ''), 'نتيجة امتحان', 'rec:' + x.id, photoOf2(x.r.n));
         else if (x.t === 'imp') NA.notifySchool(x.r.title || 'إشعار مهم', String(x.r.body || ''), 'إشعار مهم من ' + (x.r.from || 'الإدارة'), 'imp:r' + x.r.id, '');
+        else if (x.t === 'cc') NA.notifySchool('تعليق جديد', (x.r.n || '') + ': ' + (x.r.t || ''), 'قناة ' + (x.r.cn || ''), 'cc:' + x.id, '');
         else if (x.t === 'ev') NA.notifySchool(x.r.n || 'طالب', 'تقييم جديد' + (x.r.s ? ' في ' + x.r.s : '') + ({ 5: ': ممتاز', 4: ': جيد جداً', 3: ': جيد', 2: ': متوسط', 1: ': ضعيف' }[x.r.lv] || '') + (x.r.by ? ' — الأستاذ ' + x.r.by : '') + (x.r.nt ? ' · ' + x.r.nt : ''), 'تقييم المدرس', 'rec:' + x.id, photoOf2(x.r.n));
         else if (x.t === 'a') NA.notifySchool(x.r.n || 'طالب', 'غياب ' + (x.r.d || ''), 'غياب', 'rec:' + x.id, photoOf2(x.r.n));
         else NA.notifyMessage('chan:' + x.c.id, x.c.cn || 'قناة', true, x.c.on || 'المدرس', photoOf(x.c.o), x.r.t || (x.r.img ? '📷 صورة' : x.r.q ? '📊 استطلاع' : 'منشور جديد'), x.r.ts || Date.now());

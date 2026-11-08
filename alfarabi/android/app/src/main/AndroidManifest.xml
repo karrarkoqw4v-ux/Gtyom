@@ -41,6 +41,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fp"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/fp_paths" />
+        </provider>
         <receiver android:name=".ReplyReceiver" android:exported="false" />
         <receiver android:name=".MuteReceiver" android:exported="false" />
         <receiver android:name=".DeclineReceiver" android:exported="false" />

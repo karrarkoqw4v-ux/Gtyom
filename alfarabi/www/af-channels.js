@@ -80,7 +80,7 @@
           if (n.length < 2) return toast('اكتب اسم القناة');
           if (!r[1]) return toast(r[0] || 'اكتب يوزر نيم القناة');
           var id = Date.now(), m = {}; m['u' + ok(uid)] = String(uid);
-          P.addRec({ id: id, k: 'ch', ts: id, cn: n, cd: $('cd').value.trim(), s: $('cs2').value.trim().toLowerCase(), col: col, img: img || ini(U.subject || U.name), o: String(uid), on: U.name, sj: U.subject || '', m: m });
+          P.addRec({ id: id, k: 'ch', ts: id, cn: n, cd: $('cd').value.trim(), s: $('cs2').value.trim().toLowerCase(), col: col, gr: String(U.grade || ''), img: img || ini(U.subject || U.name), o: String(uid), on: U.name, sj: U.subject || '', m: m });
           toast('تم إنشاء القناة'); V.parents(); setTimeout(function () { openCh(id); }, 250);
         };
       };
@@ -94,8 +94,8 @@
       var r = function (a, b) { if (src.indexOf(a) < 0) { miss.push(a.slice(0, 50)); return; } src = src.split(a).join(b); };
       src = src.replace(/String\((\w)\.o\)===String\(uid\)/g, 'isOwnCh($1)');
       r('dir="ltr">c.m/\'+esc(c.s)+\'</a>', 'dir="ltr">\'+esc(chLink(c))+\'</a>');
-      r('placeholder="ادخل رابط القناة مثل c.m/name"', 'placeholder="الصق رابط القناة https://... أو اسمها @username"');
-      r("var s=$('jl').value.trim().toLowerCase().replace(/^c\\.m\\//,'');var c=chans().filter(function(x){return x.s===s})[0];", "var c=chFind($('jl').value);");
+      r('placeholder="الصق رابط القناة هنا"', 'placeholder="الصق رابط القناة https://... أو اسمها @username"');
+      r("var s=$('jl').value.trim().toLowerCase().replace(/^c\\.m\\//,'');var mm=s.match(/[?&](?:id|ch)=(\\d+)/),c=chans().filter(function(x){return x.s===s||(mm&&String(x.id)===mm[1])})[0];", "var c=chFind($('jl').value);");
       r('if(!p||!p.id||', 'if(!p||!(p.id||p.s)||');
       r('var c=chOne(p.id);if(!c){', 'var c=p.id?chOne(p.id):chBySlug(p.s);if(!c){');
       if (miss.length) { try { console.warn('af-channels miss', miss); } catch (e) {} }

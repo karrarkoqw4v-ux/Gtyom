@@ -223,6 +223,8 @@ object Sync {
                     }
                 }
                 "cp" -> channelPost(c, base, u, r, k)
+                "cc" -> if (r.opt("to")?.toString() == u.uid && r.opt("u")?.toString() != u.uid)
+                    Notifier.school(c, "تعليق جديد", r.optString("n", "") + ": " + r.optString("t", ""), "قناة " + r.optString("cn", ""), "cc:$k", "")
                 "imp" -> if (r.opt("uid")?.toString() != u.uid)
                     Notifier.important(c, r.optString("title", "إشعار مهم"), r.optString("body", ""), r.optString("from", "الإدارة"), "imp:$k", r.optString("img", ""))
             }
@@ -232,8 +234,9 @@ object Sync {
 
     private fun channelPost(c: Context, base: String, u: U, r: JSONObject, k: String) {
         val chId = r.opt("ch")?.toString() ?: return
-        val ch = chans.getOrPut(chId) { get(base, "/records/r${okKey(chId)}.json")?.let { try { JSONObject(it) } catch (_: Throwable) { null } } } ?: return
-        val member = ch.optJSONObject("m")?.has("u" + okKey(u.uid)) == true
+        val ch = get(base, "/records/r${okKey(chId)}.json")?.let { try { JSONObject(it) } catch (_: Throwable) { null } } ?: return
+        val forGrade = u.role == "student" && u.grade.isNotEmpty() && ch.opt("gr")?.toString() == u.grade
+        val member = forGrade || ch.optJSONObject("m")?.has("u" + okKey(u.uid)) == true
         val muted = ch.optJSONObject("mu")?.has("u" + okKey(u.uid)) == true
         if (!member || muted || ch.opt("o")?.toString() == u.uid) return
         val text = r.optString("t", "").ifEmpty { if (r.has("img")) "📷 صورة" else if (r.has("q")) "📊 استطلاع" else "منشور جديد" }
