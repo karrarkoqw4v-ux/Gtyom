@@ -68,7 +68,7 @@
       V.mkch = function () {
         var img = '', MAXCH = 5;
         var mine = chans().filter(function (x) { return isOwnCh(x); }), full = mine.length >= MAXCH;
-        var listH = '<div class="afch-list"><div class="afch-lh"><b>قنواتك</b><span>' + mine.length + ' / ' + MAXCH + '</span></div>'
+        var listH = '<div class="afch-list"><div class="afch-lh"><b>قنواتك</b><span dir="ltr">' + mine.length + ' / ' + MAXCH + '</span></div>'
           + (mine.length ? mine.map(function (x) { return '<button type="button" class="afch-row" data-ch="' + x.id + '">' + av(null, 40, x.img) + '<span><b>' + esc(x.cn) + '</b><small>@' + esc(x.s || '') + ' · ' + Object.keys(x.m || {}).length + ' مشترك</small></span></button>'; }).join('') : '<p class="hint" style="margin:6px 2px">لا توجد قنوات بعد</p>')
           + (full ? '<p class="hint" style="margin:8px 2px;color:#c62828">وصلت الحد الأقصى (5 قنوات). عدّل إحدى قنواتك بدل إنشاء قناة جديدة.</p>' : '') + '</div>';
         var formH = full ? '' : ('<div class="fd"><input id="cn" placeholder="اسم القناة" maxlength="40"></div>'
