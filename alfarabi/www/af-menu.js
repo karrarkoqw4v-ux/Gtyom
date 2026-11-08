@@ -133,13 +133,9 @@
       MENU.forEach(function (m) { if (!used[m[0]] && m[0] !== 'logout') { out.splice(out.length, 0, m); used[m[0]] = 1; } });
       // أي عنصر غير معروف يُوضع قبل مجموعة الحساب
       var lo = by.logout; if (lo) { out = out.filter(function (m) { return m[0] !== 'logout'; }); out.push(lo); }
-      // المطلوب فقط: الجدول الأسبوعي، الغيابات، الدرجات، التحاضير، تقييم الطالب (+ تسجيل الخروج)
-      var KEEP = ['schedule', 'absence', 'grades', 'plans'];
+      // القائمة الجانبية فيها كل الأقسام؛ الصفحة الرئيسية فيها 5 فقط (HOME)
       var evId = by.evals ? 'evals' : 'mylevel';
-      out = out.filter(function (m) { return KEEP.indexOf(m[0]) > -1 || m[0] === evId || m[0] === 'logout'; });
       out.forEach(function (m) { if (m[0] === evId) m[1] = 'تقييم الطالب'; });
-      var ORD = ['schedule', 'absence', 'grades', 'plans', evId, 'logout'];
-      out.sort(function (a, b) { return ORD.indexOf(a[0]) - ORD.indexOf(b[0]); });
       MENU.length = 0; out.forEach(function (m) { MENU.push(m); });
 
       var groupOf = function (id) {
@@ -166,9 +162,10 @@
         return '<button type="button" class="af-hq-btn" data-hq="' + id + '"><span class="af-hq-ic" style="background:' + grad(id) + '">' + svg(id) + '</span><div><b>' + label + '</b><small>' + mt(id)[1] + '</small></div></button>';
       };
       var html = '<div class="af-hq-grid">', seen = {};
-      MENU.forEach(function (m) {
-        var id = m[0]; if (id === 'logout' || seen[id] || !hasV(id)) return; seen[id] = 1;
-        html += tile(id, m[1]);
+      var HOME = ['schedule', 'absence', 'grades', 'plans', 'chat'], HL = { chat: 'المحادثات', schedule: 'الجدول الأسبوعي' };
+      HOME.forEach(function (id) {
+        var m = by[id]; if (!m || !hasV(id)) return;
+        html += tile(id, HL[id] || m[1]);
       });
       if (false) html += '<button type="button" class="af-hq-btn wide" data-hq="mylevel"><span class="af-hq-ic" style="background:rgba(255,255,255,.22)">' + svg('mylevel') + '</span><div><b>' + by.mylevel[1] + '</b><small>' + (isAdmin || role === 'teacher' ? 'تقييمات المدرسين ودرجات الطلاب' : 'الاسم الثلاثي وتقييمات المدرسين والدرجات') + '</small></div></button>';
       html += '</div>';
