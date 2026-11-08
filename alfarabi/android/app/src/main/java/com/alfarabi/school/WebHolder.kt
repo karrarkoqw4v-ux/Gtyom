@@ -51,6 +51,7 @@ object WebHolder {
     var permReq: PermissionRequest? = null
     @Volatile var foreground = false
     @Volatile var pendingOpen = ""
+    @Volatile var pendingLink = ""
     private var ctx: MutableContextWrapper? = null
 
     fun prefs(c: Context) = c.getSharedPreferences("af", Context.MODE_PRIVATE)
@@ -218,6 +219,10 @@ object WebHolder {
         /** صفحة تنتظر الفتح بعد الضغط على إشعار (مثل الإشعار المهم) */
         @JavascriptInterface
         fun pendingOpen(): String { val p = pendingOpen; pendingOpen = ""; return p }
+
+        /** رابط قناة فُتح من خارج التطبيق (c=username أو ch=id) */
+        @JavascriptInterface
+        fun pendingLink(): String { val p = pendingLink; pendingLink = ""; return p }
 
         @JavascriptInterface
         fun notifyCall(name: String, photo: String, cid: String, g: String) = Notifier.call(app, name, photo, cid, g)

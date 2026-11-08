@@ -51,6 +51,16 @@ class MainActivity : Activity() {
     private fun onIntent(i: Intent?) {
         val tg = i?.getStringExtra("tag") ?: ""
         if (i?.getStringExtra("kind") == "school" && tg.startsWith("imp:")) WebHolder.pendingOpen = tg
+        if (tg.startsWith("chan:")) WebHolder.pendingLink = "ch=" + tg.removePrefix("chan:")
+        val d = i?.data
+        if (d != null && (d.scheme == "alfarabi" || d.host == "karrarkoqw4v-ux.github.io")) {
+            val c = d.getQueryParameter("c") ?: ""
+            val ch = d.getQueryParameter("ch")
+            val slug = if (c.isNotEmpty()) c else (d.pathSegments?.lastOrNull() ?: "")
+            if (c.isNotEmpty()) WebHolder.pendingLink = "c=" + c
+            else if (!ch.isNullOrEmpty()) WebHolder.pendingLink = "ch=" + ch
+            else if (d.scheme == "alfarabi" && slug.isNotEmpty()) WebHolder.pendingLink = "c=" + slug
+        }
         if (i?.getStringExtra("kind") == "call") {
             if (Build.VERSION.SDK_INT >= 27) { setShowWhenLocked(true); setTurnScreenOn(true) }
         }

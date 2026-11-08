@@ -96,6 +96,7 @@
       r('dir="ltr">c.m/\'+esc(c.s)+\'</a>', 'dir="ltr">\'+esc(chLink(c))+\'</a>');
       r('placeholder="الصق رابط القناة هنا"', 'placeholder="الصق رابط القناة https://... أو اسمها @username"');
       r("var s=$('jl').value.trim().toLowerCase().replace(/^c\\.m\\//,'');var mm=s.match(/[?&](?:id|ch)=(\\d+)/),c=chans().filter(function(x){return x.s===s||(mm&&String(x.id)===mm[1])})[0];", "var c=chFind($('jl').value);");
+      r('setTimeout(chLanding,1500)', 'setTimeout(function(){chLanding()},1500)');
       r('if(!p||!p.id||', 'if(!p||!(p.id||p.s)||');
       r('var c=chOne(p.id);if(!c){', 'var c=p.id?chOne(p.id):chBySlug(p.s);if(!c){');
       if (miss.length) { try { console.warn('af-channels miss', miss); } catch (e) {} }
