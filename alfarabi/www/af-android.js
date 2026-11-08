@@ -92,6 +92,7 @@
   var lastUid = null, lastBase = '';
   setInterval(function () {
     var u = me(), id = u && u.role !== 'admin' ? u.uid : '';
+    if (!id && !u) { var adm = ''; try { adm = LS.getItem('alfarabi_session'); } catch (e) {} if (adm === 'admin') { u = { uid: 'admin', role: 'admin', grade: '', name: 'الإدارة', child: '' }; id = 'admin'; } } /* الإدارة تستقبل إشعارات الدعم والإشعارات المهمة */
     var sig = id ? [id, u.role, u.grade, u.name, u.child].join('|') : '';
     if (sig !== lastUid) { lastUid = sig; try { A.session(id, id ? u.role : '', id ? u.grade : '', id ? u.name : '', id ? (u.child || '') : ''); } catch (e) {} }
     var b = window.FBBASE || (window.AFSyncInfo && window.AFSyncInfo().base) || '';
@@ -152,7 +153,7 @@
     var chans = recs.filter(function (r) { return r.k === 'ch'; });
     var list = [];
     recs.forEach(function (r) {
-      if ((r.k === 'a' || r.k === 'g') && (u.role === 'parent' ? same(u.child, r.n) : u.role === 'student' ? same(u.name, r.n) : false)) list.push({ id: 'r' + r.id, r: r, t: r.k === 'a' ? 'a' : 'g' });
+      if ((r.k === 'a' || r.k === 'g' || r.k === 'ev') && (u.role === 'parent' ? same(u.child, r.n) : u.role === 'student' ? same(u.name, r.n) : false)) list.push({ id: 'r' + r.id, r: r, t: r.k === 'a' ? 'a' : r.k === 'ev' ? 'ev' : 'g' });
       else if (r.k === 'imp' && String(r.uid) !== u.uid) list.push({ id: 'i' + r.id, r: r, t: 'imp' });
       else if (r.k === 'cp') {
         var c = chans.filter(function (x) { return x.id === r.ch; })[0];
@@ -170,6 +171,7 @@
       try {
         if (x.t === 'g') NA.notifySchool(x.r.n || 'طالب', (x.r.s || 'المادة') + ': ' + x.r.v + (x.r.nt ? ' · ' + x.r.nt : ''), 'نتيجة امتحان', 'rec:' + x.id, photoOf2(x.r.n));
         else if (x.t === 'imp') NA.notifySchool(x.r.title || 'إشعار مهم', String(x.r.body || ''), 'إشعار مهم من ' + (x.r.from || 'الإدارة'), 'imp:r' + x.r.id, '');
+        else if (x.t === 'ev') NA.notifySchool(x.r.n || 'طالب', 'تقييم جديد' + (x.r.s ? ' في ' + x.r.s : '') + ({ 5: ': ممتاز', 4: ': جيد جداً', 3: ': جيد', 2: ': متوسط', 1: ': ضعيف' }[x.r.lv] || '') + (x.r.by ? ' — الأستاذ ' + x.r.by : '') + (x.r.nt ? ' · ' + x.r.nt : ''), 'تقييم المدرس', 'rec:' + x.id, photoOf2(x.r.n));
         else if (x.t === 'a') NA.notifySchool(x.r.n || 'طالب', 'غياب ' + (x.r.d || ''), 'غياب', 'rec:' + x.id, photoOf2(x.r.n));
         else NA.notifyMessage('chan:' + x.c.id, x.c.cn || 'قناة', true, x.c.on || 'المدرس', photoOf(x.c.o), x.r.t || (x.r.img ? '📷 صورة' : x.r.q ? '📊 استطلاع' : 'منشور جديد'), x.r.ts || Date.now());
       } catch (e) {}
@@ -181,23 +183,44 @@
     return p && String(p).length < 350000 ? String(p) : '';
   }
 
-  /* ===== 7) إعلانات المدرسة وتحاضير الدروس ===== */
+  /* ===== 7) إعلانات المدرسة وتحاضير الدروس والجدول والعطل (جديد + معدّل) ===== */
   var seenAnn = null;
+  function hsh(o) { var t = ''; try { t = JSON.stringify(o); } catch (e) {} var h = 0; for (var i = 0; i < t.length; i++) { h = (h * 31 + t.charCodeAt(i)) | 0; } return h; }
   function schoolTick() {
     if (nativeOn()) return; // المزامنة الأصلية شغالة: ما نحتاج نقرأ ونحلل البيانات هنا (يخفف التقطيع)
     var u = me(); if (!u || u.role === 'admin') return;
-    var info = J(SK, {}).info || {};
-    var ann = (Array.isArray(info.announcements) ? info.announcements : []).filter(function (a) { return a.target === 'all' || String(a.target) === u.grade || (a.target === 'student' && a.student === u.name); });
-    var plans = (Array.isArray(info.lessonPlans) ? info.lessonPlans : []).filter(function (p) { return u.role === 'teacher' ? false : String(p.grade) === u.grade || u.role === 'parent'; });
-    var ids = ann.map(function (a) { return 'a' + (a.id || a.createdAt || a.title); }).concat(plans.map(function (p) { return 'p' + (p.id || p.title); }));
-    var key = 'af_ann_seen_' + u.uid, old = J(key, null);
-    if (old === null) { try { LS.setItem(key, JSON.stringify(ids)); } catch (e) {} seenAnn = ids; return; }
+    var SDv = J(SK, {}), info = SDv.info || {}, items = [];
+    function arr(v) { return Array.isArray(v) ? v.filter(Boolean) : (v && typeof v === 'object' ? Object.keys(v).map(function (k) { return v[k]; }) : []); }
+    arr(info.announcements).forEach(function (a) {
+      var mine = a.target === 'all' || String(a.target) === u.grade || (a.target === 'student' && (same(a.student, u.name) || (u.role === 'parent' && same(a.student, u.child))));
+      var id = 'ann:' + (a.id || a.createdAt || a.title);
+      items.push({ id: id, sig: id + ':' + hsh(a), mine: mine, fire: function (ed) { NA.notifySchool('إشعار', (ed ? '✏️ تم تعديل الإشعار\n' : '') + (a.title && a.desc ? a.title + ' — ' + a.desc : (a.title || '') + (a.desc || '')), 'الإدارة • ثانوية الفارابي', id, ''); } });
+    });
+    if (u.role !== 'teacher') arr(info.lessonPlans).forEach(function (p) {
+      var id = 'plan:' + (p.id || p.title), g = String(p.grade || '');
+      items.push({ id: id, sig: id + ':' + hsh(p), mine: u.role === 'parent' || g === u.grade, fire: function (ed) {
+        NA.notifySchool(ed ? 'تحضير معدّل' : 'تحضير جديد', (p.title || 'تحضير جديد') + (p.description ? '\n' + p.description : ''),
+          'تحضير' + (p.teacher ? ' • ' + (/^(ال)?أستاذ|^(ال)?استاذ|^أ\.|^م\./.test(String(p.teacher)) ? '' : 'الأستاذ ') + p.teacher : '') + (p.subject || p.subj ? ' • ' + (p.subject || p.subj) : '') + (GN[g] ? ' • ' + GN[g] : ''), id, ''); } });
+    });
+    var sch = SDv.schedule || {};
+    Object.keys(sch).forEach(function (gk) {
+      var id = 'sch:' + gk, cls = (sch[gk] && sch[gk].cls) || GN[gk] || 'الصف';
+      items.push({ id: id, sig: id + ':' + hsh(sch[gk]), mine: u.role === 'teacher' || gk === u.grade || (u.role === 'parent' && !u.grade), fire: function () { NA.notifySchool('الجدول المدرسي', 'تم نشر/تحديث جدول ' + cls + ' الأسبوعي', 'جدول الحصص', id, ''); } });
+    });
+    var sd = info.schoolDays || {};
+    Object.keys(sd).forEach(function (day) {
+      var d = sd[day] || {}, id = 'day:' + day, hol = d.status === 'holiday';
+      items.push({ id: id, sig: id + ':' + hsh(d), mine: true, fire: function () { NA.notifySchool(hol ? 'عطلة' : 'دوام', 'يوم ' + day + ': ' + (hol ? 'عطلة' : 'دوام رسمي') + (d.note ? ' — ' + d.note : ''), 'الدوام المدرسي', id, ''); } });
+    });
+    var key = 'af_sc_seen2_' + u.uid, old = J(key, null), sigs = items.map(function (x) { return x.sig; });
+    if (old === null) { try { LS.setItem(key, JSON.stringify(sigs)); } catch (e) {} seenAnn = sigs; return; }
     if (seenAnn === null) seenAnn = old;
-    if (!fg()) {
-      ann.forEach(function (a) { var i = 'a' + (a.id || a.createdAt || a.title); if (seenAnn.indexOf(i) < 0) { try { NA.notifySchool(a.title || 'إعلان جديد', String(a.desc || ''), 'إعلان من الإدارة', 'ann:' + i, ''); } catch (e) {} } });
-      plans.forEach(function (p) { var i = 'p' + (p.id || p.title); if (seenAnn.indexOf(i) < 0) { try { NA.notifySchool(p.title || 'تحضير جديد', String(p.description || ''), 'تحضير الدروس' + (p.subj ? ' • ' + p.subj : '') + (GN[p.grade] ? ' • ' + GN[p.grade] : ''), 'plan:' + i, ''); } catch (e) {} } });
-    }
-    if (ids.length !== seenAnn.length || ids.some(function (x) { return seenAnn.indexOf(x) < 0; })) { seenAnn = ids; try { LS.setItem(key, JSON.stringify(ids)); } catch (e) {} }
+    items.forEach(function (x) {
+      if (seenAnn.indexOf(x.sig) > -1 || !x.mine || fg()) return;
+      var ed = seenAnn.some(function (z) { return z.indexOf(x.id + ':') === 0; });
+      try { x.fire(ed); } catch (e) {}
+    });
+    if (sigs.length !== seenAnn.length || sigs.some(function (x) { return seenAnn.indexOf(x) < 0; })) { seenAnn = sigs; try { LS.setItem(key, JSON.stringify(sigs)); } catch (e) {} }
   }
 
   /* ===== 8) تشغيل الفحص لحظياً عند كتابة البيانات + احتياط كل 4 ثواني ===== */

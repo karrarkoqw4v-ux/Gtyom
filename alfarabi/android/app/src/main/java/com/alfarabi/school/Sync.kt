@@ -73,8 +73,9 @@ object Sync {
     private fun same(a: String, b: String): Boolean { val x = nrm(a); val y = nrm(b); return x.length > 4 && y.length > 4 && (x == y || x.contains(y) || y.contains(x)) }
 
     private fun mine(g: String, u: U): Boolean = when {
-        g.startsWith("dsup_") -> g == "dsup_" + u.uid
+        g.startsWith("dsup_") -> g == "dsup_" + u.uid || u.role == "admin"
         g.startsWith("d") -> g.substring(1).split("~").contains(u.uid)
+        u.role == "admin" -> false
         u.role == "parent" -> g == "p"
         else -> g == (u.grade.ifEmpty { "2" })
     }
@@ -84,12 +85,12 @@ object Sync {
         var tick = 0
         while (alive(my)) {
             val u = user(c)
-            val base = if (u != null && u.role != "admin") baseUrl(c) else null
+            val base = if (u != null) baseUrl(c) else null
             if (u == null || base == null) { sleep(5_000); continue }
             try {
                 if (tick % 10 == 0) ensureStreams(c, base, u, my)
-                if (tick % 4 == 1) pollRecords(c, base, u)
-                if (tick % 7 == 3) pollSchool(c, base, u)
+                if (tick % 3 == 1) pollRecords(c, base, u)
+                if (tick % 2 == 0 && u.role != "admin") pollSchool(c, base, u)
             } catch (_: Throwable) {}
             tick++
             sleep(6_000)
@@ -98,7 +99,7 @@ object Sync {
 
     private fun ensureStreams(c: Context, base: String, u: U, my: Int) {
         val keys = HashSet<String>()
-        keys.add("g" + (if (u.role == "parent") "p" else u.grade.ifEmpty { "2" }))
+        if (u.role != "admin") keys.add("g" + (if (u.role == "parent") "p" else u.grade.ifEmpty { "2" }))
         get(base, "/chat.json?shallow=true")?.let { txt ->
             try { val o = JSONObject(txt); o.keys().forEach { k -> if (k.startsWith("g") && mine(k.substring(1), u)) keys.add(k) } } catch (_: Throwable) {}
         }
@@ -210,10 +211,13 @@ object Sync {
             seen.add(k)
             if (first || WebHolder.foreground || System.currentTimeMillis() - r.optLong("ts") > 24 * 3600_000L) continue
             when (r.optString("k")) {
-                "g", "a" -> {
+                "g", "a", "ev" -> {
                     val target = if (u.role == "parent") u.child else if (u.role == "student") u.name else ""
                     if (target.isNotEmpty() && same(target, r.optString("n"))) {
-                        if (r.optString("k") == "g")
+                        if (r.optString("k") == "ev") {
+                            val lv = mapOf(5 to "ممتاز", 4 to "جيد جداً", 3 to "جيد", 2 to "متوسط", 1 to "ضعيف")[r.optInt("lv")] ?: ""
+                            Notifier.school(c, r.optString("n", "طالب"), "تقييم جديد" + (if (r.optString("s", "").isNotEmpty()) " في " + r.optString("s") else "") + (if (lv.isNotEmpty()) ": $lv" else "") + (if (r.optString("by", "").isNotEmpty()) " — الأستاذ " + r.optString("by") else "") + (r.optString("nt", "").let { if (it.isNotEmpty()) " · $it" else "" }), "تقييم المدرس", "rec:$k", "")
+                        } else if (r.optString("k") == "g")
                             Notifier.school(c, r.optString("n", "طالب"), r.optString("s", "المادة") + ": " + r.optString("v", "") + (r.optString("nt", "").let { if (it.isNotEmpty()) " · $it" else "" }), "نتيجة امتحان", "rec:$k", "")
                         else Notifier.school(c, r.optString("n", "طالب"), "غياب " + r.optString("d", ""), "غياب", "rec:$k", "")
                     }
@@ -236,28 +240,101 @@ object Sync {
         Notifier.message(c, "chan:$chId", ch.optString("cn", "قناة"), true, ch.optString("on", "المدرس"), photoOf(c, base, ch.opt("o")?.toString() ?: ""), text, r.optLong("ts", System.currentTimeMillis()))
     }
 
-    // ---------- الإعلانات والتحاضير ----------
+    // ---------- الإعلانات والتحاضير والجدول والعطل (جديد + معدّل) ----------
+    private fun items(txt: String?): List<JSONObject> {
+        if (txt == null || txt.trim() == "null") return emptyList()
+        return try {
+            val out = ArrayList<JSONObject>()
+            val t = txt.trim()
+            if (t.startsWith("[")) { val a = org.json.JSONArray(t); for (i in 0 until a.length()) a.optJSONObject(i)?.let { out.add(it) } }
+            else { val o = JSONObject(t); val ks = o.keys().asSequence().toList().sortedBy { it.toIntOrNull() ?: Int.MAX_VALUE }; for (k in ks) o.optJSONObject(k)?.let { out.add(it) } }
+            out
+        } catch (_: Throwable) { emptyList() }
+    }
+
+    /** يرجع الصيغة "المعرّف:بصمة المحتوى" حتى نكتشف الجديد والمعدّل */
+    private class Fresh(val sig: String, val fire: () -> Unit)
+    private fun sig(prefix: String, id: String, o: JSONObject) = "$prefix:$id:${o.toString().hashCode()}"
+
     private fun pollSchool(c: Context, base: String, u: U) {
         val pr = p(c)
-        for (name in listOf("announcements", "lessonPlans")) {
-            val sh = get(base, "/school/info/$name.json?shallow=true") ?: continue
-            val keys = try { if (sh.trim() == "null") emptyList() else JSONObject(sh).keys().asSequence().toList() } catch (_: Throwable) { continue }
-            val key = "sc_$name"; val old = pr.getInt(key, -1)
-            pr.edit().putInt(key, keys.size).apply()
-            if (old == -1 || keys.size <= old || WebHolder.foreground) continue
-            val sorted = keys.sortedBy { it.toIntOrNull() ?: Int.MAX_VALUE }
-            for (k in sorted.takeLast(keys.size - old)) {
-                val it = get(base, "/school/info/$name/$k.json")?.let { t -> try { JSONObject(t) } catch (_: Throwable) { null } } ?: continue
-                if (name == "announcements") {
-                    val tg = it.opt("target")?.toString() ?: ""
-                    if (tg == "all" || tg == u.grade || (tg == "student" && it.optString("student") == u.name))
-                        Notifier.school(c, it.optString("title", "إعلان جديد"), it.optString("desc", ""), "إعلان من الإدارة", "ann:$k", "")
-                } else {
-                    if (u.role != "teacher" && (u.role == "parent" || it.opt("grade")?.toString() == u.grade))
-                        Notifier.school(c, it.optString("title", "تحضير جديد"), it.optString("description", ""),
-                            "تحضير الدروس" + (it.optString("subj", "").let { s -> if (s.isNotEmpty()) " • $s" else "" }) + (GN[it.opt("grade")?.toString() ?: ""]?.let { g -> " • $g" } ?: ""), "plan:$k", "")
-                }
+        val seenSet = pr.getStringSet("sc_seen2", null)
+        val first = seenSet == null
+        val seen = HashSet(seenSet ?: emptySet())
+        val fresh = ArrayList<Fresh>()
+        fun mark(sg: String) { val pre = sg.substringBeforeLast(':') + ":"; seen.removeAll { it.startsWith(pre) }; seen.add(sg) }
+        val myGrade = u.grade.ifEmpty { "" }
+
+        // الإعلانات: العنوان دائماً «إشعار» + نص الإعلان
+        val annTxt = get(base, "/school/info/announcements.json")
+        items(annTxt).forEach { a ->
+            val id = a.opt("id")?.toString() ?: a.opt("createdAt")?.toString() ?: a.optString("title")
+            val sg = sig("ann", id, a)
+            val tg = a.opt("target")?.toString() ?: ""
+            val forMe = tg == "all" || tg == myGrade || (tg == "student" && same(a.optString("student"), u.name)) || (u.role == "parent" && tg == "student" && same(a.optString("student"), u.child))
+            if (!forMe) { mark(sg); return@forEach }
+            if (seen.contains(sg)) return@forEach
+            val edited = seen.any { it.startsWith("ann:$id:") }
+            val title = a.optString("title", "")
+            val desc = a.optString("desc", "")
+            val body = (if (edited) "✏️ تم تعديل الإشعار\n" else "") + (if (title.isNotEmpty() && desc.isNotEmpty()) "$title — $desc" else title + desc)
+            fresh.add(Fresh(sg) { Notifier.school(c, "إشعار", body, "الإدارة • ثانوية الفارابي", "ann:$id", "") })
+        }
+
+        // تحاضير الدروس: العنوان + الوصف + اسم المدرس
+        if (u.role != "teacher" && u.role != "admin") {
+            items(get(base, "/school/info/lessonPlans.json")).forEach { it ->
+                val id = it.opt("id")?.toString() ?: it.optString("title")
+                val sg = sig("plan", id, it)
+                val gr = it.opt("grade")?.toString() ?: ""
+                if (!(u.role == "parent" || gr == myGrade)) { mark(sg); return@forEach }
+                if (seen.contains(sg)) return@forEach
+                val teacher = it.optString("teacher", "")
+                val subj = it.optString("subject", it.optString("subj", ""))
+                val sub = "تحضير" + (if (teacher.isNotEmpty()) " • " + (if (Regex("^(ال)?[أا]ستاذ|^أ\\.|^م\\.").containsMatchIn(teacher)) "" else "الأستاذ ") + teacher else "") + (if (subj.isNotEmpty()) " • $subj" else "") + (GN[gr]?.let { g -> " • $g" } ?: "")
+                val body = it.optString("title", "تحضير جديد") + (it.optString("description", "").let { d -> if (d.isNotEmpty()) "\n$d" else "" })
+                val edited = seen.any { x -> x.startsWith("plan:$id:") }
+                fresh.add(Fresh(sg) { Notifier.school(c, if (edited) "تحضير معدّل" else "تحضير جديد", body, sub, "plan:$id", "") })
             }
         }
+
+        // الجدول الأسبوعي لكل صف
+        get(base, "/school/schedule.json")?.let { txt ->
+            try {
+                if (txt.trim() != "null") {
+                    val o = JSONObject(txt)
+                    o.keys().forEach { gk ->
+                        val sch = o.optJSONObject(gk) ?: return@forEach
+                        val sg = sig("sch", gk, sch)
+                        val relevant = u.role == "teacher" || (u.role == "parent" && myGrade.isEmpty()) || gk == myGrade
+                        if (!relevant) { mark(sg); return@forEach }
+                        if (seen.contains(sg)) return@forEach
+                        val cls = sch.optString("cls", GN[gk] ?: "الصف")
+                        fresh.add(Fresh(sg) { Notifier.school(c, "الجدول المدرسي", "تم نشر/تحديث جدول $cls الأسبوعي", "جدول الحصص", "sch:$gk", "") })
+                    }
+                }
+            } catch (_: Throwable) {}
+        }
+
+        // العطل والدوام (حدث)
+        get(base, "/school/info/schoolDays.json")?.let { txt ->
+            try {
+                if (txt.trim() != "null") {
+                    val o = JSONObject(txt)
+                    o.keys().forEach { day ->
+                        val d = o.optJSONObject(day) ?: return@forEach
+                        val sg = sig("day", day, d)
+                        if (seen.contains(sg)) return@forEach
+                        val hol = d.optString("status") == "holiday"
+                        val note = d.optString("note", "")
+                        fresh.add(Fresh(sg) { Notifier.school(c, if (hol) "عطلة" else "دوام", "يوم $day: " + (if (hol) "عطلة" else "دوام رسمي") + (if (note.isNotEmpty()) " — $note" else ""), "الدوام المدرسي", "day:$day", "") })
+                    }
+                }
+            } catch (_: Throwable) {}
+        }
+
+        for (f in fresh) { mark(f.sig); if (!first && !WebHolder.foreground) try { f.fire() } catch (_: Throwable) {} }
+        // نبقي آخر المفاتيح فقط (كل عنصر له أحدث بصمة)
+        pr.edit().putStringSet("sc_seen2", seen.toList().toSet()).apply()
     }
 }

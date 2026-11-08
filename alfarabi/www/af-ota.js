@@ -4,8 +4,8 @@
   'use strict';
   var A = window.Android, X = window.AFX;
   if (!A) return;
-  var PUB = {"kty":"EC","x":"9IvmMNuga6JvjOjjBUFq4MYBDfjhllaUD8rByaS5iD0","y":"JyAh6qs9loudQZR3OnaSysYMTcy7vpZ-FuhME4BnpF8","crv":"P-256"};
-  var UIV = '2026.11.06-l';
+  var PUB = {"kty":"EC","x":"g3WXfsTm_bLnvkCt22cCS_TW9lkGjtiUJimkkL2fszg","y":"qpRrJ88sAYSdykVNBVuGkHXNnQXpQCPjdHweUbgzqZs","crv":"P-256"};
+  var UIV = '2026.11.09-menu-notify';
   var CHUNK = 700 * 1024, MAXB = 25 * 1024 * 1024;
   var isApp = !!(A.otaBegin) && !A.__web;
   function base() { return window.FBBASE || ''; }
@@ -15,46 +15,172 @@
   function msg(v, sha) { return new TextEncoder().encode('alfarabi-ota:' + v + ':' + sha); }
   function fj(p, o) { var b = base(); if (!b) return Promise.reject(new Error('لا يوجد اتصال بقاعدة البيانات')); return fetch(b + p, o).then(function (r) { if (!r.ok) throw new Error('رفض الخادم (' + r.status + ')'); return r.json(); }); }
 
-  /* ===================== الاستقبال (التطبيق فقط) ===================== */
-  var busy = false;
+  /* ===================== الاستقبال التلقائي + زر «آخر تحديثات» ===================== */
+  var busy = false, REJ = 'af_ota_rej', SEEN = 'af_ota_seen';
+  var S = { k: 'idle', t: '', pct: 0 }, subs = [];
+  function lsg(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lss(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
+  function setS(k, t, pct) { S = { k: k, t: t || '', pct: pct || 0 }; subs.forEach(function (f) { try { f(S); } catch (e) { } }); }
+  function when(v) { try { return new Date(v * 1000).toLocaleString('ar-IQ', { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return ''; } }
+  function verifySig(m) {
+    return crypto.subtle.importKey('jwk', PUB, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']).then(function (k) {
+      return crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, k, b64u8(m.sig), msg(m.v, m.sha));
+    }).then(function (ok) { if (!ok) throw new Error('التوقيع غير صحيح'); });
+  }
   function verify(bytes, meta) {
     return crypto.subtle.digest('SHA-256', bytes).then(function (h) {
-      var sha = b2h(h); if (sha !== meta.sha) throw new Error('بصمة الملف غير مطابقة');
-      return crypto.subtle.importKey('jwk', PUB, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']).then(function (k) {
-        return crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, k, b64u8(meta.sig), msg(meta.v, sha));
-      }).then(function (ok) { if (!ok) throw new Error('التوقيع غير صحيح'); });
+      if (b2h(h) !== meta.sha) throw new Error('بصمة الملف غير مطابقة');
+      return verifySig(meta);
     });
   }
-  function check() {
-    if (!isApp || busy || !base() || document.hidden) return;
-    busy = true;
-    fj('/ota/current.json').then(function (m) {
-      if (!m || !m.v || !m.n || !m.sha || !m.sig) return;
-      var cur = +A.otaVersion() || 0, bad = +A.otaBad() || 0;
-      if (m.v <= cur || m.v <= bad) return;
-      var parts = [], i = 0, total = 0;
-      function next() {
-        if (i >= m.n) return;
-        return fj('/ota_files/v' + m.v + '/c' + i + '.json').then(function (s) { if (typeof s !== 'string') throw new Error('ناقص'); var u = b64u8(s); total += u.length; if (total > MAXB) throw new Error('كبير'); parts.push(u); i++; return next(); });
-      }
-      return next().then(function () {
-        var all = new Uint8Array(total), o = 0; parts.forEach(function (p) { all.set(p, o); o += p.length; });
-        return verify(all, m).then(function () {
-          A.otaBegin();
-          for (var p = 0; p < all.length; p += 1500000) { if (!A.otaChunk(u8b64(all.subarray(p, Math.min(all.length, p + 1500000))))) throw new Error('تعذّر الحفظ'); }
-          if (!A.otaCommit(m.v)) throw new Error('الملفات غير صالحة');
-          try { var t = document.createElement('div'); t.textContent = 'تم تحديث التطبيق، جاري إعادة التشغيل...'; t.style.cssText = 'position:fixed;left:16px;right:16px;bottom:30px;z-index:2147483647;background:#14213d;color:#fff;border-radius:14px;padding:12px;text-align:center;font:700 14px Cairo,sans-serif;direction:rtl'; document.body.appendChild(t); } catch (e) { }
-          setTimeout(function () { try { A.otaReload(); } catch (e) { location.reload(); } }, 1600);
-        });
+  function apply(m) {
+    var parts = [], i = 0, total = 0;
+    setS('down', 'جاري تنزيل التحديث...', 0);
+    function next() {
+      if (i >= m.n) return;
+      return fj('/ota_files/v' + m.v + '/c' + i + '.json').then(function (s) {
+        if (typeof s !== 'string') throw new Error('ملف ناقص');
+        var u = b64u8(s); total += u.length; if (total > MAXB) throw new Error('حجم التحديث كبير');
+        parts.push(u); i++; setS('down', 'جاري تنزيل التحديث... ' + Math.round(i / m.n * 100) + '%', i / m.n); return next();
       });
-    }).catch(function () { }).then(function () { busy = false; });
+    }
+    return next().then(function () {
+      var all = new Uint8Array(total), o = 0; parts.forEach(function (p) { all.set(p, o); o += p.length; });
+      return verify(all, m).then(function () {
+        setS('down', 'جاري تثبيت التحديث...', 1);
+        A.otaBegin();
+        for (var p = 0; p < all.length; p += 1500000) { if (!A.otaChunk(u8b64(all.subarray(p, Math.min(all.length, p + 1500000))))) throw new Error('تعذّر الحفظ'); }
+        if (!A.otaCommit(m.v)) throw new Error('الملفات غير صالحة');
+        setS('done', 'تم التحديث ✓ جاري إعادة التشغيل...', 1);
+        try { var t = document.createElement('div'); t.textContent = 'تم تحديث التطبيق، جاري إعادة التشغيل...'; t.style.cssText = 'position:fixed;left:16px;right:16px;bottom:30px;z-index:2147483647;background:#14213d;color:#fff;border-radius:14px;padding:12px;text-align:center;font:700 14px Cairo,sans-serif;direction:rtl'; document.body.appendChild(t); } catch (e) { }
+        setTimeout(function () { try { A.otaReload(); } catch (e) { location.reload(); } }, 1600);
+      });
+    });
+  }
+  /* manual=true: ضغط المستخدم على الزر (يعرض الحالة). غير ذلك: فحص تلقائي صامت */
+  function check(manual) {
+    if (!isApp || busy) return Promise.resolve();
+    if (!manual && document.hidden) return Promise.resolve();
+    if (!base()) { if (manual) setS('err', 'لا يوجد اتصال بالخادم الآن، جرّب بعد قليل'); return Promise.resolve(); }
+    busy = true; if (manual) setS('chk', 'جاري البحث عن تحديث...');
+    return fj('/ota/current.json').then(function (m) {
+      if (!m || !m.v || !m.n || !m.sha || !m.sig) { setS('ok', 'أنت على آخر نسخة ✓'); return; }
+      var cur = +A.otaVersion() || 0, bad = +A.otaBad() || 0;
+      if (m.v <= cur || m.v <= bad || m.v === (+lsg(REJ) || 0)) { setS('ok', 'أنت على آخر نسخة ✓'); return; }
+      /* نتحقق من التوقيع قبل التنزيل: تحديث غير موقّع بالمفتاح الصحيح لا يُنزَّل أصلاً */
+      return verifySig(m).catch(function () { lss(REJ, m.v); throw new Error('skip'); }).then(function () { return apply(m); });
+    }).catch(function (e) {
+      if (e && e.message === 'skip') setS('ok', 'أنت على آخر نسخة ✓');
+      else if (manual || S.k === 'down') setS('err', 'تعذّر التحديث: ' + (e && e.message || e));
+      else setS('idle', '');
+    }).then(function () { busy = false; });
   }
   if (isApp) {
-    setTimeout(check, 12000); setInterval(check, 10 * 60 * 1000);
-    document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(check, 3000); });
+    setTimeout(function () { check(false); }, 3000); setInterval(function () { check(false); }, 2 * 60 * 1000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(function () { check(false); }, 2000); });
     /* نؤكد أن النسخة الجديدة اشتغلت بسلام بعد فتح الواجهة */
     setTimeout(function () { try { if (document.body && document.body.children.length > 2) A.otaOk(); } catch (e) { } }, 9000);
   }
+
+  /* نسخة الموقع: نفس التنبيه، والزر يحدّث الصفحة بالنسخة المنشورة على الاستضافة */
+  var webLatest = 0;
+  function webPoll() {
+    if (isApp || document.hidden || !base()) return;
+    fj('/ota/current.json').then(function (m) {
+      if (!m || !m.v || !m.sha || !m.sig) return;
+      return verifySig(m).then(function () {
+        webLatest = m.v; var seen = +lsg(SEEN) || 0;
+        if (!seen) { lss(SEEN, m.v); return; }
+        if (m.v > seen) setS('new', 'يوجد تحديث جديد — اضغط «تحديث الصفحة الآن»');
+      });
+    }).catch(function () { });
+  }
+  function webRefresh() {
+    setS('down', 'جاري تحديث الموقع...', 0.5);
+    if (webLatest) lss(SEEN, webLatest);
+    Promise.resolve().then(function () {
+      return navigator.serviceWorker && navigator.serviceWorker.getRegistrations ? navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }) : 0;
+    }).then(function () {
+      return window.caches ? caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }) : 0;
+    }).catch(function () { }).then(function () { location.replace(location.pathname + '?u=' + Date.now() + location.hash); });
+  }
+  if (!isApp) { setTimeout(webPoll, 4000); setInterval(webPoll, 2 * 60 * 1000); document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(webPoll, 2000); }); }
+
+  /* ---------- الواجهة: زر آخر تحديثات + النافذة ---------- */
+  function mk(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function initUI() {
+    if (document.getElementById('afUpdBtn') || !document.body) return;
+    var css = mk('style');
+    css.textContent = '#afUpdBtn{position:fixed;z-index:2147483000;top:calc(14px + env(safe-area-inset-top,0px));left:max(16px,calc(50% - 199px));height:40px;padding:0 14px 0 12px;border:0;border-radius:20px;background:linear-gradient(135deg,#1768bd,#0aa6f5);color:#fff;font:700 13px Cairo,Tahoma,sans-serif;display:flex;align-items:center;gap:7px;box-shadow:0 6px 16px rgba(23,104,189,.35);cursor:pointer;direction:rtl;-webkit-tap-highlight-color:transparent}' +
+      '#afUpdBtn svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}#afUpdBtn.spin svg{animation:afUpdSp 1s linear infinite}@keyframes afUpdSp{to{transform:rotate(360deg)}}' +
+      '#afUpdBtn i{display:none;position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:#ffd23f;border:2px solid #fff}#afUpdBtn.dot i{display:block}' +
+      '#afUpdO{position:fixed;inset:0;z-index:2147483001;background:rgba(10,20,40,.5);display:flex;align-items:flex-end;justify-content:center;direction:rtl;font-family:Cairo,Tahoma,sans-serif}' +
+      '#afUpdC{background:#fff;color:#14213d;width:100%;max-width:430px;max-height:86vh;overflow:auto;border-radius:24px 24px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.25)}' +
+      '#afUpdC h3{font-size:18px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}#afUpdC h3 button{border:0;background:#edf3fa;width:32px;height:32px;border-radius:50%;font-size:16px;color:#18385e;cursor:pointer}' +
+      '#afUpdC .r{display:flex;justify-content:space-between;gap:10px;background:#f2f6fb;border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:13px}#afUpdC .r b{text-align:left}' +
+      '#afUpdC .st{border-radius:12px;padding:10px 12px;margin:10px 0;font-size:14px;font-weight:700;background:#eef7ff;color:#1768bd;min-height:20px}#afUpdC .st.ok{background:#e9f8ef;color:#0b7a3b}#afUpdC .st.err{background:#fdecee;color:#d9283d}#afUpdC .st.new{background:#fff6dd;color:#8a5a00}' +
+      '#afUpdC .pb{height:6px;border-radius:3px;background:#e3ebf5;overflow:hidden;margin:-4px 0 10px;display:none}#afUpdC .pb div{height:100%;background:#1768bd;width:0;transition:width .3s}' +
+      '#afUpdC .go{width:100%;border:0;border-radius:14px;padding:13px;background:linear-gradient(135deg,#1768bd,#0aa6f5);color:#fff;font:700 15px Cairo,Tahoma,sans-serif;cursor:pointer}#afUpdC .go:disabled{opacity:.55}' +
+      '#afUpdC h4{font-size:14px;margin:16px 0 8px;color:#5b6b86}#afUpdC ul{list-style:none;margin:0;padding:0}#afUpdC li{border-bottom:1px solid #e8eef6;padding:9px 2px;font-size:13px;line-height:1.7}#afUpdC li small{display:block;color:#7a8aa3}#afUpdC .ft{font-size:12px;color:#7a8aa3;margin-top:12px;text-align:center}';
+    document.head.appendChild(css);
+    var btn = mk('button'); btn.id = 'afUpdBtn'; btn.type = 'button'; btn.setAttribute('aria-label', 'آخر تحديثات');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg><span>آخر تحديثات</span><i></i>';
+    /* الزر نُقل إلى القائمة */
+    function paintBtn(s) { btn.classList.toggle('spin', s.k === 'chk' || s.k === 'down'); btn.classList.toggle('dot', s.k === 'new' || s.k === 'down'); }
+    subs.push(paintBtn);
+    /* الزر يظهر فقط بالقائمة الرئيسية (مكان زر القائمة)، ويختفي داخل الصفحات والمحادثات */
+    function onHome() {
+      var cf = document.getElementById('chatFrame');
+      if (cf && getComputedStyle(cf).display !== 'none') return false;
+      var af = document.getElementById('adminFrame');
+      if (af && getComputedStyle(af).display !== 'none') {
+        try {
+          var d = af.contentDocument, b = d && d.body; if (!b) return false;
+          if (b.classList.contains('qn-home')) return true;
+          var g = d.querySelector('.burger'); return !!(g && d.defaultView.getComputedStyle(g).display !== 'none');
+        } catch (e) { return false; }
+      }
+      return true;
+    }
+    function place() { btn.style.display = onHome() ? 'flex' : 'none'; }
+    setInterval(place, 400); place();
+    btn.onclick = openSheet;
+  }
+  function openSheet() {
+    if (document.getElementById('afUpdO')) return;
+    var o = mk('div'); o.id = 'afUpdO'; var c = mk('div'); c.id = 'afUpdC'; o.appendChild(c);
+    var h = mk('h3'); h.appendChild(mk('span', '', 'آخر تحديثات')); var x = mk('button', '', '✕'); x.type = 'button'; h.appendChild(x); c.appendChild(h);
+    function row(a, b) { var r = mk('div', 'r'); r.appendChild(mk('span', '', a)); var v = mk('b', '', b); r.appendChild(v); c.appendChild(r); return v; }
+    var cur = isApp ? (+A.otaVersion() || 0) : 0;
+    row(isApp ? 'نسخة هذا الجهاز' : 'نسخة الموقع', isApp ? (cur ? when(cur) : 'الأصلية · ' + UIV) : UIV);
+    var last = row('آخر تحديث مُرسل', '...');
+    var st = mk('div', 'st'); c.appendChild(st);
+    var pb = mk('div', 'pb'); var pbi = mk('div'); pb.appendChild(pbi); c.appendChild(pb);
+    var go = mk('button', 'go', isApp ? 'تحقق من التحديث الآن' : 'تحديث الصفحة الآن'); go.type = 'button'; c.appendChild(go);
+    c.appendChild(mk('h4', '', 'سجل التحديثات'));
+    var ul = mk('ul'); c.appendChild(ul);
+    c.appendChild(mk('div', 'ft', isApp ? 'التحديثات تُنزَّل وتُثبَّت تلقائياً بدون أي إجراء منك.' : 'الموقع يتنبّه تلقائياً عند وجود تحديث جديد.'));
+    function paint(s) {
+      st.className = 'st ' + (s.k === 'ok' || s.k === 'done' ? 'ok' : s.k === 'err' ? 'err' : s.k === 'new' ? 'new' : '');
+      st.textContent = s.t || (isApp ? 'اضغط للتحقق من وجود تحديث جديد.' : 'اضغط لتحميل أحدث نسخة من الموقع.');
+      pb.style.display = s.k === 'down' ? 'block' : 'none'; pbi.style.width = Math.round((s.pct || 0) * 100) + '%';
+      go.disabled = s.k === 'chk' || s.k === 'down' || s.k === 'done';
+    }
+    subs.push(paint); paint(S);
+    function close() { var i = subs.indexOf(paint); if (i > -1) subs.splice(i, 1); o.remove(); }
+    x.onclick = close; o.addEventListener('click', function (e) { if (e.target === o) close(); });
+    go.onclick = function () { if (isApp) check(true); else webRefresh(); };
+    document.body.appendChild(o);
+    Promise.all([fj('/ota/current.json').catch(function () { return null; }), fj('/updates.json').catch(function () { return null; })]).then(function (r) {
+      var m = r[0], u = r[1];
+      last.textContent = m && m.ts ? new Date(m.ts).toLocaleString('ar-IQ', { dateStyle: 'medium', timeStyle: 'short' }) : 'لا يوجد';
+      var l = u && typeof u === 'object' ? Object.keys(u).map(function (k) { return u[k]; }).filter(Boolean).sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(0, 8) : [];
+      if (!l.length) { var li = mk('li', '', 'ما توجد تحديثات منشورة بعد.'); ul.appendChild(li); return; }
+      l.forEach(function (it) { var li = mk('li', '', String(it.v || 'تحديث') + (it.note ? ' — ' + it.note : '')); li.appendChild(mk('small', '', it.ts ? new Date(it.ts).toLocaleString('ar-IQ', { dateStyle: 'medium', timeStyle: 'short' }) : '')); ul.appendChild(li); });
+    });
+  }
+  window.afUpdates = { open: openSheet, check: function () { return check(true); } };
+  if (document.body) initUI(); else document.addEventListener('DOMContentLoaded', initUI);
 
   /* ===================== النشر (الإدارة) ===================== */
   var KEYS = 'af_ota_key';

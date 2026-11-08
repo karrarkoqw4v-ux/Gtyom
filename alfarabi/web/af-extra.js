@@ -37,7 +37,7 @@
       return sc >= 8 ? 'full' : sc >= 6 ? 'mid' : sc >= 3 ? 'lite' : 'static';
     } catch (e) { return 'lite'; }
   }
-  if (g('af_auto_spec20', '') !== '1') { s('af_auto_spec20', '1'); var sl = specLevel(); if (sl === 'full') sl = 'mid'; AUTO = sl; s('af_auto_lvl', sl); }
+  if (g('af_auto_spec21', '') !== '1') { s('af_auto_spec21', '1'); AUTO = 'lite'; s('af_auto_lvl', 'lite'); }
   function lvl() { return GFX === 'auto' ? AUTO : GFX; }
 
   // نثبّت مستوى الرسوميات قبل ما يقرأه محرك الأداء
@@ -91,7 +91,7 @@
     '#ch[data-afcp] .ch-m,#ch[data-afcp] #cl,#ch[data-afcp] .ch-h{background-color:transparent!important}',
     '#ch[data-afcp=light] .ch-m,#ch[data-afcp=light] #cl{background-image:none!important}',
     '#ch[data-afcp=light] .chd span,#ch[data-afcp=light] .chn{background:rgba(255,255,255,.85)!important;color:#475569!important}',
-    '#ch[data-afcp] .r .bb,#ch[data-afcp] .r .bb *{font-family:var(--ff,"Cairo"),sans-serif;font-weight:var(--fw,400)}',
+    '#ch[data-afcp] .r .bb,#ch[data-afcp] .r .bb *{font-family:var(--ff,sans-serif),sans-serif;font-weight:var(--fw,400)}',
 
     /* --- صفحة المدرسة: منشورات أخف بدون إطارات ثقيلة، والوصف يظهر كامل --- */
     'html .sp-p{box-shadow:0 2px 10px rgba(40,90,150,.08)!important;border:0!important}',
@@ -180,6 +180,8 @@
     '#cl2 .cb.w{background:#fff!important;color:#1f4fb8!important}',
     '@keyframes afPulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,127,.6),0 6px 16px rgba(0,0,0,.2)}50%{box-shadow:0 0 0 15px rgba(52,211,127,0),0 6px 16px rgba(0,0,0,.2)}}'
   ].join('\n');
+  var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
+  CSS += MENUCSS;
 
   window.AFX_HEAD = function () { return '<style id="af-x">' + CSS + '</style>'; };
 
@@ -417,8 +419,21 @@
     var a = J('alfarabi_sess_acc', null);
     return a ? { role: a.role, name: a.name, uid: String(a.createdAt || a.name) } : { role: 'guest', name: '', uid: '' };
   }
-  function impList() { return (J('alfarabi_rec_v1', []) || []).filter(function (r) { return r && r.k === 'imp'; }).sort(function (a, b) { return b.ts - a.ts; }); }
+  function impList() { return (J('alfarabi_rec_v1', []) || []).filter(function (r) { return r && r.k === 'imp' && !r.ed; }).sort(function (a, b) { return b.ts - a.ts; }); }
   function when(ts) { try { return new Date(ts).toLocaleString('ar-IQ', { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return ''; } }
+  function canEditImp(r) { var R = roleInfo(); return R.role === 'admin' || (R.uid && String(r.uid) === R.uid); }
+  /* تعديل إشعار مهم: يتحدث الأصل لكل الأجهزة + يُرسل إشعار «تعديل» للطلاب (سجل مخفي ed) */
+  function editImp(doc, r) {
+    var w = doc.defaultView || window, t = w.prompt('عنوان الإشعار', r.title || ''); if (t === null) return;
+    var b = w.prompt('نص الإشعار', r.body || ''); if (b === null) return;
+    t = t.trim(); b = b.trim(); if (!t) return;
+    try {
+      window.recSet(r.id, 'title', t); window.recSet(r.id, 'body', b); window.recSet(r.id, 'edited', Date.now());
+      var R = roleInfo();
+      window.addRec({ id: Date.now(), k: 'imp', ed: 1, upd: r.id, ts: Date.now(), title: '✏️ تعديل: ' + t, body: b, from: R.name, role: R.role, uid: R.uid });
+    } catch (e) { try { w.alert('تعذّر حفظ التعديل'); } catch (x) {} return; }
+    try { var m = doc.querySelector('.afp-s'); if (m) { var nr = impList().filter(function (x) { return x.id === r.id; })[0]; if (nr) impDetail(doc, nr); } } catch (e) {}
+  }
   function impCard(r) {
     return '<button class="afimp" data-id="' + r.id + '"><b>' + esc(r.title || 'إشعار مهم') + '</b><span>' + esc(String(r.body || '').slice(0, 90)) + '</span><small>' + esc(r.from || '') + ' · ' + when(r.ts) + (r.img ? ' · 📷' : '') + (r.vid ? ' · 🎬' : '') + '</small></button>';
   }
@@ -427,7 +442,11 @@
       '<div class="afp-c"><h3 style="font-size:18px">' + esc(r.title || 'إشعار مهم') + '</h3><p style="margin-top:2px">من: ' + esc(r.from || 'الإدارة') + ' · ' + when(r.ts) + '</p>' +
       (r.body ? '<div class="afimp-body">' + esc(r.body) + '</div>' : '') +
       (r.img ? '<img class="afimp-m" src="' + r.img + '" alt="">' : '') +
-      (r.vid ? '<video class="afimp-m" src="' + r.vid + '" controls playsinline></video>' : '') + '</div>');
+      (r.vid ? '<video class="afimp-m" src="' + r.vid + '" controls playsinline></video>' : '') +
+      (r.hd ? '<button class="afbtn" data-hd="' + esc(r.hd) + '" style="width:100%;margin-top:12px">📖 افتح الملزمة</button>' : '') +
+      (canEditImp(r) ? '<button class="afbtn gray" data-ed="1" style="width:100%;margin-top:12px">✏️ تعديل الإشعار</button>' : '') + '</div>',
+      function (pp) { var b = pp.querySelector('[data-hd]'); if (b) b.onclick = function () { if (window.afOpenHandout) window.afOpenHandout(b.getAttribute('data-hd'), doc); };
+        var eb = pp.querySelector('[data-ed]'); if (eb) eb.onclick = function () { editImp(doc, r); }; });
   }
   function shrinkImg(file, max, cb) {
     var fr = new FileReader();
@@ -485,7 +504,7 @@
   }
   window.afOpenImportant = function (id) {
     var key = String(id || '').replace(/^imp:/, '').replace(/^r/, '');
-    var r = impList().filter(function (x) { return String(x.id) === key; })[0]; if (!r) return false;
+    var all = (J('alfarabi_rec_v1', []) || []).filter(function (x) { return x && x.k === 'imp'; }), r = all.filter(function (x) { return String(x.id) === key; })[0]; if (r && r.ed && r.upd) r = all.filter(function (x) { return x.id === r.upd; })[0] || r; if (!r) return false;
     var f = document.getElementById('adminFrame'), d = (f && f.style.display === 'block' && f.contentDocument && f.contentDocument.body) ? f.contentDocument : document;
     impDetail(d, r); return true;
   };
@@ -493,64 +512,131 @@
 
 
   /* ===================== تنظيف البيانات (للإدارة فقط) ===================== */
+  /* تنظيف قائمة الحسابات المسجلة فقط: قوائم الطلاب بالمدرسة، المدرسين المضافين، الملازم، الدرجات، المحادثات ومعلومات المدرسة ما تنلمس.
+     قبل التنظيف يتنزل ملف بكل البيانات تلقائياً، وتنحفظ نسخة بالخادم (إذا الخادم يسمح) ويمكن استرجاعها. الطالب يدخل باسمه وينفتح له حساب جديد تلقائياً. */
   function cleanupPage(doc) {
-    var backed = false, plan = null;
+    function accs() { return (J('alfarabi_db_v1', { accounts: [] }).accounts) || []; }
     function counts() {
-      var db = (J('alfarabi_db_v1', { accounts: [] }).accounts) || [], ch = J('alfarabi_chat_v2', {}), n = 0;
-      Object.keys(ch).forEach(function (k) { n += (ch[k] || []).length; });
-      function by(r) { return db.filter(function (a) { return a.role === r; }).length; }
-      return { st: by('student'), te: by('teacher'), pa: by('parent'), msgs: n };
+      var a = accs(), sc = J('alfarabi_school_v1', {});
+      function by(r) { return a.filter(function (x) { return x.role === r; }).length; }
+      return { st: by('student'), te: by('teacher'), pa: by('parent'), fol: a.filter(function (x) { return !x.kicked; }).length, lists: ((sc && sc.students) || []).length, tl: ((sc && sc.teachers) || []).length };
     }
     function html() {
       var c = counts();
-      return '<div class="afp-c"><h3>بدء قاعدة بيانات جديدة</h3><p>يمسح المستخدمين والرسائل والتسجيلات ويبدأ من الصفر. <b>الملازم ما تنمسح أبداً</b>.</p><button class="afbtn" id="cuw" style="width:100%;background:linear-gradient(135deg,#ff5d6e,#d9283d)">مسح شامل وبدء جديد</button></div>' +
-        '<div class="afp-c"><h3>الموجود حالياً</h3><p>طلاب مسجلون: <b>' + c.st + '</b> • مدرسون: <b>' + c.te + '</b> • أولياء أمور: <b>' + c.pa + '</b> • رسائل المحادثات: <b>' + c.msgs + '</b></p><p>المدرسون والإدارة لا يُحذفون أبداً.</p></div>' +
-        '<div class="afp-c"><h3>خيارات التنظيف</h3>' +
-        '<label class="afck"><input type="checkbox" id="cu1" checked> حذف رسائل المحادثات الأقدم من <input type="number" id="cud" class="afin" style="width:80px;display:inline-block;margin:0 6px" value="30" min="1"> يوم</label>' +
-        '<label class="afck"><input type="checkbox" id="cu2"> إبقاء آخر <input type="number" id="cun" class="afin" style="width:90px;display:inline-block;margin:0 6px" value="200" min="1"> طالب مسجل فقط وحذف حسابات الباقين</label>' +
-        '<label class="afck"><input type="checkbox" id="cu3"> حذف حسابات أولياء الأمور المرتبطين بالطلاب المحذوفين</label>' +
-        '<div class="aft-row" style="margin-top:10px"><button class="afbtn gray" id="cup" style="flex:1">معاينة</button><button class="afbtn gray" id="cub" style="flex:1">نسخة احتياطية</button></div>' +
-        '<div class="afmsg" id="cum"></div><div class="hdpr" id="cupr" style="display:none"><i></i></div>' +
-        '<button class="afbtn" id="cux" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#ff5d6e,#d9283d)" disabled>تنفيذ التنظيف</button></div>' +
-        '<div class="afp-c"><p>خطوات الأمان: 1) اضغط «نسخة احتياطية» وتنزل ملف بكل البيانات. 2) اضغط «معاينة» لتشوف كم راح يتحذف. 3) بعدها يتفعل «تنفيذ التنظيف». الحذف نهائي ويطبّق على كل الأجهزة.</p></div>';
+      return '<div class="afp-c"><h3>الموجود حالياً</h3>' +
+        '<p>الطلاب المسجلون بالتطبيق: <b>' + c.st + '</b> • أولياء الأمور: <b>' + c.pa + '</b> • المدرسون المسجلون: <b>' + c.te + '</b></p>' +
+        '<p>متابعو صفحة المدرسة: <b>' + c.fol + '</b></p>' +
+        '<p>الطلاب داخل قوائم المدرسة: <b>' + c.lists + '</b> • المدرسون المضافون: <b>' + c.tl + '</b> <small>(هذي ما تنمسح أبداً)</small></p></div>' +
+        '<div class="afp-c"><h3>1) تصدير كل البيانات</h3><p>ينزل ملف JSON بكل البيانات وملف CSV بالحسابات المسجلة (يفتح بالإكسل).</p>' +
+        '<button class="afbtn" id="cue" style="width:100%">📥 تصدير كل البيانات</button></div>' +
+        '<div class="afp-c"><h3>2) تنظيف القائمة وبدء قائمة جديدة</h3>' +
+        '<label class="afck"><input type="checkbox" id="cus" checked> حسابات الطلاب المسجلين</label>' +
+        '<label class="afck"><input type="checkbox" id="cup" checked> حسابات أولياء الأمور</label>' +
+        '<label class="afck"><input type="checkbox" id="cut"> حسابات المدرسين المسجلين</label>' +
+        '<p style="margin-top:8px"><b>ما ينحذف:</b> قوائم الطلاب بالمدرسة، المدرسين المضافين، الملازم وملفاتها، الدرجات والغيابات، المحادثات، معلومات المدرسة، حساب الإدارة.</p>' +
+        '<p>يبدأ العدّاد (المتابعين) من جديد، وكل طالب يدخل باسمه من القائمة وينفتح له حسابه الجديد وينحفظ تلقائياً.</p>' +
+        '<button class="afbtn" id="cux" style="width:100%;background:linear-gradient(135deg,#ff8a3d,#e5541b)">🧹 تصدير وتنظيف وبدء قائمة جديدة</button>' +
+        '<div class="afmsg" id="cum"></div><div class="hdpr" id="cupr" style="display:none;height:10px;border-radius:6px;background:#dbe5f4;overflow:hidden;margin:8px 0"><i style="display:block;height:100%;width:0;background:linear-gradient(90deg,#0aa6f5,#12a15a);transition:width .2s"></i></div></div>' +
+        '<div class="afp-c"><h3>استرجاع</h3><p>إذا ندمت ترجع آخر قائمة انحفظت بالخادم قبل التنظيف.</p><button class="afbtn gray" id="cur" style="width:100%">↩ استرجاع آخر قائمة</button><div class="afmsg" id="cum2"></div></div>';
+    }
+    function saveFile(name, text, mime) {
+      return new Promise(function (res) {
+        try {
+          var fr = new FileReader();
+          fr.onload = function () { try { var a = doc.createElement('a'); a.href = fr.result; a.download = name; doc.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 600); res(true); } catch (e) { res(false); } };
+          fr.onerror = function () { res(false); };
+          fr.readAsDataURL(new Blob([text], { type: mime }));
+        } catch (e) { res(false); }
+      });
+    }
+    function gj(path) {
+      if (!window.FBBASE) return Promise.resolve(null);
+      return fetch(window.FBBASE + path + '.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    }
+    function csvOf(list) {
+      var cols = [['name', 'الاسم'], ['role', 'النوع'], ['grade', 'الصف'], ['subject', 'المادة'], ['child', 'اسم الابن'], ['phone', 'الهاتف'], ['email', 'المعرف'], ['createdAt', 'تاريخ التسجيل']];
+      function q(v) { v = v == null ? '' : String(v); return '"' + v.replace(/"/g, '""') + '"'; }
+      var rows = [cols.map(function (c) { return q(c[1]); }).join(',')];
+      list.forEach(function (a) { rows.push(cols.map(function (c) { var v = a[c[0]]; if (c[0] === 'createdAt' && v) { try { v = new Date(+v).toISOString().slice(0, 10); } catch (e) { } } return q(v); }).join(',')); });
+      return '\ufeff' + rows.join('\r\n');
+    }
+    function exportAll(srvAccounts) {
+      var list = accs();
+      if (srvAccounts && typeof srvAccounts === 'object') { Object.keys(srvAccounts).forEach(function (k) { var a = srvAccounts[k]; if (a && a.email && !list.some(function (x) { return x.email === a.email && String(x.createdAt) === String(a.createdAt); })) list.push(a); }); }
+      var day = ymd(new Date());
+      var o = { when: new Date().toISOString(), note: 'نسخة كاملة قبل تنظيف قائمة الحسابات', accounts: list, school: J('alfarabi_school_v1', {}), records: J('alfarabi_rec_v1', []), chat: J('alfarabi_chat_v2', {}) };
+      return saveFile('alfarabi-backup-' + day + '.json', JSON.stringify(o), 'application/json').then(function (ok1) {
+        return saveFile('alfarabi-accounts-' + day + '.csv', csvOf(list), 'text/csv;charset=utf-8').then(function (ok2) { return ok1 && ok2; });
+      });
     }
     panel(doc, 'تنظيف البيانات', html(), function (p) {
-      p.querySelector('#cuw').onclick = function () { resetPage(doc); };
-      var m = p.querySelector('#cum'), x = p.querySelector('#cux'), pr = p.querySelector('#cupr'), bar = pr.firstChild;
+      var m = p.querySelector('#cum'), m2 = p.querySelector('#cum2'), x = p.querySelector('#cux'), pr = p.querySelector('#cupr'), bar = pr.firstChild, busy = false;
       function msg(t, c) { m.className = 'afmsg ' + (c || ''); m.textContent = t; }
-      function arm() { x.disabled = !(backed && plan && (plan.msgs.length || plan.accs.length)); }
-      p.querySelector('#cub').onclick = function () {
-        var o = { when: new Date().toISOString(), accounts: J('alfarabi_db_v1', {}), chat: J('alfarabi_chat_v2', {}), records: J('alfarabi_rec_v1', []), school: J('alfarabi_school_v1', {}) };
-        var fr = new FileReader(); fr.onload = function () { var a = doc.createElement('a'); a.href = fr.result; a.download = 'alfarabi-backup-' + ymd(new Date()) + '.json'; doc.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 500); backed = true; msg('تم تنزيل النسخة الاحتياطية ✓ (تلقاها في التنزيلات)', 'ok'); arm(); };
-        fr.readAsDataURL(new Blob([JSON.stringify(o)], { type: 'application/json' }));
-      };
-      p.querySelector('#cup').onclick = function () {
-        var db = (J('alfarabi_db_v1', { accounts: [] }).accounts) || [], ch = J('alfarabi_chat_v2', {}), msgs = [], accs = [];
-        if (p.querySelector('#cu1').checked) {
-          var cut = Date.now() - Math.max(1, +p.querySelector('#cud').value || 30) * 864e5;
-          Object.keys(ch).forEach(function (k) { (ch[k] || []).forEach(function (mm) { if (mm && mm.ts && mm.ts < cut) msgs.push([k, mm.id]); }); });
-        }
-        if (p.querySelector('#cu2').checked) {
-          var keep = Math.max(1, +p.querySelector('#cun').value || 200), sts = db.filter(function (a) { return a.role === 'student'; }).sort(function (a, b) { return (+b.createdAt || 0) - (+a.createdAt || 0); });
-          sts.slice(keep).forEach(function (a) { accs.push(a); });
-          if (p.querySelector('#cu3').checked) {
-            var gone = accs.map(function (a) { return a.name; });
-            db.filter(function (a) { return a.role === 'parent' && gone.some(function (n) { return sameN(a.child, n); }); }).forEach(function (a) { accs.push(a); });
-          }
-        }
-        plan = { msgs: msgs, accs: accs }; msg('سيتم حذف ' + accs.length + ' حساب و ' + msgs.length + ' رسالة.' + (backed ? '' : ' (اعمل نسخة احتياطية أولاً)'), accs.length || msgs.length ? '' : 'ok'); arm();
-      };
-      x.onclick = function () {
-        if (!plan) return;
-        confirmDlg(doc, 'سيتم حذف ' + plan.accs.length + ' حساب و ' + plan.msgs.length + ' رسالة نهائياً من كل الأجهزة. هل أنت متأكد؟', 'نعم، احذف', function () {
-          x.disabled = true; pr.style.display = 'block'; var total = plan.accs.length + plan.msgs.length, done = 0;
-          function step() { bar.style.width = (total ? done / total * 100 : 100) + '%'; }
-          var jobs = [];
-          plan.accs.forEach(function (a) { jobs.push(function () { var id = 'a' + String(a.createdAt || a.email).replace(/[.#$\[\]\/]/g, '_'); return (window.FBBASE ? fetch(window.FBBASE + '/accounts/' + id + '.json', { method: 'DELETE' }) : Promise.resolve()).then(function () { var db = J('alfarabi_db_v1', { accounts: [] }); db.accounts = (db.accounts || []).filter(function (b) { return !(b.email === a.email && String(b.createdAt) === String(a.createdAt)); }); LS.setItem('alfarabi_db_v1', JSON.stringify(db)); }); }); });
-          plan.msgs.forEach(function (mm) { jobs.push(function () { try { window.chatDel(mm[0], mm[1]); } catch (e) {} return Promise.resolve(); }); });
-          (function run(i) { if (i >= jobs.length) { bar.style.width = '100%'; msg('تم التنظيف ✓ (الحذف من الخادم قد ياخذ دقائق للرسائل)', 'ok'); plan = null; return; } jobs[i]().catch(function () {}).then(function () { done++; if (done % 10 === 0) step(); setTimeout(function () { run(i + 1); }, 0); }); })(0);
+      function redraw() { var st = p.querySelector('.afp-s'); if (st) { st.innerHTML = html(); wire(); } }
+      function wire() {
+        p.querySelector('#cue').onclick = function () {
+          var mm = p.querySelector('#cue'); mm.disabled = true;
+          gj('/accounts').then(function (srv) { return exportAll(srv); }).then(function (ok) { mm.disabled = false; alert(ok ? 'تم تصدير الملفات ✓ تلقاها في التنزيلات' : 'تعذّر تنزيل الملف على هذا الجهاز'); });
+        };
+        p.querySelector('#cur').onclick = restore;
+        p.querySelector('#cux').onclick = start;
+        m = p.querySelector('#cum'); m2 = p.querySelector('#cum2'); x = p.querySelector('#cux'); pr = p.querySelector('#cupr'); bar = pr.firstChild;
+      }
+      function start() {
+        if (busy) return;
+        var roles = []; if (p.querySelector('#cus').checked) roles.push('student'); if (p.querySelector('#cup').checked) roles.push('parent'); if (p.querySelector('#cut').checked) roles.push('teacher');
+        if (!roles.length) return msg('اختر نوع حسابات واحد على الأقل', 'bad');
+        if (!window.FBBASE) return msg('ما اكو اتصال بقاعدة البيانات، تأكد من الإنترنت وحاول', 'bad');
+        confirmDlg(doc, 'راح ينتظّف سجل الحسابات المسجلة وتبدأ قائمة جديدة. قوائم الطلاب بالمدرسة والملازم وكل البيانات الثانية ما تنمسح، وراح ينزل لك ملف بكل البيانات أولاً. تكمل؟', 'نعم، نظّف', function () {
+          busy = true; x.disabled = true; pr.style.display = 'block'; bar.style.width = '8%'; msg('جاري تجهيز الملف...');
+          var B = window.FBBASE, ts = Date.now(), srvAll = null, victims = {};
+          gj('/accounts').then(function (srv) {
+            srvAll = srv && typeof srv === 'object' ? srv : {};
+            bar.style.width = '20%'; msg('جاري تنزيل ملف كل البيانات...');
+            return exportAll(srvAll);
+          }).then(function (ok) {
+            if (!ok) throw new Error('ما نزل ملف النسخة على هذا الجهاز، فما نظّفنا شي. جرّب من متصفح ثاني أو اضغط «تصدير كل البيانات».');
+            bar.style.width = '40%'; msg('جاري حفظ نسخة بالخادم...');
+            Object.keys(srvAll).forEach(function (k) { var a = srvAll[k]; if (a && roles.indexOf(a.role) > -1) victims[k] = a; });
+            var arc = { when: new Date(ts).toISOString(), roles: roles, accounts: victims };
+            return fetch(B + '/config/accarchive/t' + ts + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(arc) }).then(function (r) { return !!r.ok; }, function () { return false; });
+          }).then(function (arcOk) {
+            bar.style.width = '60%'; msg('جاري تنظيف القائمة...');
+            var del = {}; Object.keys(victims).forEach(function (k) { del[k] = null; });
+            var n = Object.keys(del).length;
+            var delP = n ? fetch(B + '/accounts.json', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(del) }).then(function (r) { if (!r.ok) throw new Error('رفض الخادم حذف الحسابات (' + r.status + ')، راجع قواعد قاعدة البيانات'); }) : Promise.resolve();
+            return delP.then(function () {
+              bar.style.width = '85%';
+              var mk = { ts: ts, rev: ts, acc: 1, roles: roles, chat: false, records: false, by: 'admin' };
+              return fetch(B + '/config/reset.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mk) }).then(function (r) { if (!r.ok) throw new Error('انحذفت الحسابات لكن ما انكتبت علامة التنظيف (' + r.status + '): بقية الأجهزة ممكن ترجع حساباتها القديمة'); return mk; });
+            }).then(function (mk) {
+              try { if (window.AFSetAccMk) window.AFSetAccMk(mk); } catch (e) { }
+              try { LS.setItem('af_reset_seen', String(mk.ts)); } catch (e) { }
+              bar.style.width = '100%';
+              var done = 'تم ✓ نُظّفت ' + n + ' حساب وبدأت قائمة جديدة. تم تنزيل الملفات' + (arcOk ? ' وحُفظت نسخة بالخادم.' : ' (النسخة على الخادم ما انحفظت لأن القواعد ما تسمح، الاعتماد على الملف المنزّل).');
+              busy = false; redraw(); var mm = p.querySelector('#cum'); if (mm) { mm.className = 'afmsg ok'; mm.textContent = done; }
+            });
+          }).catch(function (e) { busy = false; x.disabled = false; pr.style.display = 'none'; msg('تعذّر التنظيف: ' + (e && e.message || e), 'bad'); });
         });
-      };
+      }
+      function restore() {
+        function say(t, c) { m2.className = 'afmsg ' + (c || ''); m2.textContent = t; }
+        if (!window.FBBASE) return say('ما اكو اتصال بقاعدة البيانات', 'bad');
+        say('جاري البحث عن آخر نسخة...');
+        gj('/config/accarchive?shallow=true').then(function (keys) {
+          var ks = keys && typeof keys === 'object' ? Object.keys(keys).sort() : [];
+          if (!ks.length) { say('ما اكو نسخة محفوظة بالخادم. استخدم ملف النسخة المنزّل.', 'bad'); return; }
+          var last = ks[ks.length - 1];
+          return gj('/config/accarchive/' + last).then(function (arc) {
+            var a = arc && arc.accounts || {}, n = Object.keys(a).length;
+            if (!n) { say('النسخة فارغة', 'bad'); return; }
+            confirmDlg(doc, 'ترجيع ' + n + ' حساب من آخر قائمة؟', 'نعم، رجّع', function () {
+              fetch(window.FBBASE + '/accounts.json', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).then(function (r) { if (!r.ok) throw new Error(r.status); var rv = Date.now(), mk = { ts: 0, rev: rv, acc: 1, roles: [], by: 'admin' }; return fetch(window.FBBASE + '/config/reset.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mk) }).then(function () { try { LS.removeItem('af_accreset_mk'); } catch (e) { } try { window.AFSetAccMk && window.AFSetAccMk(mk); } catch (e) { } try { LS.setItem('af_reset_seen', String(rv)); } catch (e) { } try { window.AFAccountsNow && window.AFAccountsNow(6000); } catch (e) { } say('تم ترجيع ' + n + ' حساب ✓', 'ok'); setTimeout(redraw, 1200); }); }).catch(function (e) { say('تعذّر الترجيع: ' + (e && e.message || e), 'bad'); });
+            });
+          });
+        }).catch(function () { say('تعذّر الوصول للنسخ', 'bad'); });
+      }
+      wire();
     });
   }
 
@@ -627,6 +713,7 @@
       fetch(window.FBBASE + '/config/reset.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (mk) {
         if (!mk || !mk.ts) return;
         var seen = +g('af_reset_seen', '0') || 0;
+        if (mk.acc) return;   // تنظيف قائمة الحسابات تعالجه طبقة المزامنة
         if (mk.ts <= seen) return;
         s('af_reset_seen', String(mk.ts));
         if (mk.ts <= (+g('af_reset_first', '0') || 0)) return;   // جهاز جديد بعد المسح
@@ -683,8 +770,8 @@
         var capTs = +g('af_auto_cap_ts', '0'); if (Date.now() - capTs > 2 * 864e5) { cap = 3; }
         if (avg > 23 || worst > 120) {            // أقل من نحو 43 إطار/ثانية أو توقف ملحوظ
           good = 0; if (++bad >= 2 && i > 0) { bad = 0; s('af_auto_cap', ORDER[i - 1]); s('af_auto_cap_ts', String(Date.now())); setAuto(ORDER[i - 1]); }
-        } else if (avg <= 18.5) {                  // قريب من 60 إطار/ثانية
-          bad = 0; if (++good >= 4 && i < cap) { good = 0; setAuto(ORDER[i + 1]); }
+        } else if (avg <= 18.5) {
+          bad = 0;
         } else { bad = 0; good = 0; }
       });
     }
@@ -713,6 +800,7 @@
       var RI = roleInfo();
       if (RI.role === 'admin') { add('الصيانة والتحديثات', function (d) { if (window.afMaint) window.afMaint(d); }, true); add('📚 ملازم الثالث متوسط 2027', function (d) { if (window.afHandouts) window.afHandouts(d); }); add('🧹 تنظيف البيانات', cleanupPage); }
       add('📢 الإشعارات المهمة', importantPage);
+      add('⚡ إصلاح وتسريع الاتصال', function (d) { if (window.afConnFix) window.afConnFix(d); });
       add('🎨 المظهر والأداء', themePage);
       add('🔒 الأمان والبصمة', securityPage);
       // زر "إعدادات المحادثة" القديم يفتح الصفحة الجديدة

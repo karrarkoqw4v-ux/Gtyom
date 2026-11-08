@@ -40,12 +40,10 @@
 
   /* ---------- قدرة الجهاز → مستوى أولي ---------- */
   function deviceTier() {
-    var n = w.navigator || {}, t = 3;
+    var n = w.navigator || {}, t = 1;
     try { if (w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0; } catch (e) {}
     var c = n.connection || n.mozConnection || n.webkitConnection;
-    if (c && c.saveData) t = Math.min(t, 1);
-    if (n.deviceMemory) { if (n.deviceMemory <= 2) t = Math.min(t, 1); else if (n.deviceMemory <= 4) t = Math.min(t, 2); }
-    if (n.hardwareConcurrency && n.hardwareConcurrency <= 4) t = Math.min(t, 2);
+    if (c && c.saveData) return 1;
     return t;
   }
 
@@ -61,8 +59,8 @@
     hz: 60,
     frameMs: 1000 / 60,
     measured: false,
-    tier: 3,
-    base: 3,
+    tier: 1,
+    base: 1,
     fps: 0
   };
   var cachedHz = parseInt(ls(LSK_HZ), 10);
@@ -194,8 +192,9 @@
       'a,button,input,select,textarea,label,.option,.nb,.chip{touch-action:manipulation}' +
       /* مستوى خفيف: تخفيف الضبابية الزجاجية (أثقل عنصر على GPU الجوال) */
       'html[data-af-tier="1"] .card,html[data-af-tier="1"] .nav,html[data-af-tier="0"] .card,html[data-af-tier="0"] .nav{' +
-      '-webkit-backdrop-filter:blur(8px)!important;backdrop-filter:blur(8px)!important}' +
-      'html[data-af-tier="0"] .card,html[data-af-tier="0"] .nav{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}';
+      '-webkit-backdrop-filter:none!important;backdrop-filter:none!important}' +
+      'html[data-af-tier="1"] .card,html[data-af-tier="1"] .nav,html[data-af-tier="0"] .card,html[data-af-tier="0"] .nav{' +
+      'box-shadow:0 2px 8px rgba(0,0,0,.08)!important}';
     (doc.head || root).appendChild(s);
   }
 

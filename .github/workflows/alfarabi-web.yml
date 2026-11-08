@@ -2,7 +2,7 @@ name: Deploy Alfarabi Web
 on:
   workflow_dispatch:
   push:
-    branches: [claude/hala-yweuvu]
+    branches: [claude/hala-yweuvu, claude/hala-c5per7]
     paths: ["alfarabi/www/**", "alfarabi/web-src/**", "alfarabi/make-web.sh", ".github/workflows/alfarabi-web.yml"]
 permissions:
   contents: read
