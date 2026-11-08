@@ -45,7 +45,7 @@
         var m;
         if ((m = v.match(/[?&#]c=([^&\s#]+)/))) v = decodeURIComponent(m[1]);
         else if ((m = v.match(/[?&]ch=(\d+)/)) || (m = v.match(/c\.php\?id=(\d+)/))) return chOne(+m[1]) || null;
-        v = v.replace(/^@/, '').replace(/^c\.m\//i, '').toLowerCase();
+        v = v.replace(/^@/, '').replace(/^[cn]\.m\//i, '').toLowerCase();
         return chBySlug(v) || (/^\d+$/.test(v) ? chOne(+v) : null) || null;
       };
       chLink = function (c) { return SITE + '?c=' + encodeURIComponent((c && c.s) || '') + ((c && c.s) ? '' : '&ch=' + (c && c.id)); };
@@ -79,7 +79,7 @@
           + (full ? '<p class="hint" style="margin:8px 2px;color:#c62828">وصلت الحد الأقصى (5 قنوات). عدّل إحدى قنواتك بدل إنشاء قناة جديدة.</p>' : '') + '</div>';
         var formH = full ? '' : ('<div class="fd"><input id="cn" placeholder="اسم القناة" maxlength="40"></div>'
           + '<div class="fd"><input id="cd" placeholder="وصف القناة" maxlength="160"></div>'
-          + '<div class="fd" style="direction:ltr"><b style="color:#5b6b86">@</b><input id="cs2" placeholder="username" maxlength="30" style="direction:ltr;text-align:left" autocapitalize="off" autocomplete="off"></div>'
+          + '<div class="fd" style="direction:ltr"><b style="color:#5b6b86">n.m/</b><input id="cs2" placeholder="اكتب اسم القناة بالإنكليزي" maxlength="30" style="direction:ltr;text-align:left" autocapitalize="off" autocomplete="off"></div>'
           + '<div id="cst" class="hint" style="font-size:12.5px;margin:2px 0 6px;min-height:20px"></div>'
           + '<div class="afch-lk" id="chlk"></div><button class="bt" id="cgo">إنشاء القناة</button>');
         shell('إنشاء قناة مادة', '', '<div class="sc">' + listH + formH + '</div>',
@@ -87,7 +87,7 @@
         card.querySelectorAll('.afch-row').forEach(function (b) { b.onclick = function () { openCh(+b.dataset.ch); }; });
         if (full) return;
         function msg(v) { var r = chkSlug(v); r[0] = String(r[0]).replace('الرابط', 'اليوزر نيم'); return r; }
-        $('cs2').oninput = function () { var r = msg(this.value); $('cst').textContent = r[0]; $('cst').style.color = r[1] ? '#1a9d55' : '#d33a3a'; $('chlk').textContent = r[1] ? chLink({ s: this.value.trim().toLowerCase() }) : ''; };
+        $('cs2').oninput = function () { var r = msg(this.value); $('cst').textContent = r[0]; $('cst').style.color = r[1] ? '#1a9d55' : '#d33a3a'; $('chlk').textContent = r[1] ? 'n.m/' + this.value.trim().toLowerCase() + '\n' + chLink({ s: this.value.trim().toLowerCase() }) : ''; $('chlk').style.whiteSpace = 'pre-line'; };
         $('cgo').onclick = function () {
           if (chans().filter(function (x) { return isOwnCh(x); }).length >= MAXCH) return toast('وصلت الحد الأقصى: 5 قنوات');
           var n = $('cn').value.trim(), r = msg($('cs2').value);
@@ -95,9 +95,23 @@
           if (!r[1]) return toast(r[0] || 'اكتب يوزر نيم القناة');
           var id = Date.now(), m = {}; m['u' + ok(uid)] = String(uid);
           P.addRec({ id: id, k: 'ch', ts: id, cn: n, cd: $('cd').value.trim(), s: $('cs2').value.trim().toLowerCase(), gr: String(U.grade || ''), img: img || ini(U.subject || U.name), o: String(uid), on: U.name, sj: U.subject || '', m: m });
-          toast('تم إنشاء القناة'); V.parents(); setTimeout(function () { openCh(id); }, 250);
+          try { window.__afInvRecs && window.__afInvRecs(); } catch (e) {} toast('تم إنشاء القناة'); V.parents(); setTimeout(function () { openCh(id); }, 250);
         };
       };
+
+      /* الروابط داخل المحادثات: أي رابط بأي صيغة يصير أزرق وقابل للضغط (قناة n.m/اسم تُفتح بالتطبيق مباشرة) */
+      var patchEtx = function () {
+        var o = window.etx; if (!o || o.__af) return;
+        window.etx = function (t) { var h = o(t); try { return window.__afLinkify ? window.__afLinkify(h) : h; } catch (e) { return h; } };
+        window.etx.__af = 1;
+      };
+      patchEtx(); setTimeout(patchEtx, 400);
+      document.addEventListener('click', function (e) {
+        var t = e.target; if (!t || !t.closest) return;
+        if (t.closest('.cx.tg,.tg-cmw,.tg-ov,.tg-info')) return;
+        var n = t.closest('[data-nm]'); if (n && window.__afOpenNm) { e.preventDefault(); e.stopPropagation(); window.__afOpenNm(n.dataset.nm); return; }
+        var l = t.closest('a.afl[data-lk]'); if (l && window.__afOpenLink) { e.preventDefault(); e.stopPropagation(); window.__afOpenLink(l.dataset.lk); }
+      }, true);
     } catch (e) { try { console.warn('af-channels', e); } catch (x) {} }
   }
 

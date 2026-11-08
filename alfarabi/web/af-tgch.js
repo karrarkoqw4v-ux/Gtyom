@@ -65,6 +65,11 @@
     + '.tg-sh input,.tg-sh textarea,.tg-sh select{width:100%;border:1px solid #2c3640;background:#11161b;border-radius:14px;padding:12px 14px;font:inherit;font-size:15.5px;color:#e9edef;margin-bottom:9px;outline:0}.tg-sh input::placeholder,.tg-sh textarea::placeholder{color:#7b8794}'
     + '.tg-sh .bt2{border:0;border-radius:14px;padding:14px;width:100%;font:inherit;font-size:16px;font-weight:800;color:#fff;background:var(--btn);cursor:pointer}'
     + '.tg-sh .tghint{color:#9aa6b2;font-size:13.5px;line-height:1.8;margin:2px 2px 9px;font-weight:500}.tg-sh .tg-fl{background:#1f272e}.tg-sh .tg-fn b{color:#e9edef}.tg-sh .tg-fn small{color:#9aa6b2}'
+    + '.tg .tg-att{position:relative;display:flex;align-items:center;gap:12px;background:#151515;border:1px solid #2f2f2f;border-radius:20px;padding:10px 12px;margin:10px 0 8px;direction:rtl}.tg .tg-att .x{position:absolute;top:-10px;left:-4px;width:28px;height:28px;border-radius:50%;border:0;background:#8a8a8a;color:#fff;display:grid;place-items:center;cursor:pointer;z-index:2}.tg .tg-att .x .tgi{width:15px;height:15px;stroke-width:2.6}'
+    + '.tg .tg-att .th{width:56px;height:56px;border-radius:14px;overflow:hidden;flex:none;display:grid;place-items:center;background:#26323c}.tg .tg-att .th img{width:100%;height:100%;object-fit:cover}.tg .tg-att .th .ft{width:100%;height:100%;display:grid;place-items:center}.tg .tg-att .th .tgi{stroke:#fff;width:26px;height:26px}'
+    + '.tg .tg-att .nm{flex:1;min-width:0}.tg .tg-att .nm b{display:block;font-size:15.5px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:right}.tg .tg-att .nm small{display:block;color:var(--mut);font-size:13px;font-weight:600;margin-top:2px}'
+    + '.tg .tg-att .rg{position:relative;width:44px;height:44px;flex:none;place-items:center}.tg .tg-att .rg svg{position:absolute;inset:0;width:44px;height:44px;transform:rotate(-90deg)}.tg .tg-att .rg circle{fill:none;stroke-width:4}.tg .tg-att .rg .bg{stroke:#333}.tg .tg-att .rg .fg{stroke:#fff;stroke-linecap:round;stroke-dasharray:113;transition:stroke-dashoffset .2s}.tg .tg-att .rg b{font-size:11px;color:var(--tx);font-weight:800}'
+    + '.tg-ov.fx{position:fixed;z-index:300}.afl{color:#7fb0ff!important;font-weight:700;text-decoration:none;cursor:pointer;overflow-wrap:anywhere;word-break:normal}'
     + '.tg-pgs{width:100%;height:8px;border-radius:6px;background:#232d36;overflow:hidden;margin:9px 0}.tg-pgs i{display:block;height:100%;width:0;background:var(--btn);transition:width .2s}'
     + '.tg-info{position:absolute;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column;animation:tgFd .2s both;overflow-y:auto;color:var(--tx)}'
     + '.tg-info .ban{background:var(--pill);border-radius:0 0 26px 26px}.tg-info .ih{padding:calc(10px + var(--sa-top,env(safe-area-inset-top,0px))) 12px 6px;display:flex;align-items:center;gap:10px;color:var(--tx)}.tg-info .ih .cx-b{background:transparent;color:var(--tx)}.tg-info .ih .cx-b .tgi,.tg-info .ih .cx-b svg{stroke:var(--tx)}.tg-info .ih b{flex:1;font-size:17px;font-weight:800}'
@@ -130,6 +135,7 @@
         return _recC;
       }
       function inv() { _tC = 0; }
+      window.__afInvRecs = inv;
       function rs() { inv(); return P.recSet.apply(P, arguments); }
       function ar(r) { inv(); return P.addRec(r); }
       function dr(i) { inv(); return P.delRec(i); }
@@ -182,9 +188,18 @@
         return { ok: 0, w: 'موقع غير معروف، لم يتم التحقق من أمانه', h: h, unk: 1 };
       }
       function urlsIn(t) { return (String(t || '').match(/https?:\/\/[^\s<>"'،]+/gi) || []).map(function (u) { return u.replace(/[).,;!؟]+$/, ''); }); }
-      function linkify(t) {
-        return esc(t).replace(/https?:\/\/[^\s<>"'،]+/gi, function (u) { var c = u.replace(/[).,;!؟]+$/, ''), tail = u.slice(c.length); return '<a data-lk="' + c + '">' + c + '</a>' + tail; });
+      /* يحوّل النص (آمناً) إلى HTML: كل الروابط بأي صيغة (https:// أو www. أو domain.com أو n.m/اسم_قناة) تصير زرقاء وقابلة للضغط */
+      var NM = '(?:^|[^\\w/.@])(n\\.m\\/([A-Za-z][A-Za-z0-9_]{2,29}))';
+      function linkSeg(t) {
+        t = t.replace(/(https?:\/\/[^\s<>"'،]+)/gi, function (u) { var c = u.replace(/[).,;!؟]+$/, ''), tail = u.slice(c.length); return '\u0001' + c + '\u0002' + tail; });
+        t = t.replace(/(^|[^\w\/@.\u0001])((?:www\.[a-z0-9-]+(?:\.[a-z0-9-]+)+|[a-z0-9-]+\.(?:com|net|org|iq|edu|gov|io|me|tv|info|app|dev|co)(?![a-z0-9]))(?:\/[^\s<>"'،]*)?)/gi, function (m, pre, u) { var c = u.replace(/[).,;!؟]+$/, ''), tail = u.slice(c.length); return pre + '\u0003' + c + '\u0002' + tail; });
+        t = t.replace(/(^|[^\w\/.@])(n\.m\/([A-Za-z][A-Za-z0-9_]{2,29}))/g, function (m, pre, all, slug) { return pre + '\u0004' + slug + '\u0002'; });
+        return t.replace(/\u0001([^\u0002]+)\u0002/g, function (m, u) { return '<a class="afl" data-lk="' + u + '">' + u + '</a>'; })
+          .replace(/\u0003([^\u0002]+)\u0002/g, function (m, u) { return '<a class="afl" data-lk="https://' + u + '">' + u + '</a>'; })
+          .replace(/\u0004([^\u0002]+)\u0002/g, function (m, sl) { return '<a class="afl" data-nm="' + sl + '">n.m/' + sl + '</a>'; });
       }
+      function linkify(t) { return linkSeg(esc(t)); }
+      window.__afLinkify = function (html) { return String(html).split(/(<[^>]+>)/).map(function (x, i) { return i % 2 ? x : linkSeg(x); }).join(''); };
 
       /* ---- مشاركة وتحميل ---- */
       function shareText(t) {
@@ -233,6 +248,43 @@
       function mrole(c) { return isOwnCh(c) ? 2 : (c.ad && c.ad['u' + ok(uid)] ? 1 : 0); }
       function accOf(u) { try { return DB().accounts.find(function (a) { return String(a.createdAt || a.name) === String(u); }); } catch (e) { return null; } }
       function comments(chId, pid) { return recs().filter(function (r) { return r.k === 'cc' && r.ch === chId && (pid == null || r.cp === pid); }).sort(function (a, b) { return a.ts - b.ts; }); }
+
+      /* ---- نوافذ عامة (تعمل داخل المحادثات أيضاً): فتح رابط بفحص أمان + فتح قناة من n.m/اسم ---- */
+      function fsheet(title, body, onReady) {
+        var ov = document.createElement('div'); ov.className = 'tg-ov fx';
+        ov.innerHTML = '<div class="tg-sh"><h4><span>' + title + '</span><button data-x="1">' + ic('close') + '</button></h4><div class="tgbd">' + body + '</div></div>';
+        document.body.appendChild(ov);
+        ov.onclick = function (e) { if (e.target === ov || e.target.closest('[data-x]')) ov.remove(); };
+        if (onReady) onReady(ov, function () { ov.remove(); });
+        return ov;
+      }
+      function linkSheetG(u) {
+        var s = lsafe(u);
+        var body = s.ok
+          ? '<div class="tghint">' + ic('shield', 20) + ' الرابط آمن حسب الفحص (موقع معروف ومشفّر).<br><b dir="ltr">' + esc(u) + '</b></div><button class="tgrw pri" data-a="open">فتح الرابط</button><button class="tgrw" data-a="share">مشاركة الرابط</button><button class="tgrw" data-a="copy">نسخ الرابط</button>'
+          : '<div class="tghint" style="color:#ff8a8a">' + ic('warn', 20) + ' تنبيه: هذا الرابط غير آمن / غير موثوق.<br><b>السبب:</b> ' + esc(s.w) + '<br><b dir="ltr">' + esc(u) + '</b></div><button class="tgrw warn" data-a="open">أنا أتحمّل المسؤولية — فتح الرابط</button><button class="tgrw" data-a="share">مشاركة الرابط</button><button class="tgrw" data-a="copy">نسخ الرابط</button>';
+        fsheet(s.ok ? 'فتح رابط' : 'رابط غير آمن', body, function (ov, close) {
+          ov.querySelector('.tgbd').onclick = function (e) { var b = e.target.closest('[data-a]'); if (!b) return; var a = b.dataset.a; close();
+            if (a === 'open') { try { P.open(u, '_blank'); } catch (x) { toast('تعذّر فتح الرابط'); } }
+            else if (a === 'share') shareText(u); else { try { P.navigator.clipboard.writeText(u); toast('تم نسخ الرابط'); } catch (x) { toast(u); } } };
+        });
+      }
+      window.__afOpenLink = linkSheetG;
+      /* رابط قناة بصيغة n.m/اسم: يفتح نافذة القناة داخل التطبيق مباشرة */
+      window.__afOpenNm = function (slug) {
+        var c = chBySlug(String(slug || '').toLowerCase());
+        if (!c) return toast('لم يتم العثور على قناة بهذا الاسم');
+        try { LS.setItem('af_pend_ch', JSON.stringify({ id: c.id, t: Date.now() })); } catch (e) {}
+        chLanding();
+      };
+      function nmSheet(c) {
+        var nm = 'n.m/' + c.s;
+        fsheet('اسم مستخدم القناة', '<div class="tghint" style="text-align:center;font-size:20px;font-weight:800;color:#e9edef;direction:ltr">' + esc(nm) + '</div><button class="tgrw pri" data-a="open">' + ic('lnk', 20) + ' فتح القناة</button><button class="tgrw" data-a="share">' + ic('share', 20) + ' مشاركة الاسم والرابط</button><button class="tgrw" data-a="copy">' + ic('fl', 20) + ' نسخ الاسم</button>', function (ov, close) {
+          ov.querySelector('.tgbd').onclick = function (e) { var b = e.target.closest('[data-a]'); if (!b) return; var a = b.dataset.a; close();
+            if (a === 'open') { var cur = document.querySelector('.cx.tg'); if (cur && String(cur.dataset.id) === String(c.id)) toast('أنت داخل هذه القناة'); else openCh(c.id); }
+            else if (a === 'share') shareText(c.cn + '\n' + nm + '\n' + chLink(c)); else { try { P.navigator.clipboard.writeText(nm); toast('تم نسخ الاسم'); } catch (x) { toast(nm); } } };
+        });
+      }
 
       /* ===================== فتح القناة ===================== */
       openCh = function (id) {
@@ -352,16 +404,17 @@
           if (b.dataset.s === st && barSt === st) return; b.dataset.s = st; barSt = st;
           if (role > 0) {
             var TL = [['img', 'صورة'], ['vid', 'فيديو'], ['fl', 'ملف'], ['q', 'استطلاع'], ['lnk', 'رابط']];
-            b.innerHTML = '<div class="tg-tray" id="tgtr">' + TL.map(function (x) { return '<button data-a="' + x[0] + '"><i>' + ic(x[0], 24) + '</i>' + x[1] + '</button>'; }).join('') + '</div><div class="tg-cp"><button class="tg-ab" id="tgat">' + PLUS + '</button><textarea id="tgin" rows="1" placeholder="اكتب منشوراً للقناة..."></textarea><button class="tg-sb" id="tgsn">' + SEND + '</button></div>';
+            b.innerHTML = '<div class="tg-tray" id="tgtr">' + TL.map(function (x) { return '<button data-a="' + x[0] + '"><i>' + ic(x[0], 24) + '</i>' + x[1] + '</button>'; }).join('') + '</div><div class="tg-att" id="tgatt" style="display:none"></div><div class="tg-cp"><button class="tg-ab" id="tgat">' + PLUS + '</button><textarea id="tgin" rows="1" placeholder="اكتب منشوراً للقناة..."></textarea><button class="tg-sb" id="tgsn">' + SEND + '</button></div>';
             $('tgat').onclick = function () { var tr = $('tgtr'), on = !tr.classList.contains('on'); tr.classList.toggle('on', on); this.classList.toggle('on', on); };
             $('tgtr').onclick = function (e) { var bt = e.target.closest('[data-a]'); if (!bt) return; $('tgtr').classList.remove('on'); $('tgat').classList.remove('on'); attachDo(bt.dataset.a); };
             var ta = $('tgin'); ta.oninput = function () { this.style.height = 'auto'; this.style.height = Math.min(120, this.scrollHeight) + 'px'; };
-            $('tgsn').onclick = function () { var t = ta.value.trim(); if (!t) return toast('اكتب نصاً أو أرفق ملفاً'); if (pub({ t: t }) !== false) { ta.value = ''; ta.style.height = 'auto'; } };
+            $('tgsn').onclick = function () { if (att) return sendAtt(); var t = ta.value.trim(); if (!t) return toast('اكتب نصاً أو أرفق ملفاً'); if (pub({ t: t }) !== false) { ta.value = ''; ta.style.height = 'auto'; } };
+            renderAtt();
           } else if (m) {
             b.innerHTML = '<div class="tg-bt"><button class="tg-rb" id="tgsr" title="بحث">' + ic('search') + '</button><button class="tg-mp" id="tgmu">' + (mu ? ic('bell', 20) + ' إلغاء كتم الصوت' : ic('bellx', 20) + ' كتم الصوت') + '</button><button class="tg-rb" id="tgsh" title="مشاركة">' + ic('share') + '</button></div>';
             $('tgsr').onclick = toggleSearch;
             $('tgmu').onclick = function () { rs(id, 'mu/u' + ok(uid), mu ? null : 1); toast(mu ? 'تم إلغاء الكتم' : 'تم كتم الصوت'); barSt = ''; bar(); };
-            $('tgsh').onclick = function () { shareText(c.cn + '\n' + chLink(c)); };
+            $('tgsh').onclick = function () { shareText(c.cn + '\nn.m/' + c.s + '\n' + chLink(c)); };
           } else {
             b.innerHTML = '<div class="tg-bt"><button class="tg-mp pri" id="tgjn">انضمام للقناة</button></div>';
             $('tgjn').onclick = function () { rs(id, 'm/u' + ok(uid), String(uid)); toast('تم الانضمام للقناة'); lastSig = ''; barSt = ''; render(); bar(); };
@@ -385,10 +438,38 @@
           if (onReady) onReady(ov, function () { ov.remove(); });
           return ov;
         }
+        /* ---- مرفق قيد الإرسال: بطاقة فوق خانة الكتابة (صورة مصغّرة/أيقونة + الاسم والحجم + حلقة تقدّم + زر إلغاء) ---- */
+        var att = null;
+        function setAtt(a) { att = a; renderAtt(); var ta = $('tgin'); if (ta) { ta.placeholder = 'أضف وصفاً (اختياري)...'; ta.focus(); } }
+        function renderAtt() {
+          var box = $('tgatt'); if (!box) return;
+          if (!att) { box.style.display = 'none'; box.innerHTML = ''; var t0 = $('tgin'); if (t0) t0.placeholder = 'اكتب منشوراً للقناة...'; return; }
+          var k = fkind(att.name, att.file && att.file.type), lbl = att.kind === 'img' ? 'صورة' : att.kind === 'vid' ? 'فيديو' : k.l;
+          var th = att.th ? '<img src="' + att.th + '">' : '<span class="ft" style="background:' + k.c + '">' + ic(att.kind === 'vid' ? 'vid' : 'fl', 24) + '</span>';
+          box.style.display = 'flex';
+          box.innerHTML = '<button class="x" id="tgax" title="إزالة">' + ic('close', 16) + '</button><div class="th">' + th + '</div><div class="nm"><b>' + esc(att.name) + '</b><small id="tgas">' + lbl + ' · ' + fsz(att.size) + '</small></div><div class="rg" id="tgrg" style="display:' + (att.busy ? 'grid' : 'none') + '"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="bg"/><circle cx="22" cy="22" r="18" class="fg" id="tgrf" style="stroke-dashoffset:' + (113 * (1 - (att.pct || 0))) + '"/></svg><b id="tgrp">' + Math.round((att.pct || 0) * 100) + '%</b></div>';
+          $('tgax').onclick = function () { if (att && att.busy) { att.cancel = true; toast('تم إلغاء الرفع'); } att = null; renderAtt(); };
+        }
+        function attProg(f) { if (!att) return; att.pct = f; var r = $('tgrf'), p = $('tgrp'), s2 = $('tgas'); if (r) r.style.strokeDashoffset = 113 * (1 - f); if (p) p.textContent = Math.round(f * 100) + '%'; if (s2) s2.textContent = 'جاري الرفع ' + fsz(att.size * f) + ' من ' + fsz(att.size); }
+        function sendAtt() {
+          var a = att; if (!a || a.busy) return; var ta = $('tgin'), cap = ta ? ta.value.trim() : '';
+          a.busy = true; a.pct = 0; a.cancel = false; renderAtt(); var sb = $('tgsn'); if (sb) sb.style.opacity = '.5';
+          var mid = 'chm_' + Date.now(), upF = a.file;
+          function fail(e) { a.busy = false; if (sb) sb.style.opacity = ''; if (att === a) { renderAtt(); var s2 = $('tgas'); if (s2) { s2.textContent = 'تعذّر الرفع — تأكد من الاتصال واضغط إرسال للمحاولة مجدداً'; s2.style.color = '#ff8a8a'; } } toast('تعذّر الرفع: ' + ((e && e.message) || e)); }
+          (a.kind === 'img' ? new Promise(function (res) { shrink(a.file, 560, function (d) { res(d); }); }) : a.kind === 'vid' ? Promise.resolve(a.th || '') : Promise.resolve(''))
+            .then(function (th) {
+              var pf = a.kind === 'img' ? dataToBlob(a.dataUrl).then(function (b) { upF = b; return b; }) : Promise.resolve(a.file);
+              return pf.then(function () { return upMedia(upF, mid, attProg); }).then(function (n) {
+                if (a.cancel) { P.fetch(fbase() + '/handout_files/' + mid + '.json', { method: 'DELETE' }).catch(function () {}); return; }
+                var md = { id: mid, n: a.name, t: a.kind === 'img' ? 'image/jpeg' : (a.file.type || ''), s: upF.size, c: n, k: a.kind === 'vid' ? 'vid' : a.kind === 'img' ? 'img' : 'fl' }; if (th) md.th = th;
+                if (pub({ md: md, t: cap }) !== false) { MC[mid] = upF; att = null; renderAtt(); if (ta) { ta.value = ''; ta.style.height = 'auto'; } if (sb) sb.style.opacity = ''; }
+              });
+            }).catch(fail);
+        }
         function attachDo(a) {
-          if (a === 'img') pick('image/*', function (f) { shrink(f, 1280, function (d) { composeSheet('img', f, d); }); });
-          else if (a === 'vid') pick('video/*', function (f) { composeSheet('vid', f); });
-          else if (a === 'fl') pick('*/*', function (f) { composeSheet('fl', f); });
+          if (a === 'img') pick('image/*', function (f) { shrink(f, 1280, function (d) { setAtt({ kind: 'img', file: f, dataUrl: d, th: d, name: f.name || 'صورة.jpg', size: f.size }); }); });
+          else if (a === 'vid') pick('video/*', function (f) { if (f.size > 60 * 1048576) return toast('الفيديو أكبر من 60 ميغا'); var a0 = { kind: 'vid', file: f, name: f.name || 'فيديو', size: f.size }; setAtt(a0); vthumb(f).then(function (d) { if (att === a0 && d) { a0.th = d; renderAtt(); } }); });
+          else if (a === 'fl') pick('*/*', function (f) { if (f.size > 40 * 1048576) return toast('الملف أكبر من 40 ميغا'); setAtt({ kind: 'fl', file: f, name: f.name || 'ملف', size: f.size }); });
           else if (a === 'lnk') linkPubSheet();
           else pollSheet();
         }
@@ -550,7 +631,7 @@
           else if (m) rows += '<button class="tgrw" data-a="mute">' + ic(mu ? 'bell' : 'bellx', 22) + (mu ? 'إلغاء كتم الصوت' : 'كتم الصوت') + '</button><button class="tgrw" data-a="own">' + ic('msg', 22) + 'مراسلة المدرس</button>';
           sheet('خيارات القناة', rows, function (ov, close) {
             ov.querySelector('.tgbd').onclick = function (e) { var b = e.target.closest('[data-a]'); if (!b) return; close(); var a = b.dataset.a;
-              if (a === 'info') showInfo('m'); else if (a === 'search') { if (!searching) toggleSearch(); } else if (a === 'share') shareText(c.cn + '\n' + chLink(c));
+              if (a === 'info') showInfo('m'); else if (a === 'search') { if (!searching) toggleSearch(); } else if (a === 'share') shareText(c.cn + '\nn.m/' + c.s + '\n' + chLink(c));
               else if (a === 'edit') editSheet(null); else if (a === 'subs') showInfo('s'); else if (a === 'unpin') { rs(id, 'pin', null); lastSig = ''; render(); }
               else if (a === 'mute') { rs(id, 'mu/u' + ok(uid), mu ? null : 1); toast(mu ? 'تم إلغاء الكتم' : 'تم كتم الصوت'); barSt = ''; bar(); }
               else if (a === 'own') { var o = accOf(c.o); if (o) { closeCh(); openChat(dmKey(o)); } else toast('تعذّر العثور على المدرس'); } };
@@ -569,6 +650,7 @@
             var lks = arr(c.lks), socs = arr(c.so), ownerAcc = accOf(c.o);
             var head = '<div class="ban"><div class="ih"><button class="cx-b" data-x="1">' + ARW + '</button><b>معلومات القناة</b>' + (role > 0 ? '<button class="cx-b" data-edit="1" title="تعديل القناة">' + ic('edit', 20) + '</button>' : '') + '</div><div class="ic">' + av(null, 96, c.img) + '<h3>' + esc(c.cn) + '</h3><p>' + n + ' مشترك' + (c.sj ? ' · ' + esc(c.sj) : '') + '</p></div></div>';
             var about = '<div class="cd"><h5>الوصف</h5><p>' + esc(c.cd || 'قناة مادة ' + (c.sj || '')) + '</p></div>'
+              + '<div class="cd"><h5>اسم المستخدم</h5><div class="ln" data-nmsheet="1"><span class="ci" style="background:var(--btn)">' + ic('lnk', 20) + '</span><span style="direction:ltr;font-size:16px;font-weight:800">n.m/' + esc(c.s || '') + '</span></div></div>'
               + '<div class="cd"><h5>رابط القناة</h5><div class="ln" data-lk="' + esc(chLink(c)) + '"><span class="ci" style="background:#1d6fd6">' + ic('lnk', 20) + '</span><span style="direction:ltr;font-size:12.5px;word-break:break-all">' + esc(chLink(c)) + '</span></div><div class="ln" data-sharech="1"><span class="ci" style="background:#14a38b">' + ic('share', 20) + '</span>مشاركة رابط القناة</div></div>'
               + '<div class="cd"><h5>المدرس</h5><div class="ln" data-own="1"><span class="ci" style="background:' + g2[1] + '">' + esc((c.on || '؟').trim()[0] || '؟') + '</span>' + esc(c.on || '') + (role === 0 ? '<span style="margin-inline-start:auto;color:#1d6fd6">مراسلة</span>' : '') + '</div></div>';
             var extra = '';
@@ -599,8 +681,10 @@
             if (e.target.closest('[data-x]')) return closeInfo();
             var ed = e.target.closest('[data-edit]'); if (ed) return editSheet(draw);
             var tb = e.target.closest('[data-tb]'); if (tb) { tab = tb.dataset.tb; return draw(); }
+            var nmS = e.target.closest('[data-nmsheet]'); if (nmS) return nmSheet(c);
+            var nmA2 = e.target.closest('[data-nm]'); if (nmA2) return window.__afOpenNm(nmA2.dataset.nm);
             var lk = e.target.closest('[data-lk]'); if (lk) return linkSheet(lk.dataset.lk);
-            if (e.target.closest('[data-sharech]')) return shareText(c.cn + '\n' + chLink(c));
+            if (e.target.closest('[data-sharech]')) return shareText(c.cn + '\nn.m/' + c.s + '\n' + chLink(c));
             if (e.target.closest('[data-own]')) { if (role === 0) { var o = accOf(c.o); if (o) { closeCh(); openChat(dmKey(o)); } else toast('تعذّر العثور على المدرس'); } return; }
             var fo = e.target.closest('[data-fo]'), fd = e.target.closest('[data-fd]'), fs2 = e.target.closest('[data-fs]'), iv = e.target.closest('[data-iv]');
             if (fo) return openFile(pbyid(+fo.dataset.fo)); if (fd) return fileAct(pbyid(+fd.dataset.fd), 'd'); if (fs2) return fileAct(pbyid(+fs2.dataset.fs), 's'); if (iv) return openFile(pbyid(+iv.dataset.iv));
@@ -659,6 +743,7 @@
         var lastTap = 0, lastP = 0;
         $('tgm').onclick = function (e) {
           var t = e.target;
+          var nmA = t.closest('[data-nm]'); if (nmA) { e.preventDefault(); return window.__afOpenNm(nmA.dataset.nm); }
           var lk = t.closest('[data-lk]'); if (lk) { e.preventDefault(); return linkSheet(lk.dataset.lk); }
           var rx = t.closest('[data-rx]'); if (rx) { var r = rx.getBoundingClientRect(); return react(+rx.dataset.p, +rx.dataset.i, r.left + 14, r.top); }
           var rp = t.closest('[data-rxp]'); if (rp) return openPicker(+rp.dataset.rxp, rp);

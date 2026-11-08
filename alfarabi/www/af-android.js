@@ -89,12 +89,27 @@
     return list.find(function (a) { return String(a.createdAt || a.name) === s; });
   }
   function photoOf(uid) { var a = accOf(uid), p = a && a.photo; return p && String(p).length < 350000 ? String(p) : ''; }
+  /* لون شريطي الجهاز (أعلى/أسفل) يتبع الشاشة: المحادثات والقنوات داكنة فلا يظهر شريط أبيض */
+  var barDark = null;
+  setInterval(function () {
+    var dark = false;
+    ['adminFrame', 'chatFrame'].forEach(function (fid) {
+      try {
+        var f = document.getElementById(fid), d = f && f.contentDocument;
+        if (!d || f.style.display === 'none') return;
+        var ch = d.getElementById('ch');
+        if ((ch && ch.classList.contains('on')) || d.querySelector('.cx.tg')) dark = true;
+      } catch (e) {}
+    });
+    if (dark !== barDark) { barDark = dark; try { A.setBarColors && A.setBarColors(dark ? '#0a0908' : '', dark ? '#0a0908' : '', dark); } catch (e) {} }
+  }, 400);
   var lastUid = null, lastBase = '';
   setInterval(function () {
     var u = me(), id = u && u.role !== 'admin' ? u.uid : '';
     if (!id && !u) { var adm = ''; try { adm = LS.getItem('alfarabi_session'); } catch (e) {} if (adm === 'admin') { u = { uid: 'admin', role: 'admin', grade: '', name: 'الإدارة', child: '' }; id = 'admin'; } } /* الإدارة تستقبل إشعارات الدعم والإشعارات المهمة */
     var sig = id ? [id, u.role, u.grade, u.name, u.child].join('|') : '';
     if (sig !== lastUid) { lastUid = sig; try { A.session(id, id ? u.role : '', id ? u.grade : '', id ? u.name : '', id ? (u.child || '') : ''); } catch (e) {} }
+    if (id && !LS.getItem('af_bat_asked')) { try { LS.setItem('af_bat_asked', String(Date.now())); } catch (e) {} setTimeout(function () { try { A.askBatteryExemption && A.askBatteryExemption(); } catch (e) {} }, 20000); }
     var b = window.FBBASE || (window.AFSyncInfo && window.AFSyncInfo().base) || '';
     if (b && b !== lastBase) { lastBase = b; try { A.setBase(b); } catch (e) {} }
   }, 3000);

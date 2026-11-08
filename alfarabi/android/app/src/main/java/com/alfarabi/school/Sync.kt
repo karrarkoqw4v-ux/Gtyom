@@ -89,7 +89,7 @@ object Sync {
             if (u == null || base == null) { sleep(5_000); continue }
             try {
                 if (tick % 10 == 0) ensureStreams(c, base, u, my)
-                if (tick % 3 == 1) pollRecords(c, base, u)
+                if (tick % 3 == 1) pollRecords(c, base, u) // احتياط للبث الحي
                 if (tick % 2 == 0 && u.role != "admin") pollSchool(c, base, u)
             } catch (_: Throwable) {}
             tick++
@@ -107,6 +107,8 @@ object Sync {
             val started = synchronized(streams) { if (streams[k] == my) true else { streams[k] = my; false } }
             if (!started) Thread { stream(c, base, k, u, my) }.also { it.isDaemon = true }.start()
         }
+        val recStarted = synchronized(streams) { if (streams["#records"] == my) true else { streams["#records"] = my; false } }
+        if (!recStarted) Thread { streamRecords(c, base, u, my) }.also { it.isDaemon = true }.start()
     }
 
     // ---------- المحادثات والمكالمات (اتصال مباشر) ----------
@@ -196,40 +198,90 @@ object Sync {
     }
 
     // ---------- الدرجات والغيابات ومنشورات القنوات ----------
+    private val recLock = Any()
+
+    /** فحص احتياطي كل ~18 ثانية (البث الحي للسجلات هو الأساس وهذا يغطي أي انقطاع) */
     private fun pollRecords(c: Context, base: String, u: U) {
         val txt = get(base, "/records.json?orderBy=%22%24key%22&limitToLast=25") ?: return
         if (txt.trim() == "null") return
         val o = try { JSONObject(txt) } catch (_: Throwable) { return }
-        val pr = p(c)
-        val seen = HashSet(pr.getStringSet("rec_seen", null) ?: emptySet())
-        val first = pr.getStringSet("rec_seen", null) == null
+        val silent = p(c).getStringSet("rec_seen", null) == null
         val items = ArrayList<Pair<String, JSONObject>>()
         o.keys().forEach { k -> (o.opt(k) as? JSONObject)?.let { items.add(k to it) } }
         items.sortBy { it.second.optLong("ts") }
-        for ((k, r) in items) {
-            if (seen.contains(k)) continue
+        for ((k, r) in items) handleRecord(c, base, u, k, r, silent)
+    }
+
+    /** معالجة سجل واحد: إشعار مرة واحدة فقط لكل سجل (أو تسجيله بصمت لو أول تشغيل) */
+    private fun handleRecord(c: Context, base: String, u: U, k: String, r: JSONObject, silent: Boolean) {
+        synchronized(recLock) {
+            val pr = p(c)
+            val seen = HashSet(pr.getStringSet("rec_seen", null) ?: emptySet())
+            if (seen.contains(k)) return
             seen.add(k)
-            if (first || WebHolder.foreground || System.currentTimeMillis() - r.optLong("ts") > 24 * 3600_000L) continue
-            when (r.optString("k")) {
-                "g", "a", "ev" -> {
-                    val target = if (u.role == "parent") u.child else if (u.role == "student") u.name else ""
-                    if (target.isNotEmpty() && same(target, r.optString("n"))) {
-                        if (r.optString("k") == "ev") {
-                            val lv = mapOf(5 to "ممتاز", 4 to "جيد جداً", 3 to "جيد", 2 to "متوسط", 1 to "ضعيف")[r.optInt("lv")] ?: ""
-                            Notifier.school(c, r.optString("n", "طالب"), "تقييم جديد" + (if (r.optString("s", "").isNotEmpty()) " في " + r.optString("s") else "") + (if (lv.isNotEmpty()) ": $lv" else "") + (if (r.optString("by", "").isNotEmpty()) " — الأستاذ " + r.optString("by") else "") + (r.optString("nt", "").let { if (it.isNotEmpty()) " · $it" else "" }), "تقييم المدرس", "rec:$k", "")
-                        } else if (r.optString("k") == "g")
-                            Notifier.school(c, r.optString("n", "طالب"), r.optString("s", "المادة") + ": " + r.optString("v", "") + (r.optString("nt", "").let { if (it.isNotEmpty()) " · $it" else "" }), "نتيجة امتحان", "rec:$k", "")
-                        else Notifier.school(c, r.optString("n", "طالب"), "غياب " + r.optString("d", ""), "غياب", "rec:$k", "")
+            pr.edit().putStringSet("rec_seen", seen.toList().takeLast(500).toSet()).apply()
+        }
+        if (silent || WebHolder.foreground || System.currentTimeMillis() - r.optLong("ts") > 24 * 3600_000L) return
+        dispatchRecord(c, base, u, k, r)
+    }
+
+    private fun dispatchRecord(c: Context, base: String, u: U, k: String, r: JSONObject) {
+        when (r.optString("k")) {
+            "g", "a", "ev" -> {
+                val target = if (u.role == "parent") u.child else if (u.role == "student") u.name else ""
+                if (target.isNotEmpty() && same(target, r.optString("n"))) {
+                    if (r.optString("k") == "ev") {
+                        val lv = mapOf(5 to "ممتاز", 4 to "جيد جداً", 3 to "جيد", 2 to "متوسط", 1 to "ضعيف")[r.optInt("lv")] ?: ""
+                        Notifier.school(c, r.optString("n", "طالب"), "تقييم جديد" + (if (r.optString("s", "").isNotEmpty()) " في " + r.optString("s") else "") + (if (lv.isNotEmpty()) ": $lv" else "") + (if (r.optString("by", "").isNotEmpty()) " — الأستاذ " + r.optString("by") else "") + (r.optString("nt", "").let { if (it.isNotEmpty()) " · $it" else "" }), "تقييم المدرس", "rec:$k", "")
+                    } else if (r.optString("k") == "g")
+                        Notifier.school(c, r.optString("n", "طالب"), r.optString("s", "المادة") + ": " + r.optString("v", "") + (r.optString("nt", "").let { if (it.isNotEmpty()) " · $it" else "" }), "نتيجة امتحان", "rec:$k", "")
+                    else Notifier.school(c, r.optString("n", "طالب"), "غياب " + r.optString("d", ""), "غياب", "rec:$k", "")
+                }
+            }
+            "cp" -> channelPost(c, base, u, r, k)
+            "cc" -> if (r.opt("to")?.toString() == u.uid && r.opt("u")?.toString() != u.uid)
+                Notifier.school(c, "تعليق جديد", r.optString("n", "") + ": " + r.optString("t", ""), "قناة " + r.optString("cn", ""), "cc:$k", "")
+            "imp" -> if (r.opt("uid")?.toString() != u.uid)
+                Notifier.important(c, r.optString("title", "إشعار مهم"), r.optString("body", ""), r.optString("from", "الإدارة"), "imp:$k", r.optString("img", ""))
+        }
+    }
+
+    // ---------- بث حي للسجلات: منشورات القنوات والتعليقات والدرجات والإشعارات المهمة تصل خلال ثوانٍ ----------
+    private fun streamRecords(c: Context, base: String, u: U, my: Int) {
+        while (alive(my)) {
+            try {
+                val conn = open("$base/records.json?orderBy=%22%24key%22&limitToLast=10", true)
+                if (conn.responseCode != 200) { sleep(10_000); continue }
+                val r = conn.inputStream.bufferedReader()
+                var ev = ""
+                val firstEver = p(c).getStringSet("rec_seen", null) == null
+                while (alive(my)) {
+                    val line = r.readLine() ?: break
+                    lastOk = System.currentTimeMillis()
+                    if (line.startsWith("event:")) ev = line.substring(6).trim()
+                    else if (line.startsWith("data:") && (ev == "put" || ev == "patch")) {
+                        try { onRecData(c, base, u, line.substring(5).trim(), firstEver) } catch (_: Throwable) {}
                     }
                 }
-                "cp" -> channelPost(c, base, u, r, k)
-                "cc" -> if (r.opt("to")?.toString() == u.uid && r.opt("u")?.toString() != u.uid)
-                    Notifier.school(c, "تعليق جديد", r.optString("n", "") + ": " + r.optString("t", ""), "قناة " + r.optString("cn", ""), "cc:$k", "")
-                "imp" -> if (r.opt("uid")?.toString() != u.uid)
-                    Notifier.important(c, r.optString("title", "إشعار مهم"), r.optString("body", ""), r.optString("from", "الإدارة"), "imp:$k", r.optString("img", ""))
-            }
+                conn.disconnect()
+            } catch (_: Throwable) { sleep(5_000) }
+            sleep(1_500)
         }
-        pr.edit().putStringSet("rec_seen", seen.toList().takeLast(400).toSet()).apply()
+    }
+
+    private fun onRecData(c: Context, base: String, u: U, raw: String, firstEver: Boolean) {
+        val o = JSONObject(raw)
+        val path = o.optString("path")
+        val data = o.opt("data")
+        if (path == "/" && data is JSONObject) {
+            val items = ArrayList<Pair<String, JSONObject>>()
+            data.keys().forEach { k -> (data.opt(k) as? JSONObject)?.let { items.add(k to it) } }
+            items.sortBy { it.second.optLong("ts") }
+            for ((k, r) in items) handleRecord(c, base, u, k, r, firstEver)
+        } else if (path.length > 1 && data is JSONObject) {
+            val k = path.substring(1).substringBefore('/')
+            if (k.isNotEmpty() && !path.substring(1).contains('/')) handleRecord(c, base, u, k, data, false)
+        }
     }
 
     private fun channelPost(c: Context, base: String, u: U, r: JSONObject, k: String) {

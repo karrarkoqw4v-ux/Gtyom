@@ -299,6 +299,21 @@ object WebHolder {
         @JavascriptInterface
         fun setBars(dark: Boolean) { activity?.runOnUiThread { activity?.applyBars(dark) } ?: prefs(app).edit().putBoolean("dark", dark).apply() }
 
+        /** لون شريط الحالة وشريط التنقل (hex) مع كون الأيقونات داكنة؛ نص فارغ = رجوع للون الافتراضي */
+        @JavascriptInterface
+        fun setBarColors(status: String, nav: String, darkIcons: Boolean) {
+            activity?.runOnUiThread {
+                val a = activity ?: return@runOnUiThread
+                try {
+                    if (status.isEmpty()) a.applyBars(prefs(app).getBoolean("dark", false))
+                    else a.applyBarColors(android.graphics.Color.parseColor(status), android.graphics.Color.parseColor(nav.ifEmpty { status }), darkIcons)
+                } catch (_: Throwable) {}
+            }
+        }
+
+        @JavascriptInterface
+        fun askBatteryExemption() { activity?.runOnUiThread { activity?.askBatteryExemption() } }
+
         @JavascriptInterface
         fun bioState(): String = JSONObject().put("available", Bio.available(app)).put("enabled", prefs(app).getBoolean("bio", false) && Bio.available(app)).toString()
 
