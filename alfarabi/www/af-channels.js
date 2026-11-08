@@ -25,6 +25,12 @@
     try {
       var COLS = [['#0aa6f5', '#1d4ed8'], ['#8b5cf6', '#6d28d9'], ['#10b981', '#047857'], ['#f59e0b', '#d97706'], ['#ef4444', '#b91c1c'], ['#ec4899', '#be185d'], ['#14b8a6', '#0f766e'], ['#475569', '#0f172a']];
       window.__afChCols = COLS;
+      /* قص الصورة مربعاً من الوسط حتى تظهر قياسات صورة القناة مضبوطة */
+      window.__afSq = function (file, size, cb) {
+        var r = new FileReader();
+        r.onload = function () { var im = new Image(); im.onload = function () { var m = Math.min(im.width, im.height), c2 = document.createElement('canvas'); c2.width = c2.height = size; c2.getContext('2d').drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, size, size); cb(c2.toDataURL('image/jpeg', 0.85)); }; im.src = r.result; };
+        r.readAsDataURL(file);
+      };
       isOwnCh = function (c) {
         if (!c) return false;
         var o = String(c.o);
@@ -77,7 +83,7 @@
           + '<div id="cst" class="hint" style="font-size:12.5px;margin:2px 0 6px;min-height:20px"></div>'
           + '<div class="afch-lk" id="chlk"></div><button class="bt" id="cgo">إنشاء القناة</button>');
         shell('إنشاء قناة مادة', '', '<div class="sc">' + listH + formH + '</div>',
-          V.settings, { img: ini(U.subject || U.name), edit: function () { pick('image/*', function (x) { shrink(x, 400, function (d) { img = d; var im = $('lg').querySelector('img'); if (im) im.src = d; }); }); } });
+          V.settings, { img: ini(U.subject || U.name), edit: function () { pick('image/*', function (x) { window.__afSq(x, 400, function (d) { img = d; var im = $('lg').querySelector('img'); if (im) im.src = d; }); }); } });
         card.querySelectorAll('.afch-row').forEach(function (b) { b.onclick = function () { openCh(+b.dataset.ch); }; });
         if (full) return;
         function msg(v) { var r = chkSlug(v); r[0] = String(r[0]).replace('الرابط', 'اليوزر نيم'); return r; }
@@ -101,6 +107,8 @@
       var miss = [];
       var r = function (a, b) { if (src.indexOf(a) < 0) { miss.push(a.slice(0, 50)); return; } src = src.split(a).join(b); };
       src = src.replace(/String\((\w)\.o\)===String\(uid\)/g, 'isOwnCh($1)');
+      /* رسائلي دائماً على جهتي: مقارنة معرّف المرسل كنص (كان يفشل لو اختلف النوع رقم/نص بعد المزامنة) */
+      src = src.replace(/\b([A-Za-z_]\w*)\.u===uid\b/g, 'String($1.u)===String(uid)').replace(/\b([A-Za-z_]\w*)\.u!==uid\b/g, 'String($1.u)!==String(uid)');
       r('dir="ltr">c.m/\'+esc(c.s)+\'</a>', 'dir="ltr">\'+esc(chLink(c))+\'</a>');
       r('placeholder="الصق رابط القناة هنا"', 'placeholder="الصق رابط القناة https://... أو اسمها @username"');
       r("var s=$('jl').value.trim().toLowerCase().replace(/^c\\.m\\//,'');var mm=s.match(/[?&](?:id|ch)=(\\d+)/),c=chans().filter(function(x){return x.s===s||(mm&&String(x.id)===mm[1])})[0];", "var c=chFind($('jl').value);");

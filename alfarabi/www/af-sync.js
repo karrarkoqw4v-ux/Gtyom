@@ -409,24 +409,25 @@
     loadRoom(g, cb, 150);
   };
 
-  function maintainRoomStream() {
-    var open = getOpenChats();
-    var target = open[0] || '';
-    var b = base();
-    if (!b || !target || !vis() || typeof EventSource === 'undefined') {
-      if (roomES) { try { roomES.close(); } catch (e) {} roomES = null; roomESKey = ''; }
-      return;
-    }
-    var key = b + '|g' + ok(target);
-    if (roomES && roomESKey === key && Date.now() - roomESLast < 35000) return;
-    if (roomES) { try { roomES.close(); } catch (e) {} roomES = null; }
-    roomESKey = key;
-    roomESLast = Date.now();
+  /* بث حي (SSE) لعدة غرف بنفس الوقت: المفتوحة أولاً ثم صف الطالب وأحدث المحادثات (حتى 4).
+     أي رسالة جديدة تصل فوراً بدون انتظار الفحص الدوري (الفحص صار احتياطاً فقط). */
+  var roomESs = {};
+  function streamAlive(g) {
+    var r = roomESs[base() + '|g' + ok(g)];
+    return !!(r && Date.now() - r.last < 25000);
+  }
+  function closeAllStreams() {
+    Object.keys(roomESs).forEach(function (k) { try { roomESs[k].es.close(); } catch (e) {} delete roomESs[k]; });
+    roomES = null; roomESKey = '';
+  }
+  function openStream(b, target, key) {
+    var rec = { es: null, last: Date.now() };
+    roomESs[key] = rec;
     try {
       var es = new EventSource(b + '/chat/g' + ok(target) + '.json');
-      roomES = es;
+      rec.es = es; roomES = es; roomESKey = key; roomESLast = Date.now();
       var handleEvent = function (e) {
-        roomESLast = Date.now();
+        rec.last = Date.now(); roomESLast = rec.last;
         try {
           var p = JSON.parse(e.data);
           if (!p) return;
@@ -438,6 +439,8 @@
             if (parts.length === 1 && p.data && typeof p.data === 'object') {
               var wrap = {}; wrap[mk] = p.data;
               mergeRoomMessages(target, wrap, null);
+            } else if (parts.length === 1 && p.data === null) {
+              loadRoom(target);
             } else {
               loadRoom(target);
             }
@@ -446,12 +449,26 @@
       };
       es.addEventListener('put', handleEvent);
       es.addEventListener('patch', handleEvent);
-      es.addEventListener('keep-alive', function () { roomESLast = Date.now(); });
+      es.addEventListener('keep-alive', function () { rec.last = Date.now(); roomESLast = rec.last; });
       es.onerror = function () {
         try { es.close(); } catch (e) {}
-        if (roomES === es) { roomES = null; roomESKey = ''; }
+        if (roomESs[key] === rec) delete roomESs[key];
       };
-    } catch (e) {}
+    } catch (e) { delete roomESs[key]; }
+  }
+  function maintainRoomStream() {
+    var b = base();
+    if (!b || !vis() || typeof EventSource === 'undefined') { closeAllStreams(); return; }
+    var targets = [];
+    getOpenChats().forEach(function (g) { if (targets.indexOf(g) < 0) targets.push(g); });
+    activeGroups().forEach(function (g) { if (targets.indexOf(g) < 0) targets.push(g); });
+    targets = targets.slice(0, 4);
+    var keys = targets.map(function (t) { return b + '|g' + ok(t); });
+    Object.keys(roomESs).forEach(function (k) {
+      var r = roomESs[k];
+      if (keys.indexOf(k) < 0 || Date.now() - r.last > 40000) { try { r.es && r.es.close(); } catch (e) {} delete roomESs[k]; }
+    });
+    targets.forEach(function (t, i) { if (!roomESs[keys[i]]) openStream(b, t, keys[i]); });
   }
 
   function activeGroups() {
@@ -483,9 +500,13 @@
     return out;
   }
 
+  var lastProbe = {};
   function probe(g, isOpen) {
     var b = base();
     if (!b || !g || busyG[g]) return;
+    /* البث الحي شغّال لهذه الغرفة: الفحص الدوري يصير احتياطاً بطيئاً فقط */
+    if (streamAlive(g) && Date.now() - (lastProbe[g] || 0) < (isOpen ? 4000 : 8000)) return;
+    lastProbe[g] = Date.now();
     busyG[g] = 1;
     var lim = isOpen ? 30 : 5;
     getJ(b + '/chat/g' + ok(g) + '.json?orderBy=%22%24key%22&limitToLast=' + lim, 4000)
@@ -541,7 +562,7 @@
     if (!manual && now - lastHeal < 8000) return Promise.resolve(false);
     lastHeal = now;
     if (onStep) onStep('جاري فحص مسارات الاتصال واختيار أسرع خادم...');
-    if (roomES) { try { roomES.close(); } catch (e) {} roomES = null; roomESKey = ''; }
+    closeAllStreams();
     tries = {};
     inFlight = {};
     failCount = 0;
