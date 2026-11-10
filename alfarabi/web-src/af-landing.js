@@ -10,9 +10,10 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.06-l';
+  var VER = '2026.11.06-m';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
-  var dip = null;
+  var dip = null, rtApk = null;
+  setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
   W.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dip = e; refreshPwa(); });
   W.addEventListener('appinstalled', function () { close(); });
 
@@ -174,7 +175,8 @@
       '<div class="dc cr"><div class="ln"></div><h3>الشكر والتقدير</h3>' +
       '<div class="cm"><span>تم تطوير التطبيق من</span><b>الإدارة المحترمة</b></div>' +
       '<div class="cm"><span>وبجهود الأساتذة</span><b>كادر التدريس المحترم</b></div>' +
-      '<div class="rw"><div><small>المشرف</small><b>الأستاذ زين العابدين</b></div><div><small>المصمم</small><b>كرار حيدر</b></div></div></div>';
+      '<div class="rw"><div><small>المشرف</small><b>الأستاذ زين العابدين</b></div><div><small>المصمم</small><b>كرار حيدر</b></div></div></div>' +
+      '<button class="ac" data-a="dev" style="margin-top:2px"><span class="ai ph" style="background:linear-gradient(135deg,#1f2a44,#14213d)">' + I.lock + '</span><span class="t">حساب المطوّر<small>للمطوّر فقط</small></span>' + I.chv + '</button>';
   }
   function mount() { if (!D.body) return setTimeout(mount, 30); D.body.appendChild(root); D.documentElement.classList.add('afl-on'); D.documentElement.style.overflow = 'hidden'; D.documentElement.style.overflowX = 'hidden'; D.body.style.overflowX = 'hidden'; }
   mount();
@@ -301,13 +303,24 @@
     if (a === 'and') return andSheet();
     if (a === 'ios') return iosSheet();
     if (a === 'sc') { var s = D.getElementById('afs'); if (s) s.remove(); if (ar) ar.remove(); return; }
-    if (a === 'apk') { if (!D.querySelector('#afs .sh')) toast('بدأ تنزيل التطبيق. افتح الملف بعد ما ينتهي واسمح بالتثبيت.'); var l = D.createElement('a'); l.href = apk.url; l.rel = 'noopener'; D.body.appendChild(l); l.click(); l.remove(); var t = D.querySelector('#afs .sh'); if (t) { var n = D.createElement('div'); n.className = 'wn'; n.innerHTML = 'بدأ التنزيل. بعد ما ينتهي افتح الملف واسمح بالتثبيت من هذا المصدر عند ظهور الطلب، وبعدها افتح «الفارابي».'; t.insertBefore(n, t.querySelector('.cl')); } return; }
+    if (a === 'apk') {
+      try { var tk = localStorage.getItem('af_web_tok') || 'x'; if (W.FBBASE) fetch(W.FBBASE + '/stats/apkdl/' + tk + '.json', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ last: Date.now() }) }).catch(function () { }); } catch (e) { }
+      function ver(v) { return String(v || '0').split('.').map(function (x) { return +x || 0; }); }
+      function newer(a1, b1) { a1 = ver(a1); b1 = ver(b1); for (var i = 0; i < 4; i++) { if ((a1[i] || 0) !== (b1[i] || 0)) return (a1[i] || 0) > (b1[i] || 0); } return false; }
+      if (rtApk && W.afSite && newer(rtApk.ver, apk.ver)) {
+        toast('جاري تجهيز التطبيق...');
+        W.afSite.apkDownload(rtApk).then(function () { toast('بدأ التنزيل. افتح الملف بعد ما ينتهي واسمح بالتثبيت.'); }).catch(function () { var l0 = D.createElement('a'); l0.href = apk.url; D.body.appendChild(l0); l0.click(); l0.remove(); });
+        return;
+      }
+      if (!D.querySelector('#afs .sh')) toast('بدأ تنزيل التطبيق. افتح الملف بعد ما ينتهي واسمح بالتثبيت.'); var l = D.createElement('a'); l.href = apk.url; l.rel = 'noopener'; D.body.appendChild(l); l.click(); l.remove(); var t = D.querySelector('#afs .sh'); if (t) { var n = D.createElement('div'); n.className = 'wn'; n.innerHTML = 'بدأ التنزيل. بعد ما ينتهي افتح الملف واسمح بالتثبيت من هذا المصدر عند ظهور الطلب، وبعدها افتح «الفارابي».'; t.insertBefore(n, t.querySelector('.cl')); } return;
+    }
     if (a === 'pwa') {
       if (dip) { dip.prompt(); dip.userChoice.then(function (c) { dip = null; if (c && c.outcome === 'accepted') close(); }); return; }
       if (isIOS) { toast('على آيفون افتح الموقع من سفاري واضغط تثبيت Apple.'); return; }
       act('apk'); return;
     }
     if (a === 'share') { var u = location.href.split('#')[0]; if (navigator.share) navigator.share({ title: 'الفارابي', url: u }).catch(function () { }); return; }
+    if (a === 'dev') { if (W.afDev) W.afDev(); else toast('حساب المطوّر غير متاح الآن'); return; }
     if (a === 'mnt') return maintLogin();
     if (a === 'mgo') return maintGo();
     if (a === 'ph') {

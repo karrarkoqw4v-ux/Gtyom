@@ -7,11 +7,11 @@ mv web/manifest.webmanifest web/manifest.json   # بعض الاستضافات ا
 sed -i 's#manifest\.webmanifest#manifest.json#g' web/index.html
 cp web-src/icons/* web/
 : > web/android-responsive.css
-cp web-src/af-webshim.js web-src/af-landing.js web-src/sw.js web/
+cp web-src/af-webshim.js web-src/af-landing.js web-src/af-dev.js web-src/sw.js web/
 python3 - <<'P'
 import re,json
 p='web/index.html'; s=open(p,encoding='utf8').read()
-s=s.replace('<script src="/af-android.js"></script>','<script src="/af-webshim.js"></script>\n  <script src="/af-landing.js"></script>\n  <script src="/af-android.js"></script>',1)
+s=s.replace('<script src="/af-android.js"></script>','<script src="/af-webshim.js"></script>\n  <script src="/af-landing.js"></script>\n  <script src="/af-dev.js"></script>\n  <script src="/af-android.js"></script>',1)
 open(p,'w',encoding='utf8').write(s)
 m={"id":"./","name":"ثانوية الفارابي الأهلية للبنين","short_name":"مدرسة الفارابي","description":"بوابة ثانوية الفارابي الأهلية للبنين","lang":"ar","dir":"rtl","start_url":"./","scope":"./","display":"standalone","orientation":"portrait","background_color":"#ffffff","theme_color":"#0aa6f5","prefer_related_applications":False,
 "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
@@ -39,7 +39,7 @@ sed -i "s#register('/sw.js')#register('sw.js')#g" web/index.html
 sed -i '/rel="icon" href="school-install-icon.svg"/d' web/index.html
 # رقم إصدار على روابط السكربتات حتى لا يعرض المتصفح نسخاً قديمة محفوظة
 V=$(cat www/*.js web-src/*.js | md5sum | cut -c1-8)
-sed -i -E "s#(src=\"[^\"]*(af-webshim|af-landing|af-android|af-extra|af-handouts)\.js)\"#\1?v=$V\"#" web/index.html
+sed -i -E "s#(src=\"[^\"]*(af-webshim|af-landing|af-dev|af-android|af-extra|af-handouts)\.js)\"#\1?v=$V\"#" web/index.html
 # نسخة APK الأحدث داخل الموقع (إن وُجدت) ليحمّلها الموقع مباشرة من نفس الاستضافة
 APK=$(ls -1 dist/alfarabi-v*.apk 2>/dev/null | sort -V | tail -1)
 if [ -n "$APK" ]; then cp "$APK" web/alfarabi.apk; basename "$APK" | sed -E 's/alfarabi-v(.*)\.apk/\1/' | tr -d '\n' > web/apk-version.txt; fi
