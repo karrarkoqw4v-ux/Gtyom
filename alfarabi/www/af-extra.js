@@ -278,6 +278,26 @@
     'html:root body .af-hq-btn:nth-child(2) .af-hq-ic{animation-delay:-.7s}html:root body .af-hq-btn:nth-child(3) .af-hq-ic{animation-delay:-1.4s}html:root body .af-hq-btn:nth-child(4) .af-hq-ic{animation-delay:-2.1s}html:root body .af-hq-btn:nth-child(5) .af-hq-ic{animation:afGlow 2.4s ease-in-out infinite}',
     'html:root body .hbn::after{content:\'\';position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.10);left:-30px;bottom:-60px;animation:afDrift 7s ease-in-out infinite;pointer-events:none}',
     '@media (prefers-reduced-motion:reduce){html:root body .hbn,html:root body .af-hq-btn,html:root body .rows .rw,html:root body .af-hq-ic,html:root body .hbn::after{animation:none!important}}',
+    /* ===== صفحة قنوات المادة ===== */
+    'html:root body main.app:has(#jl){justify-content:flex-start!important;padding:62px 14px 110px!important}',
+    'html:root body #card:has(#jl) {width:100%!important;max-width:none!important;background:transparent!important;box-shadow:none!important;border:0!important;padding:0 2px!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}',
+    'html:root body #card:has(#jl) .back{position:static!important;margin:0 0 4px auto!important;display:grid!important}',
+    'html:root body main.app:has(#jl),html:root body main:has(#jl){align-items:flex-start!important;align-content:flex-start!important;justify-content:flex-start!important;padding-top:62px!important}',
+    'html:root body #card:has(#jl){margin:0!important;align-self:flex-start!important;height:auto!important}',
+    'html:root body #card:has(#jl) .title{text-align:right!important;font-size:27px!important;font-weight:800!important;margin:6px 4px 14px!important;color:#14213d!important}',
+    'html:root body #card:has(#jl) .sc .fd:has(#jl){background:#fff!important;border:0!important;border-radius:20px!important;height:58px!important;padding:0 6px 0 14px!important;box-shadow:0 8px 22px rgba(20,60,120,.12)!important;gap:8px!important;margin-bottom:14px!important}',
+    'html:root body #card:has(#jl) #jl{font-size:13px!important;height:100%!important}',
+    'html:root body #card:has(#jl) #jg{height:44px!important;padding:0 20px!important;border-radius:15px!important;font-size:15.5px!important;flex:none}',
+    'html:root body #card:has(#jl) .tc{display:flex!important;flex-direction:row!important;align-items:center!important;gap:14px!important;width:100%!important;height:auto!important;min-height:84px!important;padding:12px 14px!important;margin:0 0 12px!important;border:0!important;border-radius:24px!important;background:#fff!important;box-shadow:0 8px 22px rgba(20,60,120,.11)!important;text-align:right!important;position:relative;overflow:hidden;animation:afRise .5s cubic-bezier(.2,.8,.3,1) both;transition:transform .15s}',
+    'html:root body #card:has(#jl) .tc:active{transform:scale(.97)}',
+    'html:root body #card:has(#jl) .tc:nth-of-type(2){animation-delay:.05s}html:root body #card:has(#jl) .tc:nth-of-type(3){animation-delay:.1s}html:root body #card:has(#jl) .tc:nth-of-type(4){animation-delay:.15s}html:root body #card:has(#jl) .tc:nth-of-type(5){animation-delay:.2s}',
+    'html:root body #card:has(#jl) .tc .av{width:58px!important;height:58px!important;flex:none!important;border-radius:19px!important;box-shadow:0 6px 14px rgba(20,60,120,.22);background:linear-gradient(135deg,#38bdf8,#2563eb)!important;font-size:22px!important}',
+    'html:root body #card:has(#jl) .tc:nth-of-type(3n+2) .av{background:linear-gradient(135deg,#a78bfa,#7c3aed)!important}html:root body #card:has(#jl) .tc:nth-of-type(3n) .av{background:linear-gradient(135deg,#4ade80,#16a34a)!important}',
+    'html:root body #card:has(#jl) .tc .tn{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;align-items:flex-start}',
+    'html:root body #card:has(#jl) .tc .tn b{font-size:17px!important;font-weight:800!important;color:#14213d!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}',
+    'html:root body #card:has(#jl) .tc .tn small{font-size:12.5px!important;font-weight:600!important;color:#51647e!important;background:#eef5ff;border-radius:999px;padding:2px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}',
+    'html:root body #card:has(#jl) .tc>svg{flex:none;width:32px!important;height:32px!important;padding:7px;border-radius:50%;background:#eef5ff;color:#2563eb!important}',
+    'html:root body #card:has(#jl) .hint{text-align:center!important;font-size:15px!important;color:#51647e!important;padding:40px 10px!important}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
