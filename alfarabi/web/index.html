@@ -13,8 +13,8 @@
   <title>ثانوية الفارابي</title>
   <link rel="stylesheet" href="fonts/fonts.css">
   <script src="af-webshim.js?v=1794060001"></script>
-  <script src="af-landing.js?v=5c7d7a8d"></script>
-  <script src="af-dev.js?v=5c7d7a8d"></script>
+  <script src="af-landing.js?v=9c74ce51"></script>
+  <script src="af-dev.js?v=9c74ce51"></script>
   
   <script src="af-android.js?v=1794060001"></script>
   <script src="af-sync.js?v=20261108x"></script>
@@ -1167,16 +1167,23 @@ function netDiag(){if(window.afConnFix){window.afConnFix(document);return}var o=
   fetch(u+'/school.json?shallow=true',{cache:'no-store'}).then(function(r){if(r.ok)anyOk=1;add(r.ok,nm+' — '+(r.ok?'يستجيب':(r.status===401||r.status===403?'مرفوض ('+r.status+'): قواعد الحماية Rules غير منشورة':'رد '+r.status)));nx()}).catch(function(){add(false,nm+' — لا يستجيب');nx()})})()}
 
 var fl={};
-function fast(path,val,n){fl[path]=1;fetch(base+'/'+path+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(val),keepalive:true}).then(function(r){if(!r.ok)throw r.status;delete fl[path];delete pend[path]}).catch(function(){delete fl[path];if(n<5)setTimeout(function(){fast(path,val,n+1)},700*(n+1));else{q.push([path,val]);run()}})}
-function put(path,val){if(!hold&&base&&val!==null&&path.indexOf('chat/')===0&&!fl[path]){var l=0;try{l=JSON.stringify(val).length}catch(e){l=1e9}if(l<60000){fast(path,val,0);return}}q.push([path,val]);run()}
+function fast(path,val,n){fl[path]=1;var del=val===null;fetch(authQ(base+'/'+path+'.json'),{method:del?'DELETE':'PUT',headers:{'Content-Type':'application/json'},body:del?undefined:JSON.stringify(val),keepalive:true}).then(function(r){if(!r.ok)throw r.status;delete fl[path];delete pend[path]}).catch(function(){delete fl[path];if(n<5)setTimeout(function(){fast(path,val,n+1)},700*(n+1));else{q.push([path,val]);run()}})}
+/* مسارات الإرسال: السريع (رسائل، تحاضير، سجلات، تصويت) مباشرة بدون طابور، والكبير بطابور منفصل، والباقي (المدرسة والحسابات) بطابور الصيانة */
+var FASTP=/^(chat|records|votes|typing)\//,qb=[],actB=0;
+function runBig(){if(hold||!base)return;while(actB<2&&qb.length){(function(it){actB++;fetch(authQ(base+'/'+it[0]+'.json'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(it[1])}).then(function(r){if(!r.ok)throw r.status;delete pend[it[0]];delete fl[it[0]];actB--;runBig()}).catch(function(){actB--;setTimeout(function(){qb.push(it);runBig()},1500)})})(qb.shift())}}
+function put(path,val){if(!hold&&base&&FASTP.test(path)&&!fl[path]){if(val===null){fast(path,val,0);return}var l=0;try{l=JSON.stringify(val).length}catch(e){l=1e9}if(l<60000){fast(path,val,0);return}fl[path]=1;qb.push([path,val]);runBig();return}q.push([path,val]);run()}
 window.addEventListener('online',function(){try{run()}catch(e){}});
 function run(){if(hold||busy||!base||!q.length)return;busy=1;var it=q[0],del=it[1]===null;
  fetch(authQ(base+'/'+it[0]+'.json'),{method:del?'DELETE':'PUT',headers:{'Content-Type':'application/json'},body:del?undefined:JSON.stringify(it[1])})
  .then(function(r){if(!r.ok)throw r.status;q.shift();delete pend[it[0]];if(it[0].indexOf('school')===0&&!q.some(function(x){return x[0].indexOf('school')===0}))dS=0;busy=0;run()}).catch(function(e){busy=0;st('غير متصل '+(typeof e==='number'?'['+e+']':''));if(q.length>1)q.push(q.shift());setTimeout(run,700)})}
 /* من الجهاز إلى الخادم */
-Storage.prototype.setItem=function(k,v){raw.apply(this,arguments);if(this!==localStorage)return;try{if(k===DBK)pushAcc(JSON.parse(v));else if(k===CK)pushChat(JSON.parse(v));else if(k===SK)pushSchool()}catch(e){}};
+var ckT=0,ckV=null;
+function schedChat(v){ckV=v;if(ckT)return;ckT=setTimeout(function(){ckT=0;var x=ckV;ckV=null;try{pushChat(typeof x==='string'?JSON.parse(x):x)}catch(e){}},700)}
+Storage.prototype.setItem=function(k,v){raw.apply(this,arguments);if(this!==localStorage)return;try{if(k===DBK)pushAcc(JSON.parse(v));else if(k===CK)schedChat(v);else if(k===SK)pushSchool()}catch(e){}};
+/* إرسال فوري لآخر رسائل المحادثة المفتوحة فقط (بدون فحص كل الرسائل) */
+window.AFPushTail=function(o,g){try{pushChat(typeof o==='string'?JSON.parse(o):o,{g:g,n:40})}catch(e){}};
 /* مزامنة تغييرات الإطارات الداخلية (صفحات المستخدم والإدارة) إلى الخادم */
-window.AFPushKey=function(k,v){try{var o=typeof v==='string'?JSON.parse(v):v;if(k===DBK)pushAcc(o);else if(k===CK)pushChat(o);else if(k===SK)pushSchool()}catch(e){}};
+window.AFPushKey=function(k,v){try{if(k===CK){schedChat(v);return}var o=typeof v==='string'?JSON.parse(v):v;if(k===DBK)pushAcc(o);else if(k===SK)pushSchool()}catch(e){}};
 window.addEventListener('storage',function(e){if(!e||!e.key||e.newValue==null)return;window.AFPushKey(e.key,e.newValue)});
 
 function aid(a){return 'a'+ok(a.createdAt||a.email)}
@@ -1191,7 +1198,7 @@ window.AFSetAccMk=setMk;window.AFAccKilled=killed;
 function pullMk(cb){var b=base;if(!b){cb&&cb();return}fetch(b+'/config/reset.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(m){if(m&&m.acc)setMk(m);cb&&cb()}).catch(function(){cb&&cb()})}
 function pushAcc(d){(d.accounts||[]).forEach(function(a){if(killed(a))return;var id=aid(a),j=sj(a);if(seen.a[id]!==j){seen.a[id]=j;put('accounts/'+id,a)}})}
 function csj(m){var c={};for(var k in m)c[k]=(k==='img'||k==='vid'||k==='aud')&&typeof m[k]==='string'?m[k].length:m[k];return JSON.stringify(c)}
-function pushChat(d){Object.keys(d||{}).forEach(function(g){var gk='g'+g;(d[g]||[]).forEach(function(m){var k='m'+m.id,b=JSON.parse(JSON.stringify(m)),vm={};
+function pushChat(d,opt){Object.keys(d||{}).forEach(function(g){if(opt&&opt.g!=null&&String(g)!==String(opt.g))return;var gk='g'+g,arr=d[g]||[];if(opt&&opt.n)arr=arr.slice(-opt.n);arr.forEach(function(m){var k='m'+m.id,b=JSON.parse(JSON.stringify(m)),vm={};
  if(b.o){m.o.forEach(function(x,i){(x.v||[]).forEach(function(u){vm['u'+ok(u)]=i})});b.o=b.o.map(function(x){return{t:x.t}})}
  var j=csj(b);if(seen.m[gk+k]!==j){var nw=seen.m[gk+k]===undefined;seen.m[gk+k]=j;pend['chat/'+gk+'/'+k]=1;put('chat/'+gk+'/'+k,b);if(nw&&window.pushOut)try{window.pushOut(g,m)}catch(e){}}
  if(m.o){var old=seen.v[gk+k]||{};Object.keys(vm).forEach(function(u){if(old[u]!==vm[u])put('votes/'+gk+'/'+k+'/'+u,vm[u])});Object.keys(old).forEach(function(u){if(!(u in vm))put('votes/'+gk+'/'+k+'/'+u,null)});seen.v[gk+k]=vm}})})}
@@ -2725,7 +2732,7 @@ var MENU=[['schedule','جدول الأسبوع'],['announcements','الإعلا�
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tmr);tmr=setTimeout(function(){t.classList.remove('show')},2200)}
 function J(k,d){try{return JSON.parse(LS.getItem(k))||d}catch(e){return d}}
-function W(k,v){try{var s=JSON.stringify(v);LS.setItem(k,s);try{if(P.AFPushKey)P.AFPushKey(k,v);if(k===CK&&P.AFSyncKick)P.AFSyncKick(cg)}catch(x){}return 1}catch(e){toast('امتلأ التخزين، قلّل حجم الملف');return 0}}
+function W(k,v){try{var s=JSON.stringify(v);LS.setItem(k,s);try{if(k===CK){if(P.AFPushTail)P.AFPushTail(v,cg);if(P.AFPushKey)P.AFPushKey(k,v)}else if(P.AFPushKey)P.AFPushKey(k,v)}catch(x){}return 1}catch(e){toast('امتلأ التخزين، قلّل حجم الملف');return 0}}
 function DB(){return J(DBK,{accounts:[]})}
 function saveMe(f){var d=DB(),i=d.accounts.findIndex(function(a){return a.email===U.email});if(i<0)return 0;f(d.accounts[i]);W(DBK,d);Object.assign(U,d.accounts[i]);return 1}
 function pf(g){return Object.assign({bub:'#0aa6f5',bg:'linear-gradient(180deg,#e6f3ff,#f6fbff 50%,#fff5fa)',tx:'#ffffff',fs:14,ff:'sans-serif',fw:'400'},J('af_cp_g_'+uid,{}),J(PK,{})[g]||{})}
