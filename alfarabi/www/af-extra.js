@@ -208,7 +208,7 @@
     'html body #sheet.open .option[data-k="i"]::before{background-color:#3b82f6;background-image:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'1.9\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><rect x=\'3\' y=\'4\' width=\'18\' height=\'16\' rx=\'3\'/><circle cx=\'9\' cy=\'10\' r=\'2\'/><path d=\'M4 18l5-5 4 4 3-3 4 4\'/></svg>")}',
     'html body #sheet.open .option[data-k="v"]::before{background-color:#e5484d;background-image:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'1.9\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><rect x=\'3\' y=\'6\' width=\'13\' height=\'12\' rx=\'3\'/><path d=\'M16 10l5-3v10l-5-3\'/></svg>")}',
     'html body #sheet.open .option[data-k="q"]::before{background-color:#9b51e0;background-image:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'1.9\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M5 20V10M12 20V4M19 20v-7\'/></svg>")}',
-    'html body #sheet.open .opt-text{color:#e6edf6!important;font-size:12.5px!important;font-weight:700!important}',
+    'html body #sheet.open .option[data-k] .opt-text{color:#e6edf6!important;font-size:12.5px!important;font-weight:700!important}',
     'html body #sheet.open img.mi{display:block!important;margin:0 auto 12px!important;max-height:46vh!important;width:100%!important;object-fit:contain!important;border-radius:18px!important;background:#0e1621}',
     'html body #sheet.open .fd:has(#cap){background:#0e1621!important;border:1px solid #243445!important;border-radius:22px!important;padding:6px 14px!important}',
     'html body #sheet.open #cap{color:#f5f7fa!important;font-size:15px!important}',
@@ -335,6 +335,11 @@
     'html:root body:not(#zz) .rows .rw::before{display:none!important}',
     'html:root body:not(#zz) .rows .rw span{font-size:14.5px!important;font-weight:800!important}',
     'html:root body:not(#zz) .af-hq-btn{background:linear-gradient(160deg,color-mix(in srgb,var(--c1) 22%,white),rgba(255,255,255,.7))!important;border:1.5px solid color-mix(in srgb,var(--c1) 35%,white)!important;box-shadow:0 12px 28px color-mix(in srgb,var(--c2) 20%,transparent)!important}',
+    /* إصلاح: تداخل الوقت مع النص القصير + نصوص نافذة الدعم */
+    'html:root body #ch:not([data-afcp]) .r .bb .tm{display:inline-flex!important;align-items:center;gap:4px;white-space:nowrap!important;direction:ltr!important;margin:6px 20px 0 4px!important}',
+    'html:root body #ch:not([data-afcp]) .r .bb{min-width:92px;overflow-wrap:anywhere}',
+    'html:root body .sheet .option:not([data-k]),html:root body .sheet .option:not([data-k]) .opt-text,html:root body .sheet .option:not([data-k]) b,html:root body .sheet .option:not([data-k]) span{color:#14213d!important}',
+    'html:root body .sheet .option:not([data-k]) .opt-text{font-weight:700!important;font-size:16px!important}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
