@@ -51,6 +51,16 @@ class MainActivity : Activity() {
     private fun onIntent(i: Intent?) {
         val tg = i?.getStringExtra("tag") ?: ""
         if (i?.getStringExtra("kind") == "school" && tg.startsWith("imp:")) WebHolder.pendingOpen = tg
+        if (tg.startsWith("chan:")) WebHolder.pendingLink = "ch=" + tg.removePrefix("chan:")
+        val d = i?.data
+        if (d != null && (d.scheme == "alfarabi" || d.host == "karrarkoqw4v-ux.github.io")) {
+            val c = d.getQueryParameter("c") ?: ""
+            val ch = d.getQueryParameter("ch")
+            val slug = if (c.isNotEmpty()) c else (d.pathSegments?.lastOrNull() ?: "")
+            if (c.isNotEmpty()) WebHolder.pendingLink = "c=" + c
+            else if (!ch.isNullOrEmpty()) WebHolder.pendingLink = "ch=" + ch
+            else if (d.scheme == "alfarabi" && slug.isNotEmpty()) WebHolder.pendingLink = "c=" + slug
+        }
         if (i?.getStringExtra("kind") == "call") {
             if (Build.VERSION.SDK_INT >= 27) { setShowWhenLocked(true); setTurnScreenOn(true) }
         }
@@ -71,15 +81,33 @@ class MainActivity : Activity() {
     // ===== لون الشريطين (أعلى وأسفل الجهاز) نفس لون التطبيق =====
     fun applyBars(dark: Boolean) {
         WebHolder.prefs(this).edit().putBoolean("dark", dark).apply()
-        val c = if (dark) 0xFF08101D.toInt() else 0xFFFFFFFF.toInt()
-        window.statusBarColor = c
-        window.navigationBarColor = c
+        paintBars(if (dark) 0xFF08101D.toInt() else 0xFFEEF5FF.toInt(), if (dark) 0xFF08101D.toInt() else 0xFFEEF5FF.toInt(), dark)
+    }
+
+    /** لون الشريطين يتبع الشاشة الحالية (المحادثات والقنوات داكنة) حتى لا يظهر شريط أبيض أعلى وأسفل الشاشة */
+    fun applyBarColors(status: Int, nav: Int, dark: Boolean) { paintBars(status, nav, dark) }
+
+    private fun paintBars(status: Int, nav: Int, darkIcons: Boolean) {
+        window.statusBarColor = status
+        window.navigationBarColor = nav
         var f = window.decorView.systemUiVisibility
-        f = if (dark) f and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() else f or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        if (Build.VERSION.SDK_INT >= 26) f = if (dark) f and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv() else f or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        f = if (darkIcons) f and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() else f or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        if (Build.VERSION.SDK_INT >= 26) f = if (darkIcons) f and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv() else f or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         window.decorView.systemUiVisibility = f
-        root.setBackgroundColor(c)
-        WebHolder.web?.setBackgroundColor(c)
+        root.setBackgroundColor(status)
+        WebHolder.web?.setBackgroundColor(status)
+    }
+
+    /** يطلب إعفاء التطبيق من توفير البطارية حتى تصل الإشعارات والمحادثات والتطبيق مغلق */
+    fun askBatteryExemption() {
+        try {
+            val pm = getSystemService(android.content.Context.POWER_SERVICE) as android.os.PowerManager
+            if (Build.VERSION.SDK_INT >= 23 && !pm.isIgnoringBatteryOptimizations(packageName)) {
+                startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$packageName")))
+            }
+        } catch (_: Throwable) {
+            try { startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) } catch (_: Throwable) {}
+        }
     }
 
     // ===== قفل البصمة =====

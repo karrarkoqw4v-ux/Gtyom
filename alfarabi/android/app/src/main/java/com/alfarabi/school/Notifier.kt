@@ -25,9 +25,9 @@ import java.net.URL
 
 /** إشعارات بأسلوب واتساب: مكالمات باسم وصورة المتصل، رسائل تتجمع بكل محادثة مع رد وكتم، وتنبيهات المدرسة. */
 object Notifier {
-    const val CH_MSG = "af_msg"
+    const val CH_MSG = "af_msg2"
     const val CH_CALL = "af_call"
-    const val CH_SCHOOL = "af_school"
+    const val CH_SCHOOL = "af_school2"
     const val CH_KEEP = "af_keep2"
     const val ID_KEEP = 7
     const val ID_SUMMARY = 9
@@ -49,8 +49,13 @@ object Notifier {
         if (Build.VERSION.SDK_INT < 26) return
         val m = nm(c)
         try { m.deleteNotificationChannel("af_keep") } catch (_: Throwable) {}
+        // قنوات جديدة بصوت وأولوية عالية (القنوات القديمة كانت بدون صوت صريح ولا يمكن تعديلها بعد إنشائها)
+        try { m.deleteNotificationChannel("af_msg"); m.deleteNotificationChannel("af_school") } catch (_: Throwable) {}
+        val snd = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val aa = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
         m.createNotificationChannel(NotificationChannel(CH_MSG, "الرسائل والمجموعات", NotificationManager.IMPORTANCE_HIGH).apply {
-            description = "رسائل المحادثات والمجموعات وقنوات المدرسين"; enableVibration(true); lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            description = "رسائل المحادثات والمجموعات وقنوات المدرسين"; enableVibration(true); vibrationPattern = longArrayOf(0, 250, 150, 250)
+            setSound(snd, aa); enableLights(true); lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         })
         m.createNotificationChannel(NotificationChannel(CH_CALL, "المكالمات الواردة", NotificationManager.IMPORTANCE_HIGH).apply {
             description = "مكالمات صوتية واردة"
@@ -61,8 +66,9 @@ object Notifier {
             )
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         })
-        m.createNotificationChannel(NotificationChannel(CH_SCHOOL, "إعلانات المدرسة", NotificationManager.IMPORTANCE_DEFAULT).apply {
-            description = "الإعلانات والتحاضير والدرجات والغيابات"
+        m.createNotificationChannel(NotificationChannel(CH_SCHOOL, "إعلانات المدرسة", NotificationManager.IMPORTANCE_HIGH).apply {
+            description = "الإعلانات والتحاضير والدرجات والغيابات"; enableVibration(true); vibrationPattern = longArrayOf(0, 250, 150, 250)
+            setSound(snd, aa); enableLights(true)
         })
         m.createNotificationChannel(NotificationChannel(CH_KEEP, "خدمة الخلفية", NotificationManager.IMPORTANCE_NONE).apply {
             description = "يبقي التطبيق متصلاً لاستقبال الإشعارات"; setShowBadge(false)

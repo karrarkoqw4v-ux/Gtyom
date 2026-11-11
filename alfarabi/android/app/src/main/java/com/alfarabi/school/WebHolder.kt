@@ -27,6 +27,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.webkit.WebViewAssetLoader
 import org.json.JSONObject
 import java.io.IOException
@@ -50,6 +51,7 @@ object WebHolder {
     var permReq: PermissionRequest? = null
     @Volatile var foreground = false
     @Volatile var pendingOpen = ""
+    @Volatile var pendingLink = ""
     private var ctx: MutableContextWrapper? = null
 
     fun prefs(c: Context) = c.getSharedPreferences("af", Context.MODE_PRIVATE)
@@ -218,6 +220,10 @@ object WebHolder {
         @JavascriptInterface
         fun pendingOpen(): String { val p = pendingOpen; pendingOpen = ""; return p }
 
+        /** رابط قناة فُتح من خارج التطبيق (c=username أو ch=id) */
+        @JavascriptInterface
+        fun pendingLink(): String { val p = pendingLink; pendingLink = ""; return p }
+
         @JavascriptInterface
         fun notifyCall(name: String, photo: String, cid: String, g: String) = Notifier.call(app, name, photo, cid, g)
 
@@ -293,6 +299,21 @@ object WebHolder {
         @JavascriptInterface
         fun setBars(dark: Boolean) { activity?.runOnUiThread { activity?.applyBars(dark) } ?: prefs(app).edit().putBoolean("dark", dark).apply() }
 
+        /** لون شريط الحالة وشريط التنقل (hex) مع كون الأيقونات داكنة؛ نص فارغ = رجوع للون الافتراضي */
+        @JavascriptInterface
+        fun setBarColors(status: String, nav: String, darkIcons: Boolean) {
+            activity?.runOnUiThread {
+                val a = activity ?: return@runOnUiThread
+                try {
+                    if (status.isEmpty()) a.applyBars(prefs(app).getBoolean("dark", false))
+                    else a.applyBarColors(android.graphics.Color.parseColor(status), android.graphics.Color.parseColor(nav.ifEmpty { status }), darkIcons)
+                } catch (_: Throwable) {}
+            }
+        }
+
+        @JavascriptInterface
+        fun askBatteryExemption() { activity?.runOnUiThread { activity?.askBatteryExemption() } }
+
         @JavascriptInterface
         fun bioState(): String = JSONObject().put("available", Bio.available(app)).put("enabled", prefs(app).getBoolean("bio", false) && Bio.available(app)).toString()
 
@@ -308,6 +329,37 @@ object WebHolder {
         @JavascriptInterface fun otaCommit(v: Long): Boolean = Ota.commit(app, v)
         @JavascriptInterface fun appVersion(): String = try { app.packageManager.getPackageInfo(app.packageName, 0).versionName ?: "" } catch (_: Throwable) { "" }
         @JavascriptInterface fun otaReload() { web?.post { web?.reload() } }
+
+
+        /** مشاركة نص أو رابط عبر نافذة المشاركة */
+        @JavascriptInterface
+        fun shareText(text: String) {
+            try {
+                val i = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
+                app.startActivity(Intent.createChooser(i, "مشاركة").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            } catch (_: Throwable) {}
+        }
+
+        /** حفظ ملف (base64) في مجلد التنزيلات */
+        @JavascriptInterface
+        fun saveFile(name: String, mime: String, b64: String): Boolean = try {
+            saveData("data:" + mime + ";base64," + b64, name.replace(Regex("[\\\\/:*?\"<>|]"), "_").ifEmpty { "file" }); true
+        } catch (_: Throwable) { toast("تعذّر الحفظ"); false }
+
+        /** مشاركة ملف (base64) مع أي تطبيق */
+        @JavascriptInterface
+        fun shareFile(name: String, mime: String, b64: String): Boolean = try {
+            val dir = java.io.File(app.cacheDir, "share"); dir.mkdirs()
+            dir.listFiles()?.forEach { try { it.delete() } catch (_: Throwable) {} }
+            val safe = name.replace(Regex("[\\\\/:*?\"<>|]"), "_").ifEmpty { "file" }
+            val f = java.io.File(dir, safe)
+            f.writeBytes(Base64.decode(b64, Base64.DEFAULT))
+            val uri = FileProvider.getUriForFile(app, app.packageName + ".fp", f)
+            val i = Intent(Intent.ACTION_SEND).setType(mime.ifEmpty { "application/octet-stream" })
+                .putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            app.startActivity(Intent.createChooser(i, "مشاركة").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION))
+            true
+        } catch (_: Throwable) { toast("تعذّرت المشاركة"); false }
 
         /** وسيط لطلبات الصفحة لخادم المدرسة (رفع الصور والإشعارات) */
         @JavascriptInterface

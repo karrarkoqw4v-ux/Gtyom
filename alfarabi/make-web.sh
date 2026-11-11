@@ -12,6 +12,11 @@ python3 - <<'P'
 import re,json
 p='web/index.html'; s=open(p,encoding='utf8').read()
 s=s.replace('<script src="/af-android.js"></script>','<script src="/af-webshim.js"></script>\n  <script src="/af-landing.js"></script>\n  <script src="/af-dev.js"></script>\n  <script src="/af-android.js"></script>',1)
+# النسخة الجديدة من index.html فيها af-webshim مسبقاً: نضيف شاشة التثبيت (landing) وحساب المطوّر بعده إن لم يكونا موجودين
+if 'af-landing.js' not in s:
+    s=re.sub(r'(<script src="(?:/)?af-webshim\.js[^"]*"></script>)',r'\1\n  <script src="af-landing.js"></script>',s,count=1)
+if 'af-dev.js' not in s:
+    s=re.sub(r'(<script src="(?:/)?af-landing\.js[^"]*"></script>)',r'\1\n  <script src="af-dev.js"></script>',s,count=1)
 open(p,'w',encoding='utf8').write(s)
 m={"id":"./","name":"ثانوية الفارابي الأهلية للبنين","short_name":"مدرسة الفارابي","description":"بوابة ثانوية الفارابي الأهلية للبنين","lang":"ar","dir":"rtl","start_url":"./","scope":"./","display":"standalone","orientation":"portrait","background_color":"#ffffff","theme_color":"#0aa6f5","prefer_related_applications":False,
 "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
@@ -43,3 +48,5 @@ sed -i -E "s#(src=\"[^\"]*(af-webshim|af-landing|af-dev|af-android|af-extra|af-h
 # نسخة APK الأحدث داخل الموقع (إن وُجدت) ليحمّلها الموقع مباشرة من نفس الاستضافة
 APK=$(ls -1 dist/alfarabi-v*.apk 2>/dev/null | sort -V | tail -1)
 if [ -n "$APK" ]; then cp "$APK" web/alfarabi.apk; basename "$APK" | sed -E 's/alfarabi-v(.*)\.apk/\1/' | tr -d '\n' > web/apk-version.txt; fi
+# نسخة الـAPK تُخفي واجهة التثبيت (#afl)؛ في نسخة الموقع نُظهر شاشة تثبيت التطبيق
+sed -i 's/,#afl{display:none!important}/{display:none!important}/' web/index.html

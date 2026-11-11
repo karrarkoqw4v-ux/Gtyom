@@ -1,9 +1,0 @@
-#map{position:fixed;inset:0}
-#top{position:fixed;top:0;right:0;left:0;z-index:20;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 0}
-#fabs{position:fixed;left:12px;top:calc(env(safe-area-inset-top,0px) + 74px);z-index:15;display:flex;flex-direction:column;gap:10px}
-#sheet{position:fixed;right:0;left:0;bottom:0;z-index:25;background:var(--surface);border-radius:var(--r-sheet) var(--r-sheet) 0 0;box-shadow:0 -8px 30px rgba(20,36,59,.14);max-height:58vh;max-height:58dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);transition:max-height .25s ease}
-#sheet.mini{max-height:calc(64px + env(safe-area-inset-bottom,0px));overflow:hidden}
-#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translate(-50%,40px);opacity:0;z-index:60;background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:0.875rem;max-width:88vw;text-align:center;transition:.25s;pointer-events:none}
-#toast.on{transform:translate(-50%,0);opacity:1}
-body.navigating #top,body.navigating #fabs,body.navigating #sheet{display:none}
-.maplibregl-ctrl-bottom-left,.maplibregl-ctrl-bottom-right{bottom:calc(env(safe-area-inset-bottom,0px) + 4px)}

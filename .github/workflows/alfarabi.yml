@@ -2,7 +2,7 @@ name: Build Alfarabi APK
 on:
   workflow_dispatch:
   push:
-    branches: [claude/hala-yweuvu, main]
+    branches: [claude/hala-yweuvu, claude/hala-c5per7, main]
     paths: ["alfarabi/**", ".github/workflows/alfarabi.yml"]
 permissions:
   contents: write
@@ -32,5 +32,5 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add -A alfarabi/dist
           git commit -m "Build: update Alfarabi APK v$V [skip ci]" || exit 0
-          git pull --rebase origin claude/hala-yweuvu || true
-          git push
+          git pull --rebase origin "$GITHUB_REF_NAME" || true
+          git push origin "HEAD:$GITHUB_REF_NAME"

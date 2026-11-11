@@ -22,11 +22,10 @@
   var PAGE_CSS = [
     /* توهج الشعار: حركة طفو خفيفة (compositor) بدل تغيير filter كل إطار */
     '@keyframes afFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}',
-    '.card:not(.welcome):not([hidden])>.logo{animation:afFade .55s both,afFloat 4.2s ease-in-out .6s infinite!important;',
-    'filter:drop-shadow(0 6px 14px rgba(10,166,245,.4))}',
+    '.card:not(.welcome):not([hidden])>.logo{animation:afFade .4s both!important}',
     'html[data-af-tier="1"] .card:not(.welcome):not([hidden])>.logo,html[data-af-tier="0"] .card:not(.welcome):not([hidden])>.logo{animation:afFade .55s both!important}',
     /* ردة فعل لمس فورية */
-    '.option,.btn-primary,.btn,.chip,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease,border-color .2s ease}',
+    '.option,.btn-primary,.btn,.chip,button{transition:transform .12s ease,opacity .16s ease,background-color .2s ease,border-color .2s ease}',
     '.option:active,.btn-primary:active{transform:scale(.97)}',
     /* إطار الواجهة: تلاشي عند الظهور */
     '#adminFrame.af-hold{opacity:0}',
