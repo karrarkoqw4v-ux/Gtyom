@@ -227,9 +227,9 @@
     'html:root body .rows .rw{font-size:14.5px!important}',
     'html:root body .hbn-t *{line-height:1.45!important}',
     /* ===== تصميم الرئيسية المعتمد: شبكة بطاقات + كبسولة سفلية ===== */
-    'html:root body main.app:has(.af-hq-grid){padding:62px 12px 106px!important;align-items:stretch!important;justify-content:flex-start!important}',
-    'html:root body main.app:has(.af-hq-grid) #card.card{display:flex!important;flex-direction:column!important;margin:0!important;height:100%!important;padding:0 2px!important;gap:12px!important;box-sizing:border-box;background:transparent!important;box-shadow:none!important;border:0!important}',
-    'html:root body main.app:has(.af-hq-grid) #card.card>*{margin:0!important}',
+    'html:root body main.app:has(.hbn){padding:62px 12px 106px!important;align-items:stretch!important;justify-content:flex-start!important}',
+    'html:root body main.app:has(.hbn) #card.card{display:flex!important;flex-direction:column!important;margin:0!important;height:100%!important;padding:0 2px!important;gap:12px!important;box-sizing:border-box;background:transparent!important;box-shadow:none!important;border:0!important}',
+    'html:root body main.app:has(.hbn) #card.card>*{margin:0!important}',
     'html:root body .hbn{flex:none!important;height:96px!important;padding:8px 14px!important;min-height:0!important}',
     'html:root body .hbn-i{width:64px!important;height:64px!important}',
     'html:root body .hbn-t{height:auto!important}',
@@ -299,9 +299,9 @@
     'html:root body #card:has(#jl) .tc>svg{flex:none;width:32px!important;height:32px!important;padding:7px;border-radius:50%;background:#eef5ff;color:#2563eb!important}',
     'html:root body #card:has(#jl) .hint{text-align:center!important;font-size:15px!important;color:#51647e!important;padding:40px 10px!important}',
     /* ===== الرئيسية المعتمدة: زجاجي ملوّن ===== */
-    'html:root body:not(#zz) main.app:has(.af-hq-grid){padding:62px 12px 106px!important;align-items:stretch!important;justify-content:flex-start!important}',
-    'html:root body:not(#zz) main.app:has(.af-hq-grid) #card.card{display:flex!important;flex-direction:column!important;margin:0!important;height:100%!important;padding:0 2px!important;gap:11px!important;box-sizing:border-box;background:transparent!important;box-shadow:none!important;border:0!important}',
-    'html:root body:not(#zz) main.app:has(.af-hq-grid) #card.card>*{margin:0!important}',
+    'html:root body:not(#zz) main.app:has(.hbn){padding:62px 12px 106px!important;align-items:stretch!important;justify-content:flex-start!important}',
+    'html:root body:not(#zz) main.app:has(.hbn) #card.card{display:flex!important;flex-direction:column!important;margin:0!important;height:100%!important;padding:0 2px!important;gap:11px!important;box-sizing:border-box;background:transparent!important;box-shadow:none!important;border:0!important}',
+    'html:root body:not(#zz) main.app:has(.hbn) #card.card>*{margin:0!important}',
     'html:root body:not(#zz) .hbn{flex:none!important;height:96px!important;padding:8px 14px!important;min-height:0!important;}',
     'html:root body:not(#zz) .hbn-i{width:62px!important;height:62px!important}',
     'html:root body:not(#zz) .hbn-t *{font-size:13px!important}',
@@ -340,6 +340,9 @@
     'html:root body #ch:not([data-afcp]) .r .bb{min-width:92px;overflow-wrap:anywhere}',
     'html:root body .sheet .option:not([data-k]),html:root body .sheet .option:not([data-k]) .opt-text,html:root body .sheet .option:not([data-k]) b,html:root body .sheet .option:not([data-k]) span{color:#14213d!important}',
     'html:root body .sheet .option:not([data-k]) .opt-text{font-weight:700!important;font-size:16px!important}',
+    /* ثلاث بطاقات معلومات (المدرس): العنوان فوق والقيمة تحته */
+    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw{flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;height:60px!important;border-radius:20px!important;gap:0!important;padding:0 14px!important}',
+    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px!important;color:#14213d!important}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
