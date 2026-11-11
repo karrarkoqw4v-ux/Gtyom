@@ -182,10 +182,10 @@
     /* ===== مظهر محادثة الجروبات (داكن بأسلوب تيليجرام) — لا يُطبّق إذا غيّر المستخدم ألوانه ===== */
     'html body #ch:not([data-afcp]) #cl{padding:10px 8px 12px!important;gap:3px!important}',
     'html body #ch:not([data-afcp]) .r{gap:7px!important;align-items:flex-end!important}',
-    'html body #ch:not([data-afcp]) .r .bb{display:flow-root!important;position:relative!important;max-width:84%!important;padding:6px 11px 5px!important;font-size:calc(var(--fs,14px)*1.18)!important;line-height:1.42!important;box-shadow:none!important;border:0!important;border-radius:17px 17px 17px 5px!important;background:#182533!important;color:#f5f7fa!important}',
-    'html body #ch:not([data-afcp]) .r.me .bb{border-radius:17px 17px 5px 17px!important;background:linear-gradient(180deg,#31608f,#27527f)!important;color:#fff!important}',
-    'html body #ch:not([data-afcp]) .r .bb::before{content:"";position:absolute;bottom:0;left:-7px;width:12px;height:16px;background:#182533;clip-path:path("M12 0V16H0C5 15 11 10 12 0Z")}',
-    'html body #ch:not([data-afcp]) .r.me .bb::before{left:auto;right:-7px;background:#27527f;clip-path:path("M0 0V16H12C7 15 1 10 0 0Z")}',
+    'html body #ch:not([data-afcp]) .r .bb{display:flow-root!important;position:relative!important;max-width:84%!important;padding:6px 11px 5px!important;font-size:calc(var(--fs,14px)*1.18)!important;line-height:1.42!important;box-shadow:none!important;border:0!important;border-radius:17px 17px 17px 5px!important;background:var(--af-in,#182533)!important;color:#f5f7fa!important}',
+    'html body #ch:not([data-afcp]) .r.me .bb{border-radius:17px 17px 5px 17px!important;background:linear-gradient(180deg,var(--af-out,#31608f),var(--af-out2,#27527f))!important;color:#fff!important}',
+    'html body #ch:not([data-afcp]) .r .bb::before{content:"";position:absolute;bottom:0;left:-7px;width:12px;height:16px;background:var(--af-in,#182533);clip-path:path("M12 0V16H0C5 15 11 10 12 0Z")}',
+    'html body #ch:not([data-afcp]) .r.me .bb::before{left:auto;right:-7px;background:var(--af-out2,#27527f);clip-path:path("M0 0V16H12C7 15 1 10 0 0Z")}',
     'html body #ch:not([data-afcp]) .r .bb .bn{font-size:calc(var(--fs,14px)*1)!important;font-weight:700!important;margin-bottom:2px!important}',
     'html body #ch:not([data-afcp]) .r .bb .tm{float:left!important;margin:6px 0 0 12px!important;font-size:11px!important;opacity:.62!important;line-height:1.2!important}',
     'html body #ch:not([data-afcp]) .r.me .bb .tm{opacity:.85!important}',
@@ -202,6 +202,37 @@
   window.AFX_HEAD = function () { return '<style id="af-x">' + CSS + '</style>'; };
 
   /* ===================== تطبيق الثيم على كل المستندات ===================== */
+  /* ===================== ألوان التطبيق (٢٠ تصميماً بنفس الشكل والحركة) ===================== */
+  var PAL = [
+    ['أزرق الفارابي', '#0aa6f5', '#2f7fb0', '#182533', '#31608f', '#27527f'],
+    ['سماوي', '#22b8e8', '#1b8db3', '#15262e', '#2a7f9c', '#226b85'],
+    ['زمردي', '#1fae6b', '#137a4a', '#15261f', '#2c7a56', '#236546'],
+    ['نعناعي', '#2ec4a6', '#1b9a82', '#14272a', '#2b8a7b', '#236f63'],
+    ['بنفسجي', '#8b6cf0', '#5b3fc4', '#1d1a2e', '#5a47b0', '#483a92'],
+    ['أرجواني', '#b45cf0', '#7e2fc0', '#221830', '#7a3fb0', '#63318f'],
+    ['وردي', '#ee5d9b', '#c02e72', '#2a1822', '#a63d6c', '#8a3158'],
+    ['أحمر', '#e5484d', '#b02a30', '#2a1a1c', '#a83a3f', '#8c2f34'],
+    ['برتقالي', '#ff8a2a', '#d65f0a', '#2a2018', '#b0622a', '#944f20'],
+    ['ذهبي', '#e0a21c', '#b57a00', '#2a2416', '#a07a1c', '#856418'],
+    ['كحلي', '#3b63d6', '#243f96', '#161c2e', '#2d4a9a', '#243b7c'],
+    ['نيلي', '#5b7cfa', '#3d56c4', '#181d33', '#3f56b0', '#33468f'],
+    ['فولاذي', '#7b8ea6', '#55677e', '#1a2028', '#4a5d74', '#3b4b5e'],
+    ['رمادي أنيق', '#9aa4b2', '#6c7683', '#1c1c1e', '#3a3d42', '#2c2f33'],
+    ['بحري', '#0b8fa8', '#066478', '#13262b', '#1f7a8c', '#196777'],
+    ['كرزي', '#d6336c', '#a1174c', '#2a161e', '#9c2f58', '#832749'],
+    ['عنابي', '#a8324f', '#7a1c36', '#2a171c', '#8a2d45', '#72253a'],
+    ['ترابي', '#b8742f', '#8a5218', '#261d16', '#8a5a2c', '#734a24'],
+    ['زيتوني', '#7fb800', '#5a8a00', '#1c2414', '#5e8a1a', '#4d7215'],
+    ['جليدي', '#3ecbff', '#1a8fd0', '#132733', '#1f86b5', '#196f96']
+  ];
+  function palCss(i) {
+    var p = PAL[i]; if (!p || g('af_pal_set', '') !== '1') return '';
+    return 'html:root{--blue:' + p[1] + '!important;--blue-dark:' + p[2] + '!important;--af-in:' + p[3] + ';--af-out:' + p[4] + ';--af-out2:' + p[5] + '}' +
+      'html:root body #ch #cs.ch-s,html:root body #ch #cmic,html:root body #ch .ch-i .ch-act button.ch-s{background:linear-gradient(135deg,' + p[1] + ',' + p[2] + ')!important;background-image:linear-gradient(135deg,' + p[1] + ',' + p[2] + ')!important;color:#fff!important}' +
+      'html:root body .hbn{background:linear-gradient(135deg,' + p[1] + ',' + p[2] + ')!important}';
+  }
+  var PALI = +g('af_pal', '0') || 0;
+  function setPal(i) { PALI = Math.max(0, Math.min(PAL.length - 1, +i || 0)); s('af_pal', String(PALI)); s('af_pal_set', '1'); applyAll(); }
   var docs = [];
   function applyDoc(d) {
     try {
@@ -210,6 +241,8 @@
       r.classList.toggle('af-lite', lvl() === 'lite' || lvl() === 'static');
       r.classList.toggle('af-nofx', lvl() !== 'full');
       try { r.setAttribute('data-af-tier', String(TIER[lvl()])); } catch (e) {}
+      var pst = d.getElementById('af-pal'); if (!pst) { pst = d.createElement('style'); pst.id = 'af-pal'; (d.head || r).appendChild(pst); }
+      if (pst.getAttribute('data-i') !== String(PALI)) { pst.textContent = palCss(PALI); pst.setAttribute('data-i', String(PALI)); }
       if (!d.getElementById('af-x')) {
         var st = d.createElement('style'); st.id = 'af-x'; st.textContent = CSS; (d.head || r).appendChild(st);
       }
@@ -794,7 +827,7 @@
     setTimeout(function () { tick(); setInterval(tick, 5000); }, 4000);
   })();
 
-  window.AFX = { cleanup: cleanupPage, reset: resetPage, panel: function (d, t, h, b) { return panel(d, t, h, b, true); }, esc: esc, on: on, roleInfo: function () { return roleInfo(); }, J: J };
+  window.AFX = { pal: function (i) { if (i === undefined) return PALI; setPal(i); }, PAL: PAL, cleanup: cleanupPage, reset: resetPage, panel: function (d, t, h, b) { return panel(d, t, h, b, true); }, esc: esc, on: on, roleInfo: function () { return roleInfo(); }, J: J };
 
   /* ===================== إدراج الأزرار بقائمة الإعدادات ===================== */
   function injectEntries(doc) {
