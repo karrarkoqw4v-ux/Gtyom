@@ -257,6 +257,27 @@
     'html:root body nav#nav .nb{font-size:0!important;width:52px!important;height:52px!important;padding:0!important;border-radius:999px!important;justify-content:center!important;gap:0!important;flex:none!important;transition:width .3s}',
     'html:root body nav#nav .nb svg{width:23px!important;height:23px!important}',
     'html:root body nav#nav .nb.on{width:auto!important;padding:0 18px!important;gap:8px!important;font-size:14px!important;font-weight:800!important;flex-direction:row!important;white-space:nowrap}',
+    /* ===== تفاصيل الرئيسية: معلومات الطالب + حركات ===== */
+    'html:root body .rows{gap:10px!important}',
+    'html:root body .rows .rw{flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:1px!important;height:58px!important;padding:0 16px!important;border-radius:18px!important;background:#fff!important;border:0!important;box-shadow:0 6px 16px rgba(20,60,120,.10)!important;font-size:11.5px!important;font-weight:600!important;color:#6b7c93!important;position:relative;overflow:hidden!important}',
+    'html:root body .rows .rw::before{content:\'\';position:absolute;inset-inline-start:0;top:14px;bottom:14px;width:4px;border-radius:4px;background:linear-gradient(180deg,var(--blue,#0aa6f5),var(--blue-dark,#2f7fb0))}',
+    'html:root body .rows .rw span{font-size:15.5px!important;font-weight:800!important;color:#14213d!important;margin:0!important;max-width:100%}',
+    'html:root body .af-hq-btn:last-child{align-items:center!important}',
+    'html:root body .af-hq-btn:last-child>div{align-self:center!important}',
+    'html:root body .af-hq-btn:last-child b{margin-top:0!important}',
+    '@keyframes afRise{from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}',
+    '@keyframes afFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}',
+    '@keyframes afGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.35)}50%{box-shadow:0 0 0 12px rgba(255,255,255,0)}}',
+    '@keyframes afDrift{0%,100%{transform:translate(0,0)}50%{transform:translate(10px,-8px)}}',
+    'html:root body .hbn{animation:afRise .5s cubic-bezier(.2,.8,.3,1) both}',
+    'html:root body .af-hq-btn{animation:afRise .5s cubic-bezier(.2,.8,.3,1) both;transition:transform .15s ease,box-shadow .2s ease;-webkit-tap-highlight-color:transparent}',
+    'html:root body .af-hq-btn:nth-child(1){animation-delay:.06s}html:root body .af-hq-btn:nth-child(2){animation-delay:.12s}html:root body .af-hq-btn:nth-child(3){animation-delay:.18s}html:root body .af-hq-btn:nth-child(4){animation-delay:.24s}html:root body .af-hq-btn:nth-child(5){animation-delay:.30s}',
+    'html:root body .rows .rw{animation:afRise .5s .36s cubic-bezier(.2,.8,.3,1) both}',
+    'html:root body .af-hq-btn:active{transform:scale(.95)!important;box-shadow:0 3px 8px rgba(20,60,120,.12)!important}',
+    'html:root body .af-hq-btn .af-hq-ic{animation:afFloat 3.6s ease-in-out infinite}',
+    'html:root body .af-hq-btn:nth-child(2) .af-hq-ic{animation-delay:-.7s}html:root body .af-hq-btn:nth-child(3) .af-hq-ic{animation-delay:-1.4s}html:root body .af-hq-btn:nth-child(4) .af-hq-ic{animation-delay:-2.1s}html:root body .af-hq-btn:nth-child(5) .af-hq-ic{animation:afGlow 2.4s ease-in-out infinite}',
+    'html:root body .hbn::after{content:\'\';position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.10);left:-30px;bottom:-60px;animation:afDrift 7s ease-in-out infinite;pointer-events:none}',
+    '@media (prefers-reduced-motion:reduce){html:root body .hbn,html:root body .af-hq-btn,html:root body .rows .rw,html:root body .af-hq-ic,html:root body .hbn::after{animation:none!important}}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
