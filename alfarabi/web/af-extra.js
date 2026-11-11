@@ -178,7 +178,23 @@
     '#cl2 .cb.end{background:linear-gradient(145deg,#ff5d6e,#d9283d)!important;width:76px!important;height:76px!important}',
     '#cl2 .cb.end svg{transform:rotate(135deg)}',
     '#cl2 .cb.w{background:#fff!important;color:#1f4fb8!important}',
-    '@keyframes afPulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,127,.6),0 6px 16px rgba(0,0,0,.2)}50%{box-shadow:0 0 0 15px rgba(52,211,127,0),0 6px 16px rgba(0,0,0,.2)}}'
+    '@keyframes afPulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,127,.6),0 6px 16px rgba(0,0,0,.2)}50%{box-shadow:0 0 0 15px rgba(52,211,127,0),0 6px 16px rgba(0,0,0,.2)}}',
+    /* ===== مظهر محادثة الجروبات (داكن بأسلوب تيليجرام) — لا يُطبّق إذا غيّر المستخدم ألوانه ===== */
+    'html body #ch:not([data-afcp]) #cl{padding:10px 8px 12px!important;gap:3px!important}',
+    'html body #ch:not([data-afcp]) .r{gap:7px!important;align-items:flex-end!important}',
+    'html body #ch:not([data-afcp]) .r .bb{display:flow-root!important;position:relative!important;max-width:84%!important;padding:6px 11px 5px!important;font-size:calc(var(--fs,14px)*1.18)!important;line-height:1.42!important;box-shadow:none!important;border:0!important;border-radius:17px 17px 17px 5px!important;background:#182533!important;color:#f5f7fa!important}',
+    'html body #ch:not([data-afcp]) .r.me .bb{border-radius:17px 17px 5px 17px!important;background:linear-gradient(180deg,#31608f,#27527f)!important;color:#fff!important}',
+    'html body #ch:not([data-afcp]) .r .bb::before{content:"";position:absolute;bottom:0;left:-7px;width:12px;height:16px;background:#182533;clip-path:path("M12 0V16H0C5 15 11 10 12 0Z")}',
+    'html body #ch:not([data-afcp]) .r.me .bb::before{left:auto;right:-7px;background:#27527f;clip-path:path("M0 0V16H12C7 15 1 10 0 0Z")}',
+    'html body #ch:not([data-afcp]) .r .bb .bn{font-size:calc(var(--fs,14px)*1)!important;font-weight:700!important;margin-bottom:2px!important}',
+    'html body #ch:not([data-afcp]) .r .bb .tm{float:left!important;margin:6px 0 0 12px!important;font-size:11px!important;opacity:.62!important;line-height:1.2!important}',
+    'html body #ch:not([data-afcp]) .r.me .bb .tm{opacity:.85!important}',
+    'html body #ch:not([data-afcp]) .r .av{width:32px!important;height:32px!important;font-size:13px!important;box-shadow:none!important}',
+    '@keyframes afIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}',
+    '@keyframes afInMe{from{opacity:0;transform:translate(10px,14px) scale(.96)}to{opacity:1;transform:none}}',
+    'html body #ch .r.af-in{animation:afIn .32s cubic-bezier(.2,.9,.3,1.15) both;transform-origin:0 100%}',
+    'html body #ch .r.me.af-in{animation:afInMe .32s cubic-bezier(.2,.9,.3,1.15) both;transform-origin:100% 100%}',
+    '@media (prefers-reduced-motion:reduce){html body #ch .r.af-in{animation:none!important}}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
@@ -811,10 +827,27 @@
       });
     });
   }
+  /* حركة دخول الرسائل الجديدة في المحادثة */
+  function chatAnim(d) {
+    try {
+      var ch = d.getElementById('ch'), cl = d.getElementById('cl'); if (!ch || !cl) return;
+      var on = ch.classList.contains('on'), key = ch.getAttribute('data-g') || '';
+      if (!on) { cl.__afs = null; return; }
+      var st = cl.__afs;
+      var rows = cl.querySelectorAll('.r[data-id]');
+      if (!st || st.k !== key) { st = cl.__afs = { k: key, ids: {} }; rows.forEach(function (r) { st.ids[r.getAttribute('data-id')] = 1; }); return; }
+      var nw = Date.now();
+      rows.forEach(function (r) {
+        var id = r.getAttribute('data-id'), t0 = st.ids[id];
+        if (!t0) { st.ids[id] = nw; r.classList.add('af-in'); }
+        else if (t0 > 1 && nw - t0 < 340 && !r.classList.contains('af-in')) { r.classList.add('af-in'); r.style.animationDelay = (-(nw - t0)) + 'ms'; }
+      });
+    } catch (e) { }
+  }
   function watchDoc(d) {
     if (!d || !d.body || d.__afxw) return; d.__afxw = 1;
     var q = 0;
-    new MutationObserver(function () { if (q) return; q = 1; (d.defaultView || window).requestAnimationFrame(function () { q = 0; injectEntries(d); supTick(d); }); }).observe(d.body, { childList: true, subtree: true });
+    new MutationObserver(function () { if (q) return; q = 1; (d.defaultView || window).requestAnimationFrame(function () { q = 0; injectEntries(d); supTick(d); chatAnim(d); }); }).observe(d.body, { childList: true, subtree: true });
     injectEntries(d); supTick(d);
   }
   function hookFrame(f) {
