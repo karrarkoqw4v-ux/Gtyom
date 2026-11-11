@@ -13,8 +13,8 @@
   <title>ثانوية الفارابي</title>
   <link rel="stylesheet" href="fonts/fonts.css">
   <script src="af-webshim.js?v=1794060001"></script>
-  <script src="af-landing.js?v=0215ccbc"></script>
-  <script src="af-dev.js?v=0215ccbc"></script>
+  <script src="af-landing.js?v=ec31ed9e"></script>
+  <script src="af-dev.js?v=ec31ed9e"></script>
   
   <script src="af-android.js?v=1794060001"></script>
   <script src="af-sync.js?v=20261108x"></script>
@@ -4598,7 +4598,8 @@ window.USER_CSS=(window.USER_CSS||'')+RP_CSS;
 (function(){
 var FONT_LINK='<link rel="stylesheet" href="fonts/fonts.css">';
 var FONT_CSS=String.raw`<style id="af-font">
-:root{--af-font:system-ui,-apple-system,Roboto,"Noto Sans Arabic","Droid Arabic Naskh",sans-serif}
+@font-face{font-family:"AFLat";src:local("Roboto"),local("Arial"),local("Liberation Sans"),local("Helvetica Neue"),local("Helvetica");unicode-range:U+0020-007E,U+00A0-00FF}
+:root{--af-font:"AFLat","Noto Naskh Arabic","Droid Arabic Naskh",system-ui,-apple-system,Roboto,sans-serif}
 html,body,body *,input,textarea,button,select{font-family:var(--af-font)!important;letter-spacing:0!important}
 body{font-weight:600;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 button,.bt,.option,.chip,.nb{font-weight:700}
