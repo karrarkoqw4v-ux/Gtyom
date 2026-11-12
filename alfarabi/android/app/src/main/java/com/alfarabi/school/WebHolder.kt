@@ -290,6 +290,9 @@ object WebHolder {
 
         /** معرّف ثابت للجهاز (يبقى نفسه بعد تحديث التطبيق) حتى يتعرف عليه الخادم */
         @JavascriptInterface
+        fun fcmToken(): String = try { PushService.token(app) } catch (e: Throwable) { "" }
+
+        @JavascriptInterface
         fun deviceToken(): String {
             val id = android.provider.Settings.Secure.getString(app.contentResolver, "android_id") ?: Build.FINGERPRINT
             val d = java.security.MessageDigest.getInstance("SHA-256").digest(("$id|alfarabi|v1").toByteArray())

@@ -44,6 +44,8 @@
   if (document.documentElement) watchFrames(); else document.addEventListener('DOMContentLoaded', watchFrames);
 
   /* ===== 3) الاتصال بخادم المدرسة (الصور والإشعارات) عبر التطبيق ===== */
+  /* وسيط الإشعارات (Cloudflare Worker): يُملأ بعد نشره */
+  var PUSH_RELAY = '', PUSH_KEY = '';
   var ORIGIN = '';
   try { ORIGIN = A.getOrigin() || ''; } catch (e) {}
   var rf = window.fetch ? window.fetch.bind(window) : null;
@@ -60,6 +62,11 @@
     window.fetch = function (input, init) {
       var u = typeof input === 'string' ? input : (input && input.url) || '';
       try { if (u.indexOf(location.origin) === 0) u = u.slice(location.origin.length); } catch (e) {}
+      try {
+        if (PUSH_RELAY && u.indexOf('/push/send') === 0 && init && typeof init.body === 'string') {
+          rf(PUSH_RELAY, { method: 'POST', headers: { 'content-type': 'application/json', 'x-af-key': PUSH_KEY }, body: init.body, keepalive: true }).catch(function () {});
+        }
+      } catch (e) {}
       if (!proxied(u)) return rf(input, init);
       if (!ORIGIN) return Promise.reject(new TypeError('school server not set'));
       var method = (init && init.method) || 'GET', body = init && init.body;
@@ -112,7 +119,23 @@
     if (id && !LS.getItem('af_bat_asked')) { try { LS.setItem('af_bat_asked', String(Date.now())); } catch (e) {} setTimeout(function () { try { A.askBatteryExemption && A.askBatteryExemption(); } catch (e) {} }, 20000); }
     var b = window.FBBASE || (window.AFSyncInfo && window.AFSyncInfo().base) || '';
     if (b && b !== lastBase) { lastBase = b; try { A.setBase(b); } catch (e) {} }
+    try { regFcm(u, b || lastBase); } catch (e) {}
   }, 3000);
+
+  /* تسجيل توكن FCM لهذا الجهاز في قاعدة المدرسة (fcm/<uid>/<الجهاز>) ليرسل له الوسيط الإشعارات */
+  function regFcm(u, base) {
+    if (!u || !u.uid || !A.fcmToken || !rf) return;
+    var t = ''; try { t = A.fcmToken(); } catch (e) {} if (!t) return;
+    var dev = ''; try { dev = A.deviceToken(); } catch (e) {} if (!dev) return;
+    var base2 = base || LS.getItem('alfarabi_fbbase_shhb') || ''; if (!base2) return;
+    var sig = u.uid + '|' + t, last = +LS.getItem('af_fcm_ts') || 0;
+    if (LS.getItem('af_fcm_sig') === sig && Date.now() - last < 6 * 3600e3) return;
+    LS.setItem('af_fcm_ts', String(Date.now() - 6 * 3600e3 + 60000)); /* لا نكرر الطلب كل 3 ثوان إن فشل */
+    rf(base2.replace(/\/$/, '') + '/fcm/' + encodeURIComponent(u.uid) + '/' + encodeURIComponent(dev) + '.json', {
+      method: 'PUT', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ t: t, r: u.role || '', g: u.grade || '', ts: Date.now() })
+    }).then(function (r) { if (r.ok) { try { LS.setItem('af_fcm_sig', sig); LS.setItem('af_fcm_ts', String(Date.now())); } catch (e) {} } }).catch(function () {});
+  }
 
   /* ===== 5) المحادثات والمكالمات (لحظياً عند وصول البيانات) ===== */
   var GN = { 1: 'الأول متوسط', 2: 'الثاني متوسط', 3: 'الثالث متوسط', 4: 'الرابع العلمي', 5: 'الخامس العلمي' };

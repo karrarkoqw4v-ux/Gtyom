@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "733709666460",
+    "project_id": "wiom-fab0d",
+    "storage_bucket": "wiom-fab0d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733709666460:android:f0db09361829b6b56d0559",
+        "android_client_info": {
+          "package_name": "com.alfarabi.school"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATunB0zreYXOV3VX5-DXe_AZS03Q-W9uY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
