@@ -1,5 +1,8 @@
 /* ملازم الثالث متوسط 2027: قائمة بمربعات، عارض PDF بأدوات، إضافة/تعديل/تحديث/حذف للإدارة والمدرسين، وتقييم الطلاب */
 (function () {
+  var PDFX = { cMapUrl: new URL('vendor/pdfjs/cmaps/', location.href).href, cMapPacked: true, standardFontDataUrl: new URL('vendor/pdfjs/standard_fonts/', location.href).href, useSystemFonts: false };
+  function gd(lib, o) { for (var k in PDFX) o[k] = PDFX[k]; return lib.getDocument(o); }
+
   'use strict';
   var A = window.Android;
   if (!A || !window.AFX) return;
@@ -379,7 +382,7 @@
       var fp = S.querySelector('#hdFastProg');
       if (fp) fp.textContent = 'جاري تجهيز الصفحات... ' + Math.max(1, Math.round((f || 0) * 100)) + '%';
     })
-      .then(function (blob) { return loadPdf().then(function (lib) { objUrl = URL.createObjectURL(blob); return lib.getDocument({ url: objUrl }).promise; }); })
+      .then(function (blob) { return loadPdf().then(function (lib) { objUrl = URL.createObjectURL(blob); return gd(lib, { url: objUrl }).promise; }); })
       .then(function (d) {
         pdf = d; N = d.numPages;
         S.innerHTML = '';
@@ -393,8 +396,8 @@
   function coverFrom(file) {
     return loadPdf().then(function (lib) {
       var u = URL.createObjectURL(file);
-      return lib.getDocument({ url: u, disableAutoFetch: true, disableStream: false, rangeChunkSize: 262144 }).promise.catch(function () {
-        return file.arrayBuffer().then(function (buf) { return lib.getDocument({ data: buf }).promise; });
+      return gd(lib, { url: u, disableAutoFetch: true, disableStream: false, rangeChunkSize: 262144 }).promise.catch(function () {
+        return file.arrayBuffer().then(function (buf) { return gd(lib, { data: buf }).promise; });
       });
     }).then(function (pdf) {
       return pdf.getPage(1).then(function (pg) {

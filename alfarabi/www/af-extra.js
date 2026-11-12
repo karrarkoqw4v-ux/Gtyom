@@ -215,7 +215,7 @@
     'html body #sheet.open #cap::placeholder{color:#7f91a4}',
     'html body #sheet.open #sd{background:linear-gradient(135deg,var(--blue,#0aa6f5),var(--blue-dark,#2f7fb0))!important;color:#fff!important;border-radius:999px!important;height:50px!important;font-size:16px!important;font-weight:800!important;margin-top:12px!important;box-shadow:0 10px 22px rgba(10,120,200,.4)!important}',
     'html body #ch .r .bb.bi{padding:3px 3px 5px!important}',
-    'html body #ch .r .bb.bi .mi{border-radius:14px!important;max-height:340px!important;width:100%!important;object-fit:cover!important;display:block}',
+    'html body #ch .r .bb.bi .mi{border-radius:14px!important;max-height:420px!important;width:100%!important;object-fit:contain!important;display:block}',
     /* ===== خط نسخ موحّد وأحجام مرتبة (القائمة السفلية لم تُمَس) ===== */
     'html:root body{font-size:16px;line-height:1.55}',
     'html:root body .bt,html:root body button.bt{min-height:48px!important;font-size:16.5px!important;font-weight:700!important;border-radius:16px!important;padding:0 18px!important}',
@@ -354,6 +354,12 @@
     'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw{flex:1 1 calc(50% - 5px)!important;height:auto!important;min-height:58px!important;padding:8px 14px!important}',
     'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw:first-child{flex:1 1 100%!important}',
     'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw span{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.35!important;font-size:14.5px!important}',
+    /* أيقونات خيارات الرسالة (إيموجي النظام) */
+    'html body #sheet.open .option[data-k="et"]::before,html body #sheet.open .option[data-k="ei"]::before,html body #sheet.open .option[data-k="dl"]::before,html body #sheet.open .option[data-k="rt"]::before{background-image:none!important;display:grid!important;place-items:center;font-size:27px;line-height:1;font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif}',
+    'html body #sheet.open .option[data-k="et"]::before{content:"✏️";background-color:#f59e0b}',
+    'html body #sheet.open .option[data-k="ei"]::before{content:"🖼️";background-color:#14b8a6}',
+    'html body #sheet.open .option[data-k="dl"]::before{content:"🗑️";background-color:#e5484d}',
+    'html body #sheet.open .option[data-k="rt"]::before{content:"🔄";background-color:#3b82f6}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
