@@ -343,6 +343,17 @@
     /* ثلاث بطاقات معلومات (المدرس): العنوان فوق والقيمة تحته */
     'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw{flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;height:60px!important;border-radius:20px!important;gap:0!important;padding:0 14px!important}',
     'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px!important;color:#14213d!important}',
+    /* شعار المدرسة دائرة كاملة بدون قص */
+    'html:root body:not(#zz) .hbn-i{width:80px!important;height:80px!important;border-radius:50%!important;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,50,.28),inset 0 0 0 3px rgba(255,255,255,.9)!important}',
+    'html:root body:not(#zz) .hbn-i img{width:70%!important;height:70%!important;border-radius:0!important;object-fit:contain!important}',
+    'html:root body:not(#zz) .hbn{height:104px!important}',
+    'html:root body:not(#zz) .logo{overflow:hidden}',
+    'html:root body:not(#zz) .logo img{width:68%!important;height:68%!important;border-radius:0!important;object-fit:contain!important}',
+    /* بطاقات معلومات المدرس: الاسم كامل بصف مستقل */
+    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)){flex-wrap:wrap!important}',
+    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw{flex:1 1 calc(50% - 5px)!important;height:auto!important;min-height:58px!important;padding:8px 14px!important}',
+    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw:first-child{flex:1 1 100%!important}',
+    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw span{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.35!important;font-size:14.5px!important}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
