@@ -341,19 +341,18 @@
     'html:root body .sheet .option:not([data-k]),html:root body .sheet .option:not([data-k]) .opt-text,html:root body .sheet .option:not([data-k]) b,html:root body .sheet .option:not([data-k]) span{color:#14213d!important}',
     'html:root body .sheet .option:not([data-k]) .opt-text{font-weight:700!important;font-size:16px!important}',
     /* ثلاث بطاقات معلومات (المدرس): العنوان فوق والقيمة تحته */
-    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw{flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;height:60px!important;border-radius:20px!important;gap:0!important;padding:0 14px!important}',
-    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px!important;color:#14213d!important}',
+    'html:root body:not(#zz) .rows .rw{flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;height:60px!important;border-radius:20px!important;gap:0!important;padding:0 14px!important}',
+    'html:root body:not(#zz) .rows .rw span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px!important;color:#14213d!important}',
     /* شعار المدرسة دائرة كاملة بدون قص */
     'html:root body:not(#zz) .hbn-i{width:80px!important;height:80px!important;border-radius:50%!important;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,50,.28),inset 0 0 0 3px rgba(255,255,255,.9)!important}',
     'html:root body:not(#zz) .hbn-i img{width:70%!important;height:70%!important;border-radius:0!important;object-fit:contain!important}',
     'html:root body:not(#zz) .hbn{height:104px!important}',
-    'html:root body:not(#zz) .logo{overflow:hidden}',
     'html:root body:not(#zz) .logo img{width:68%!important;height:68%!important;border-radius:0!important;object-fit:contain!important}',
     /* بطاقات معلومات المدرس: الاسم كامل بصف مستقل */
-    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)){flex-wrap:wrap!important}',
-    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw{flex:1 1 calc(50% - 5px)!important;height:auto!important;min-height:58px!important;padding:8px 14px!important}',
-    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw:first-child{flex:1 1 100%!important}',
-    'html:root body:not(#zz) .rows:has(.rw:nth-child(3)) .rw span{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.35!important;font-size:14.5px!important}',
+    'html:root body:not(#zz) .rows{flex-wrap:wrap!important}',
+    'html:root body:not(#zz) .rows .rw{flex:1 1 calc(50% - 5px)!important;height:auto!important;min-height:58px!important;padding:8px 14px!important}',
+    'html:root body:not(#zz) .rows .rw:first-child{flex:1 1 100%!important}',
+    'html:root body:not(#zz) .rows .rw span{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.35!important;font-size:14.5px!important}',
     /* أيقونات خيارات الرسالة بأسلوب النظام (خطوط بيضاء) مع حركة */
     'html body #sheet.open .option[data-k="et"]::before,html body #sheet.open .option[data-k="ei"]::before,html body #sheet.open .option[data-k="dl"]::before,html body #sheet.open .option[data-k="rt"]::before{content:""!important;background-color:#26364a!important;background-size:28px!important;background-repeat:no-repeat!important;background-position:center!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 8px 18px rgba(0,0,0,.35)!important;transition:transform .18s cubic-bezier(.3,1.6,.5,1),background-color .18s}',
     'html body #sheet.open .option[data-k="et"]::before{background-image:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23ffffff\' stroke-width=\'1.8\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z\'/><path d=\'M14 7l3 3\'/></svg>")!important}',
@@ -365,6 +364,7 @@
     'html body #sheet.open .option[data-k]::before{animation:afPop .38s cubic-bezier(.3,1.4,.5,1) both}',
     'html body #sheet.open .option[data-k]:nth-of-type(2)::before{animation-delay:.05s}html body #sheet.open .option[data-k]:nth-of-type(3)::before{animation-delay:.1s}html body #sheet.open .option[data-k]:nth-of-type(4)::before{animation-delay:.15s}',
     'html body #sheet.open .option[data-k]:active::before{transform:scale(.86) rotate(-6deg)!important;background-color:var(--blue,#0aa6f5)!important}',
+    'html:root body:not(#zz) .logo#lg img{width:84%!important;height:84%!important;border-radius:50%!important;object-fit:cover!important}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
