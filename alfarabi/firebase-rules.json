@@ -2,84 +2,197 @@
   "rules": {
     ".read": false,
     ".write": false,
-
     "accounts": {
-      ".read": true, ".write": true,
-      "$uid": { ".validate": "newData.val() === null || newData.hasChildren()" }
-    },
-
-    "chat": {
-      ".read": true, ".write": true,
-      "$room": {
-        ".indexOn": ["ts", "id"],
-        "$msg": {
-          ".validate": "newData.val() === null || newData.hasChildren()",
-          "t":   { ".validate": "newData.isString() && newData.val().length <= 6000" },
-          "ts":  { ".validate": "newData.isNumber()" },
-          "img": { ".validate": "newData.isString() && newData.val().length <= 4000000" },
-          "vid": { ".validate": "newData.isString() && newData.val().length <= 4000000" },
-          "aud": { ".validate": "newData.isString() && newData.val().length <= 4000000" }
+      ".read": true,
+      ".write": true,
+      "$uid": {
+        "name": {
+          ".validate": "!newData.isString() || newData.val().length <= 200"
+        },
+        "email": {
+          ".validate": "!newData.isString() || newData.val().length <= 200"
+        },
+        "role": {
+          ".validate": "!newData.isString() || newData.val().length <= 30"
+        },
+        "grade": {
+          ".validate": "!newData.isString() || newData.val().length <= 10"
+        },
+        "child": {
+          ".validate": "!newData.isString() || newData.val().length <= 200"
+        },
+        "subject": {
+          ".validate": "!newData.isString() || newData.val().length <= 200"
+        },
+        "pass": {
+          ".validate": "!newData.isString() || newData.val().length <= 500"
+        },
+        "photo": {
+          ".validate": "!newData.isString() || newData.val().length <= 3000000"
+        },
+        "$f": {
+          ".validate": "!newData.isString() || newData.val().length <= 3000000"
         }
       }
     },
-
+    "chat": {
+      ".read": true,
+      ".write": true,
+      "$room": {
+        ".indexOn": [
+          "ts",
+          "id"
+        ],
+        "$msg": {
+          "$f": {
+            ".validate": "!newData.isString() || newData.val().length <= 8000000"
+          }
+        }
+      }
+    },
     "records": {
-      ".read": true, ".write": true,
-      ".indexOn": ["ts", "k"],
-      "$rec": { ".validate": "newData.val() === null || newData.hasChildren()" }
+      ".read": true,
+      ".write": true,
+      ".indexOn": [
+        "ts",
+        "k",
+        "gr",
+        "id",
+        "cid"
+      ],
+      "$rec": {
+        "$f": {
+          ".validate": "!newData.isString() || newData.val().length <= 8000000"
+        }
+      }
     },
-
-    "school":        { ".read": true, ".write": true },
-    "plans":         { ".read": true, ".write": true, ".indexOn": ["ts"] },
-    "plansSeen":     { ".read": true, ".write": true },
-    "ministry":      { ".read": true, ".write": true },
-    "votes":         { ".read": true, ".write": true },
-    "updates":       { ".read": true, ".write": true },
-    "rat":           { ".read": true, ".write": true },
-
+    "plans": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": [
+        "ts"
+      ]
+    },
+    "plansSeen": {
+      ".read": true,
+      ".write": true
+    },
+    "school": {
+      ".read": true,
+      ".write": true
+    },
+    "ministry": {
+      ".read": true,
+      ".write": true
+    },
+    "votes": {
+      ".read": true,
+      ".write": true
+    },
+    "updates": {
+      ".read": true,
+      ".write": true
+    },
+    "rat": {
+      ".read": true,
+      ".write": true
+    },
+    "chk": {
+      ".read": true,
+      ".write": true
+    },
     "typing": {
-      ".read": true, ".write": true,
-      "$room": { "$uid": { ".validate": "newData.val() === null || newData.hasChildren()" } }
+      ".read": true,
+      ".write": true,
+      "$room": {
+        "$uid": {}
+      }
     },
-
-    "devices":  { ".read": true, ".write": true },
-    "lastdev":  { ".read": true, ".write": true },
-    "chk":      { ".read": true, ".write": true },
-
+    "devices": {
+      ".read": true,
+      ".write": true,
+      "$uid": {
+        "$dev": {
+          "$f": {
+            ".validate": "!newData.isString() || newData.val().length <= 2000"
+          }
+        }
+      }
+    },
+    "lastdev": {
+      ".read": true,
+      ".write": true,
+      "$uid": {
+        ".validate": "true"
+      }
+    },
     "config": {
-      ".read": true, ".write": true,
-      "creds":      { ".validate": "newData.val() === null || newData.hasChildren()" },
-      "reset":      { ".validate": "newData.val() === null || newData.isNumber() || newData.isString() || newData.hasChildren()" },
-      "accarchive": { ".validate": "newData.val() === null || newData.hasChildren()" }
+      ".read": true,
+      ".write": true,
+      "creds": {
+        "$f": {
+          ".validate": "!newData.isString() || newData.val().length <= 2000"
+        }
+      },
+      "reset": {},
+      "accarchive": {}
     },
-
     "handouts": {
-      ".read": true, ".write": true,
-      "$id": { ".validate": "newData.hasChildren() || newData.val() === null" }
+      ".read": true,
+      ".write": true,
+      "$id": {
+        ".validate": "newData.hasChildren() || newData.val() === null"
+      }
     },
     "handout_files": {
-      ".read": true, ".write": true,
-      "$id": { "$chunk": { ".validate": "newData.val() === null || (newData.isString() && newData.val().length <= 2000000)" } }
+      ".read": true,
+      ".write": true,
+      "$id": {
+        "$chunk": {
+          ".validate": "newData.val() === null || !newData.isString() || newData.val().length <= 2000000"
+        }
+      }
     },
-
-    "usage":    { ".read": true, ".write": true },
-    "usagesrc": { ".read": true, ".write": true },
-    "stats":    { ".read": true, ".write": true },
-
-    "ota":      { ".read": true, ".write": true },
-    "ota_web":  { ".read": true, ".write": true },
-    "site":     { ".read": true, ".write": true },
-    "site_apk": { ".read": true, ".write": true },
-
+    "usage": {
+      ".read": true,
+      ".write": true
+    },
+    "usagesrc": {
+      ".read": true,
+      ".write": true
+    },
+    "stats": {
+      ".read": true,
+      ".write": true
+    },
+    "ota": {
+      ".read": true,
+      ".write": true
+    },
+    "ota_web": {
+      ".read": true,
+      ".write": true
+    },
+    "site": {
+      ".read": true,
+      ".write": true
+    },
+    "site_apk": {
+      ".read": true,
+      ".write": true
+    },
     "fcm": {
-      ".read": true, ".write": true,
+      ".read": true,
+      ".write": true,
       "$uid": {
         "$device": {
           ".validate": "newData.val() === null || (newData.hasChildren(['t']) && newData.child('t').isString() && newData.child('t').val().length > 20 && newData.child('t').val().length < 400)"
         }
       }
     },
-
-    "$other": { ".read": true, ".write": true }
+    "$other": {
+      ".read": true,
+      ".write": true
+    }
   }
 }
