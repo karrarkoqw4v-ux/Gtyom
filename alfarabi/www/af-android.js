@@ -45,7 +45,7 @@
 
   /* ===== 3) الاتصال بخادم المدرسة (الصور والإشعارات) عبر التطبيق ===== */
   /* وسيط الإشعارات (Cloudflare Worker): يُملأ بعد نشره */
-  var PUSH_RELAY = '', PUSH_KEY = '';
+  var PUSH_RELAY = '', PUSH_KEY = ''; /* تُقرأ تلقائياً من قاعدة المدرسة: config/push = {url, key} */
   var ORIGIN = '';
   try { ORIGIN = A.getOrigin() || ''; } catch (e) {}
   var rf = window.fetch ? window.fetch.bind(window) : null;
@@ -63,7 +63,7 @@
       var u = typeof input === 'string' ? input : (input && input.url) || '';
       try { if (u.indexOf(location.origin) === 0) u = u.slice(location.origin.length); } catch (e) {}
       try {
-        if (PUSH_RELAY && u.indexOf('/push/send') === 0 && init && typeof init.body === 'string') {
+        if (PUSH_RELAY && PUSH_RELAY.indexOf('https') === 0 && u.indexOf('/push/send') === 0 && init && typeof init.body === 'string') {
           rf(PUSH_RELAY, { method: 'POST', headers: { 'content-type': 'application/json', 'x-af-key': PUSH_KEY }, body: init.body, keepalive: true }).catch(function () {});
         }
       } catch (e) {}
@@ -120,7 +120,18 @@
     var b = window.FBBASE || (window.AFSyncInfo && window.AFSyncInfo().base) || '';
     if (b && b !== lastBase) { lastBase = b; try { A.setBase(b); } catch (e) {} }
     try { regFcm(u, b || lastBase); } catch (e) {}
+    try { loadPushCfg(b || lastBase); } catch (e) {}
   }, 3000);
+
+  /* رابط الوسيط ومفتاحه يُقرآن من config/push في قاعدة المدرسة (بدون الحاجة لتحديث التطبيق) */
+  var pcTs = 0;
+  function loadPushCfg(base) {
+    if (!base || !rf || Date.now() - pcTs < (PUSH_RELAY ? 600000 : 30000)) return;
+    pcTs = Date.now();
+    rf(base.replace(/\/$/, '') + '/config/push.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (c) {
+      if (c && typeof c.url === 'string' && c.url.indexOf('https://') === 0) { PUSH_RELAY = c.url; PUSH_KEY = String(c.key || ''); }
+    }).catch(function () {});
+  }
 
   /* تسجيل توكن FCM لهذا الجهاز في قاعدة المدرسة (fcm/<uid>/<الجهاز>) ليرسل له الوسيط الإشعارات */
   function regFcm(u, base) {

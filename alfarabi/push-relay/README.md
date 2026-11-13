@@ -7,10 +7,10 @@
 1. **حساب الخدمة:** Firebase Console ← مشروع `wiom-fab0d` ← Project settings ← Service accounts ← *Generate new private key*. يُحمَّل ملف JSON. **لا ترفعه على GitHub ولا ترسله في المحادثة.**
 2. **Cloudflare:** Workers & Pages ← Create ← Worker ← الصق محتوى `worker.js` ← Deploy.
 3. من إعدادات الـWorker ← Variables and Secrets:
-   - `SA` (Secret): الصق محتوى ملف JSON كاملاً.
+   - `SA_JSON` (Secret): الصق محتوى ملف JSON كاملاً.
    - `PUSH_KEY` (Secret): كلمة طويلة عشوائية تختارها (مثلاً 32 حرفاً).
    - `RTDB` (Text): `https://shhb-1ae9e-default-rtdb.firebaseio.com` (أو عنوان قاعدتك إن كان مختلفاً).
-4. أرسل لي **رابط الـWorker** و**قيمة `PUSH_KEY`** (مفتاح مشترك مع التطبيق، وليس ملف حساب الخدمة) لأضعهما في التطبيق ثم أبني النسخة.
+4. اربط الوسيط بالتطبيق **بدون أي تحديث**: في Firebase ← Realtime Database (قاعدة المدرسة) أنشئ العقدة `config/push` بالقيمتين `url` (رابط الـWorker، يبدأ بـ https) و`key` (نفس قيمة `PUSH_KEY`). يلتقطها التطبيق تلقائياً خلال دقائق.
 
 ## كيف يعمل
 - التطبيق يسجّل توكن جهازه تلقائياً في `fcm/<uid>/<الجهاز>` بقاعدة المدرسة.
