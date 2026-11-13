@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.13-b';
+  var VER = '2026.11.13-c';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
