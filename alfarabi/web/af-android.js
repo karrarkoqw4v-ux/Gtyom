@@ -329,6 +329,25 @@
         } catch (e) { out.push('• ' + items[i][1] + ': تعذّر الاتصال'); }
       }
     }
+    /* فحص الإشعارات الفورية: التوكن ← التسجيل ← الوسيط ← إرسال تجريبي لهذا الجهاز */
+    out.push('', 'الإشعارات الفورية (FCM):');
+    var tk = ''; try { tk = A.fcmToken ? A.fcmToken() : ''; } catch (e) {}
+    out.push('• رمز الجهاز: ' + (tk ? 'موجود (' + tk.length + ' حرف)' : 'غير موجود ← النسخة قديمة (<3.9.0) أو خدمات Google Play غير متاحة أو لا إنترنت'));
+    var uu = me();
+    out.push('• تسجيل الجهاز بالقاعدة: ' + (uu && LS.getItem('af_fcm_sig') === uu.uid + '|' + tk ? 'تم' : 'لم يتم بعد (افتح التطبيق دقيقة بعد تسجيل الدخول)'));
+    if (base && uu && uu.uid) {
+      try { var rr = await rf(base + '/fcm/' + encodeURIComponent(uu.uid) + '.json', { cache: 'no-store' }); var jj = rr.ok ? await rr.json() : null; out.push('• أجهزتك في القاعدة: ' + (jj ? Object.keys(jj).length : (rr.ok ? 0 : 'خطأ ' + rr.status))); } catch (e) { out.push('• أجهزتك في القاعدة: تعذّر الاتصال'); }
+      try { pcTs = 0; await loadPushCfg(base); } catch (e) {}
+      try { var pc = await rf(base + '/config/push.json', { cache: 'no-store' }).then(function (x) { return x.json(); }); out.push('• config/push في القاعدة: ' + (pc && pc.url ? 'موجود' + (pc.key ? '' : ' (بدون key!)') : 'غير موجود ← أنشئه بالحقلين url و key')); if (pc && pc.url && String(pc.url).indexOf('https://') === 0) { PUSH_RELAY = pc.url; PUSH_KEY = String(pc.key || ''); } } catch (e) {}
+    }
+    out.push('• رابط الوسيط في التطبيق: ' + (PUSH_RELAY ? PUSH_RELAY.replace(/^(https:\/\/[^\/]{0,40}).*/, '$1') : 'غير مضبوط'));
+    if (PUSH_RELAY && uu && uu.uid) {
+      try {
+        var tr = await rf(PUSH_RELAY, { method: 'POST', headers: { 'content-type': 'application/json', 'x-af-key': PUSH_KEY }, body: JSON.stringify({ uids: [uu.uid], title: 'اختبار الإشعارات', body: 'إذا وصلك هذا الإشعار فالنظام يعمل', tag: 'test' }) });
+        var tt = await tr.text();
+        out.push('• اختبار الوسيط: HTTP ' + tr.status + ' ' + tt.slice(0, 120) + (tr.status === 403 ? ' ← مفتاح key غير مطابق لـ PUSH_KEY' : tr.status === 200 ? ' ← sent=عدد الأجهزة التي أُرسل لها (يجب أن يصلك إشعار الآن)' : ''));
+      } catch (e) { out.push('• اختبار الوسيط: تعذّر الوصول للرابط (' + e + ')'); }
+    }
     A.showText('فحص المزامنة', out.join('\n'));
   };
   window.afPull = async function () {
