@@ -364,6 +364,9 @@
     'html body #sheet.open .option[data-k]::before{animation:afPop .38s cubic-bezier(.3,1.4,.5,1) both}',
     'html body #sheet.open .option[data-k]:nth-of-type(2)::before{animation-delay:.05s}html body #sheet.open .option[data-k]:nth-of-type(3)::before{animation-delay:.1s}html body #sheet.open .option[data-k]:nth-of-type(4)::before{animation-delay:.15s}',
     'html body #sheet.open .option[data-k]:active::before{transform:scale(.86) rotate(-6deg)!important;filter:brightness(1.15)}',
+    /* نافذة الدرجات الجديدة: عناوين البطاقات واضحة على الخلفية الفاتحة */
+    'html:root body:not(#zz) .gp .gc b,html:root body:not(#zz) .sheet .gc b{color:#14213d!important}',
+    'html:root body:not(#zz) .gp .gc small,html:root body:not(#zz) .sheet .gc small{color:#51647e!important}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
