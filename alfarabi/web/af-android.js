@@ -62,11 +62,6 @@
     window.fetch = function (input, init) {
       var u = typeof input === 'string' ? input : (input && input.url) || '';
       try { if (u.indexOf(location.origin) === 0) u = u.slice(location.origin.length); } catch (e) {}
-      try {
-        if (PUSH_RELAY && PUSH_RELAY.indexOf('https') === 0 && u.indexOf('/push/send') === 0 && init && typeof init.body === 'string') {
-          rf(PUSH_RELAY, { method: 'POST', headers: { 'content-type': 'application/json', 'x-af-key': PUSH_KEY }, body: init.body, keepalive: true }).catch(function () {});
-        }
-      } catch (e) {}
       if (!proxied(u)) return rf(input, init);
       if (!ORIGIN) return Promise.reject(new TypeError('school server not set'));
       var method = (init && init.method) || 'GET', body = init && init.body;
