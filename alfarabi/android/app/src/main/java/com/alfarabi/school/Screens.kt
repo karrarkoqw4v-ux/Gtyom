@@ -11,6 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +39,44 @@ private val Ink = Color(0xFF14213D)
 private val Sub = Color(0xFF51647E)
 private val Blue1 = Color(0xFF1AA7F2)
 private val Blue2 = Color(0xFF2F5FD0)
-private val PageBg = Brush.verticalGradient(listOf(Color(0xFFF4F9FF), Color(0xFFE6F0FF), Color(0xFFFFF3E6)))
+private val PageBg = Brush.verticalGradient(listOf(Color.White, Color.White))
+
+/** خلفية الفارابي: بقع ألوان ناعمة تتلاشى للأبيض من الأعلى (مطابقة لتصميم الويب) */
+@Composable
+fun AppBg(content: @Composable BoxScope.() -> Unit) {
+    Box(Modifier.fillMaxSize().background(Color.White).drawBehind {
+        val w = size.width; val h = size.height
+        fun blob(c: Color, x: Float, y: Float, r: Float, a: Float) = drawRect(Brush.radialGradient(listOf(c.copy(alpha = a), Color.Transparent), Offset(w * x, h * y), w * r))
+        blob(Color(0xFFFCA5A5), 0.0f, 0.30f, 0.85f, .55f)
+        blob(Color(0xFF7DD3FC), 1.0f, 0.34f, 0.80f, .65f)
+        blob(Color(0xFF38BDF8), 0.5f, 0.50f, 0.55f, .55f)
+        blob(Color(0xFFFDBA74), 0.0f, 0.72f, 0.75f, .70f)
+        blob(Color(0xFFFDE047), 0.75f, 0.66f, 0.70f, .65f)
+        blob(Color(0xFFC4B5FD), 1.0f, 0.92f, 0.70f, .60f)
+        drawRect(Brush.verticalGradient(listOf(Color.White, Color.White.copy(alpha = .85f), Color.Transparent), 0f, h * 0.32f))
+    }, content = content)
+}
+
+@Composable
+fun GlassCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier.fillMaxWidth().shadow(16.dp, RoundedCornerShape(36.dp), ambientColor = Color(0x1F1E50A0), spotColor = Color(0x1F1E50A0))
+        .clip(RoundedCornerShape(36.dp)).background(Color.White.copy(alpha = .86f)).border(1.dp, Color.White, RoundedCornerShape(36.dp)).padding(18.dp), content = content)
+}
+
+/** صفحة داخلية: بطاقة بيضاء فيها سهم رجوع وعنوان في الوسط */
+@Composable
+fun CardPage(title: String, content: @Composable ColumnScope.() -> Unit) {
+    Rtl { AppBg {
+        Column(Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState()).padding(horizontal = 14.dp).padding(top = 30.dp)) {
+            GlassCard {
+                Row(Modifier.fillMaxWidth()) { Box(Modifier.size(40.dp).clip(CircleShape).background(Color.White), contentAlignment = Alignment.Center) { Icon(Icons.Default.KeyboardArrowRight, null, tint = Ink) } }
+                Text(title, color = Ink, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp), content = content)
+            }
+            Spacer(Modifier.height(100.dp))
+        }
+    } }
+}
 
 data class Tile(val title: String, val sub: String, val icon: ImageVector, val c1: Color, val c2: Color, val key: String)
 val Tiles = listOf(
@@ -49,7 +90,7 @@ val Tiles = listOf(
 @Composable private fun Rtl(content: @Composable () -> Unit) = CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl, content = content)
 
 @Composable
-private fun GradIcon(icon: ImageVector, c1: Color, c2: Color, size: Int = 54) {
+private fun GradIcon(icon: ImageVector, c1: Color, c2: Color, size: Int = 52) {
     Box(Modifier.size(size.dp).shadow(10.dp, CircleShape, ambientColor = c2, spotColor = c2).clip(CircleShape)
         .background(Brush.linearGradient(listOf(c1, c2))).border(2.dp, Color.White.copy(alpha = .35f), CircleShape), contentAlignment = Alignment.Center) {
         Icon(icon, null, tint = Color.White, modifier = Modifier.size((size * 0.5f).dp))
@@ -58,7 +99,7 @@ private fun GradIcon(icon: ImageVector, c1: Color, c2: Color, size: Int = 54) {
 
 @Composable
 fun Dock(selected: Int, onSelect: (Int) -> Unit) {
-    val items = listOf("الرئيسية" to Icons.Default.Home, "قنوات المادة" to Icons.Default.Person, "صفحة المدرسة" to Icons.Default.Info, "كروب الطلاب" to Icons.Default.Email, "الإعدادات" to Icons.Default.Settings)
+    val items = listOf("الرئيسية" to Icons.Outlined.Home, "قنوات المادة" to Icons.Outlined.Person, "صفحة المدرسة" to Icons.Outlined.Info, "كروب الطلاب" to Icons.Outlined.Email, "الإعدادات" to Icons.Outlined.Settings)
     Rtl {
         Row(Modifier.padding(horizontal = 18.dp, vertical = 14.dp).fillMaxWidth().shadow(14.dp, RoundedCornerShape(999.dp), ambientColor = Color(0x331E50A0), spotColor = Color(0x331E50A0))
             .clip(RoundedCornerShape(999.dp)).background(Color.White.copy(alpha = .94f)).padding(7.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -77,19 +118,19 @@ fun Dock(selected: Int, onSelect: (Int) -> Unit) {
 
 @Composable
 fun PageScaffold(title: String?, content: @Composable ColumnScope.() -> Unit) {
-    Rtl {
-        Column(Modifier.fillMaxSize().background(PageBg).statusBarsPadding().verticalScroll(rememberScrollState()).padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (title != null) Text(title, color = Ink, fontSize = 26.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh, modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp))
+    Rtl { AppBg {
+        Column(Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState()).padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (title != null) Text(title, color = Ink, fontSize = 28.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh, modifier = Modifier.padding(horizontal = 4.dp).padding(top = 54.dp, bottom = 4.dp))
             content()
-            Spacer(Modifier.height(90.dp))
+            Spacer(Modifier.height(100.dp))
         }
-    }
+    } }
 }
 
 @Composable
 fun HomeScreen(userName: String, grade: String, role: String, onTile: (String) -> Unit) {
     PageScaffold(null) {
-        Spacer(Modifier.height(44.dp))
+        Row(Modifier.fillMaxWidth().padding(top = 8.dp)) { Spacer(Modifier.weight(1f)); Box(Modifier.size(46.dp).shadow(6.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(Color.White), contentAlignment = Alignment.Center) { Icon(Icons.Default.Menu, null, tint = Ink, modifier = Modifier.size(28.dp)) } }
         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(30.dp)).background(Brush.linearGradient(listOf(Blue1, Blue2))).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(painterResource(R.drawable.school_logo), null, contentScale = ContentScale.Fit, modifier = Modifier.size(84.dp).clip(CircleShape).background(Color.White).padding(10.dp))
             Spacer(Modifier.width(14.dp))
@@ -109,16 +150,14 @@ fun HomeScreen(userName: String, grade: String, role: String, onTile: (String) -
                 if (row.size == 1 && row[0].key != "chat") Spacer(Modifier.weight(1f))
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            InfoPill("الاسم", userName, Modifier.weight(1f))
-            InfoPill("الصف", grade, Modifier.weight(1f))
-        }
+        InfoPill("الاسم", userName, Modifier.fillMaxWidth())
+        InfoPill("الصف", grade, Modifier.fillMaxWidth())
     }
 }
 
 @Composable
 private fun SquareTile(t: Tile, onTile: (String) -> Unit, modifier: Modifier) {
-    Column(modifier.height(168.dp).clip(RoundedCornerShape(28.dp))
+    Column(modifier.height(138.dp).clip(RoundedCornerShape(28.dp))
         .background(Brush.linearGradient(listOf(t.c1.copy(alpha = .22f), Color.White.copy(alpha = .7f))))
         .border(1.5.dp, t.c1.copy(alpha = .35f), RoundedCornerShape(28.dp)).clickable { onTile(t.key) }.padding(16.dp), verticalArrangement = Arrangement.SpaceBetween) {
         GradIcon(t.icon, t.c1, t.c2)
@@ -128,10 +167,10 @@ private fun SquareTile(t: Tile, onTile: (String) -> Unit, modifier: Modifier) {
 
 @Composable
 private fun ChatTile(t: Tile, onTile: (String) -> Unit, modifier: Modifier) {
-    Row(modifier.height(100.dp).clip(RoundedCornerShape(28.dp))
+    Row(modifier.height(92.dp).clip(RoundedCornerShape(28.dp))
         .background(Brush.linearGradient(listOf(t.c1.copy(alpha = .25f), Color.White.copy(alpha = .75f))))
         .border(1.5.dp, t.c1.copy(alpha = .35f), RoundedCornerShape(28.dp)).clickable { onTile(t.key) }.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-        GradIcon(t.icon, t.c1, t.c2, 60)
+        GradIcon(t.icon, t.c1, t.c2, 58)
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) { Text(t.title, color = Ink, fontSize = 19.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh); Text(t.sub, color = Sub, fontSize = 12.sp, fontFamily = Naskh) }
         Box(Modifier.size(34.dp).clip(CircleShape).background(Color.White.copy(alpha = .85f)), contentAlignment = Alignment.Center) { Icon(Icons.Default.KeyboardArrowLeft, null, tint = Blue2) }
@@ -149,18 +188,18 @@ private fun InfoPill(label: String, value: String, modifier: Modifier) {
 data class GradeRow(val subject: String, val exam: String, val value: String, val note: String)
 @Composable
 fun GradesScreen(rows: List<GradeRow>) {
-    PageScaffold("درجات الامتحانات") {
+    CardPage("درجات الامتحانات") {
         rows.forEach { g ->
             val pct = g.value.substringBefore("/").toIntOrNull() ?: 0
             val col = if (pct >= 80) Color(0xFF16A34A) else if (pct >= 60) Color(0xFFFACC15) else if (pct >= 50) Color(0xFFF97316) else Color(0xFFDC2626)
-            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Color.White).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Color.White.copy(alpha = .9f)).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.width(5.dp).height(52.dp).clip(RoundedCornerShape(5.dp)).background(col))
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text("${g.subject} — ${g.exam}", color = Ink, fontSize = 16.5.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh)
                     if (g.note.isNotEmpty()) Text(g.note, color = Sub, fontSize = 12.sp, fontFamily = Naskh)
                 }
-                Box(Modifier.size(width = 88.dp, height = 56.dp).clip(RoundedCornerShape(18.dp)).background(col), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(width = 84.dp, height = 58.dp).clip(RoundedCornerShape(999.dp)).background(col), contentAlignment = Alignment.Center) {
                     Text(g.value, color = if (pct in 60..79) Color(0xFF4A3B00) else Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
                 }
             }
@@ -171,7 +210,7 @@ fun GradesScreen(rows: List<GradeRow>) {
 data class PlanRow(val title: String, val subject: String, val teacher: String, val body: String, val left: String)
 @Composable
 fun PlansScreen(rows: List<PlanRow>) {
-    PageScaffold("تحاضير الدروس") {
+    CardPage("تحاضير الدروس") {
         rows.forEach { p ->
             Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Color.White).padding(16.dp)) {
                 Text(p.title, color = Ink, fontSize = 17.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh)
@@ -209,11 +248,39 @@ fun ChannelsScreen(rows: List<ChannelRow>) {
 
 @Composable
 fun SettingsScreen(items: List<String>) {
-    PageScaffold("الإعدادات") {
+    CardPage("الإعدادات") {
         items.forEach { s ->
             Row(Modifier.fillMaxWidth().height(62.dp).clip(RoundedCornerShape(999.dp)).background(Color.White).border(1.dp, Color(0xFFE1E9F5), RoundedCornerShape(999.dp)).padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(s, color = Ink, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh, modifier = Modifier.weight(1f))
                 Icon(Icons.Default.KeyboardArrowLeft, null, tint = Color(0xFF9DB0C8))
+            }
+        }
+    }
+}
+
+
+data class DayRow(val day: String, val meta: String, val lessons: List<Triple<String, String, Int>>)
+@Composable
+fun ScheduleScreen(today: String, nextLine: String, days: List<DayRow>) {
+    CardPage("جدول الأسبوع") {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(today, color = Ink, fontSize = 17.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh)
+            Spacer(Modifier.width(8.dp)); Text(nextLine, color = Sub, fontSize = 12.sp, fontFamily = Naskh)
+        }
+        days.forEach { d ->
+            Column(Modifier.fillMaxWidth()) {
+                Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(d.day, color = Ink, fontSize = 17.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh, modifier = Modifier.weight(1f))
+                    Text(d.meta, color = Sub, fontSize = 11.5.sp, fontFamily = Naskh)
+                }
+                d.lessons.forEach { (subject, time, n) ->
+                    Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(32.dp).clip(RoundedCornerShape(10.dp)).background(Brush.linearGradient(listOf(Color(0xFF38BDF8), Color(0xFF0A86D6)))), contentAlignment = Alignment.Center) { Text("$n", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp) }
+                        Spacer(Modifier.width(12.dp))
+                        Text(subject, color = Ink, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh, modifier = Modifier.weight(1f))
+                        Text(time, color = Sub, fontSize = 12.5.sp)
+                    }
+                }
             }
         }
     }
