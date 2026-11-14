@@ -119,7 +119,7 @@ fun Dock(selected: Int, onSelect: (Int) -> Unit) {
 @Composable
 fun PageScaffold(title: String?, content: @Composable ColumnScope.() -> Unit) {
     Rtl { AppBg {
-        Column(Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState()).padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState()).padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (title != null) Text(title, color = Ink, fontSize = 28.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh, modifier = Modifier.padding(horizontal = 4.dp).padding(top = 54.dp, bottom = 4.dp))
             content()
             Spacer(Modifier.height(100.dp))
@@ -131,13 +131,13 @@ fun PageScaffold(title: String?, content: @Composable ColumnScope.() -> Unit) {
 fun HomeScreen(userName: String, grade: String, role: String, onTile: (String) -> Unit) {
     PageScaffold(null) {
         Row(Modifier.fillMaxWidth().padding(top = 8.dp)) { Spacer(Modifier.weight(1f)); Box(Modifier.size(46.dp).shadow(6.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).background(Color.White), contentAlignment = Alignment.Center) { Icon(Icons.Default.Menu, null, tint = Ink, modifier = Modifier.size(28.dp)) } }
-        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(30.dp)).background(Brush.linearGradient(listOf(Blue1, Blue2))).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(painterResource(R.drawable.school_logo), null, contentScale = ContentScale.Fit, modifier = Modifier.size(84.dp).clip(CircleShape).background(Color.White).padding(10.dp))
+        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(30.dp)).background(Brush.linearGradient(listOf(Blue1, Blue2))).padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Image(painterResource(R.drawable.school_logo), null, contentScale = ContentScale.Fit, modifier = Modifier.size(76.dp).clip(CircleShape).background(Color.White).padding(9.dp))
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text("أهلاً بك في", color = Color.White.copy(alpha = .9f), fontSize = 14.sp, fontFamily = Naskh)
-                Text("ثانوية الفارابي الأهلية للبنين", color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh)
-                Spacer(Modifier.height(6.dp))
+                Text("ثانوية الفارابي الأهلية للبنين", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh)
+                Spacer(Modifier.height(4.dp))
                 Text(if (role == "teacher") "واجهة المدرس" else if (role == "parent") "واجهة ولي الأمر" else "واجهة الطالب", color = Color.White, fontSize = 13.sp, fontFamily = Naskh,
                     modifier = Modifier.clip(RoundedCornerShape(999.dp)).background(Color.White.copy(alpha = .22f)).padding(horizontal = 14.dp, vertical = 4.dp))
             }
@@ -157,7 +157,7 @@ fun HomeScreen(userName: String, grade: String, role: String, onTile: (String) -
 
 @Composable
 private fun SquareTile(t: Tile, onTile: (String) -> Unit, modifier: Modifier) {
-    Column(modifier.height(138.dp).clip(RoundedCornerShape(28.dp))
+    Column(modifier.height(130.dp).clip(RoundedCornerShape(28.dp))
         .background(Brush.linearGradient(listOf(t.c1.copy(alpha = .22f), Color.White.copy(alpha = .7f))))
         .border(1.5.dp, t.c1.copy(alpha = .35f), RoundedCornerShape(28.dp)).clickable { onTile(t.key) }.padding(16.dp), verticalArrangement = Arrangement.SpaceBetween) {
         GradIcon(t.icon, t.c1, t.c2)
@@ -167,7 +167,7 @@ private fun SquareTile(t: Tile, onTile: (String) -> Unit, modifier: Modifier) {
 
 @Composable
 private fun ChatTile(t: Tile, onTile: (String) -> Unit, modifier: Modifier) {
-    Row(modifier.height(92.dp).clip(RoundedCornerShape(28.dp))
+    Row(modifier.height(86.dp).clip(RoundedCornerShape(28.dp))
         .background(Brush.linearGradient(listOf(t.c1.copy(alpha = .25f), Color.White.copy(alpha = .75f))))
         .border(1.5.dp, t.c1.copy(alpha = .35f), RoundedCornerShape(28.dp)).clickable { onTile(t.key) }.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
         GradIcon(t.icon, t.c1, t.c2, 58)
@@ -179,7 +179,7 @@ private fun ChatTile(t: Tile, onTile: (String) -> Unit, modifier: Modifier) {
 
 @Composable
 private fun InfoPill(label: String, value: String, modifier: Modifier) {
-    Column(modifier.clip(RoundedCornerShape(22.dp)).background(Color.White.copy(alpha = .72f)).border(1.5.dp, Color.White, RoundedCornerShape(22.dp)).padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(modifier.clip(RoundedCornerShape(22.dp)).background(Color.White.copy(alpha = .72f)).border(1.5.dp, Color.White, RoundedCornerShape(22.dp)).padding(horizontal = 16.dp, vertical = 5.dp)) {
         Text(label, color = Sub, fontSize = 11.5.sp, fontFamily = Naskh)
         Text(value, color = Ink, fontSize = 15.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh)
     }
@@ -250,7 +250,7 @@ fun ChannelsScreen(rows: List<ChannelRow>) {
 fun SettingsScreen(items: List<String>) {
     CardPage("الإعدادات") {
         items.forEach { s ->
-            Row(Modifier.fillMaxWidth().height(62.dp).clip(RoundedCornerShape(999.dp)).background(Color.White).border(1.dp, Color(0xFFE1E9F5), RoundedCornerShape(999.dp)).padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().height(50.dp).clip(RoundedCornerShape(999.dp)).background(Color.White).border(1.dp, Color(0xFFE1E9F5), RoundedCornerShape(999.dp)).padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(s, color = Ink, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh, modifier = Modifier.weight(1f))
                 Icon(Icons.Default.KeyboardArrowLeft, null, tint = Color(0xFF9DB0C8))
             }
