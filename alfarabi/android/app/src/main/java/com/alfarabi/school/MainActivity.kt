@@ -172,6 +172,10 @@ class MainActivity : Activity() {
             text = "السماح للتطبيق بالعمل بالخلفية"
             setOnClickListener { try { startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) } catch (_: Exception) {} }
         })
+        col.addView(Button(this).apply {
+            text = "المحادثات الأصلية (Kotlin) - تجريبي"
+            setOnClickListener { try { startActivity(Intent(this@MainActivity, NativeChatActivity::class.java)) } catch (_: Throwable) {} }
+        })
         col.addView(TextView(this).apply { text = "\nأدوات البيانات"; textSize = 13f })
         col.addView(Button(this).apply {
             text = "فحص المزامنة مع الخادم"

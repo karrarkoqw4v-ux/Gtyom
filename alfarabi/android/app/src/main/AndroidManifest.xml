@@ -71,6 +71,7 @@
         <receiver android:name=".ReplyReceiver" android:exported="false" />
         <receiver android:name=".MuteReceiver" android:exported="false" />
         <receiver android:name=".DeclineReceiver" android:exported="false" />
+        <activity android:name=".NativeChatActivity" android:exported="false" android:windowSoftInputMode="adjustResize" android:theme="@android:style/Theme.Material.NoActionBar" />
         <service android:name=".PushService" android:exported="false">
             <intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter>
         </service>
