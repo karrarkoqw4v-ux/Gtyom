@@ -25,7 +25,8 @@ jobs:
       - name: Commit screenshots
         run: |
           mkdir -p alfarabi/shots
-          find alfarabi/android -name "native_*.png" -exec cp {} alfarabi/shots/ ; ; ls -la alfarabi/shots
+          find alfarabi/android -name "native_*.png" -print0 | xargs -0 -I{} cp {} alfarabi/shots/
+          ls -la alfarabi/shots
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
           git add -A alfarabi/shots
