@@ -5,7 +5,7 @@
   var A = window.Android, X = window.AFX;
   if (!A) return;
   var PUB = {"kty":"EC","x":"g3WXfsTm_bLnvkCt22cCS_TW9lkGjtiUJimkkL2fszg","y":"qpRrJ88sAYSdykVNBVuGkHXNnQXpQCPjdHweUbgzqZs","crv":"P-256"};
-  var UIV = '2026.11.14-push1';
+  var UIV = '2026.11.14-push2';
   var CHUNK = 700 * 1024, MAXB = 25 * 1024 * 1024;
   var isApp = !!(A.otaBegin) && !A.__web;
   function base() { return window.FBBASE || ''; }
