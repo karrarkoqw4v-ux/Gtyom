@@ -33,32 +33,33 @@ export default {
     if (!env.PUSH_KEY || req.headers.get('x-af-key') !== env.PUSH_KEY) return new Response('forbidden', { status: 403, headers: CORS });
 
     let b; try { b = await req.json(); } catch (e) { return new Response('bad json', { status: 400, headers: CORS }); }
-    const uids = (b.uids || []).slice(0, 40).map(String);
-    if (!uids.length) return new Response(JSON.stringify({ sent: 0 }), { headers: CORS });
+    /* الصيغة الجديدة: items=[{uids, d:{...}}] — كل عنصر إشعار دقيق (محادثة/تحضير/إعلان/درجة) يُرسل فوراً */
+    const items = Array.isArray(b.items) ? b.items : [{ uids: b.uids, d: { title: b.title, body: b.body, tag: b.tag, call: b.call ? '1' : '0' } }];
 
     const sa = JSON.parse(env.SA_JSON);
     const tok = await accessToken(sa);
     const url = 'https://fcm.googleapis.com/v1/projects/' + sa.project_id + '/messages:send';
-    const data = {
-      title: String(b.title || 'ثانوية الفارابي'), body: String(b.body || ''),
-      tag: String(b.tag || ''), call: b.call ? '1' : '0', type: b.call ? 'call' : 'msg',
-    };
     let sent = 0, dead = 0;
 
-    await Promise.all(uids.map(async (uid) => {
-      const r = await fetch(DB + '/fcm/' + encodeURIComponent(uid) + '.json');
-      const devs = (await r.json()) || {};
-      await Promise.all(Object.entries(devs).map(async ([dev, v]) => {
-        if (!v || !v.t) return;
-        const res = await fetch(url, {
-          method: 'POST', headers: { authorization: 'Bearer ' + tok, 'content-type': 'application/json' },
-          body: JSON.stringify({ message: { token: v.t, data, android: { priority: 'HIGH', ttl: '86400s' } } }),
-        });
-        if (res.ok) sent++;
-        else if (res.status === 404 || res.status === 400) { // توكن ميت
-          const t = await res.text();
-          if (/UNREGISTERED|NOT_FOUND|INVALID_ARGUMENT/.test(t)) { dead++; await fetch(DB + '/fcm/' + encodeURIComponent(uid) + '/' + encodeURIComponent(dev) + '.json', { method: 'DELETE' }); }
-        }
+    await Promise.all(items.slice(0, 60).map(async (it) => {
+      const uids = (it.uids || []).slice(0, 100).map(String);
+      const data = {};
+      Object.keys(it.d || {}).forEach((k) => { data[k] = String(it.d[k] == null ? '' : it.d[k]).slice(0, 400); });
+      await Promise.all(uids.map(async (uid) => {
+        const r = await fetch(DB + '/fcm/' + encodeURIComponent(uid) + '.json');
+        const devs = (await r.json()) || {};
+        await Promise.all(Object.entries(devs).map(async ([dev, v]) => {
+          if (!v || !v.t) return;
+          const res = await fetch(url, {
+            method: 'POST', headers: { authorization: 'Bearer ' + tok, 'content-type': 'application/json' },
+            body: JSON.stringify({ message: { token: v.t, data, android: { priority: 'HIGH', ttl: '86400s' } } }),
+          });
+          if (res.ok) sent++;
+          else if (res.status === 404 || res.status === 400) {
+            const t = await res.text();
+            if (/UNREGISTERED|NOT_FOUND|INVALID_ARGUMENT/.test(t)) { dead++; await fetch(DB + '/fcm/' + encodeURIComponent(uid) + '/' + encodeURIComponent(dev) + '.json', { method: 'DELETE' }); }
+          }
+        }));
       }));
     }));
     return new Response(JSON.stringify({ sent, dead }), { headers: { ...CORS, 'content-type': 'application/json' } });

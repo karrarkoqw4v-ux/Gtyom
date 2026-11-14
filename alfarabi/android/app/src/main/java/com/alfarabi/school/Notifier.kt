@@ -199,6 +199,7 @@ object Notifier {
         if (!enabled(c) || isMuted(c, sender)) return
         val av = avatar(photo, sender)
         val list = history.getOrPut(tag) { ArrayList() }
+        if (list.any { it.ts == ts && it.text == text && it.sender == sender }) return  // نفس الرسالة وصلت من قناتين (FCM والمزامنة)
         list.add(Msg(sender, text, ts, false, av))
         while (list.size > 8) list.removeAt(0)
         meta[tag] = Pair(conv, isGroup)
