@@ -1019,7 +1019,7 @@
         if (top && sc.firstChild) sc.insertBefore(b, sc.firstChild); else sc.appendChild(b);
       }
       var RI = roleInfo();
-      if (RI.role === 'admin') { add('الصيانة والتحديثات', function (d) { if (window.afMaint) window.afMaint(d); }, true); add('📚 ملازم الثالث متوسط 2027', function (d) { if (window.afHandouts) window.afHandouts(d); }); add('🧹 تنظيف البيانات', cleanupPage); }
+      if (RI.role === 'admin') { add('الصيانة والتحديثات', function (d) { if (window.afMaint) window.afMaint(d); }, true); add('📚 ملازم الثالث متوسط 2027', function (d) { if (window.afHandouts) window.afHandouts(d); }); add('🧹 تنظيف البيانات', cleanupPage); add('🗑️ مسح شامل (الرسائل والحسابات)', resetPage); }
       add('📢 الإشعارات المهمة', importantPage);
       add('⚡ إصلاح وتسريع الاتصال', function (d) { if (window.afConnFix) window.afConnFix(d); });
       add('🎨 المظهر والأداء', themePage);
