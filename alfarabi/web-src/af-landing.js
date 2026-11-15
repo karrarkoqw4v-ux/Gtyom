@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.16-a';
+  var VER = '2026.11.16-c';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -242,6 +242,18 @@
     'html:root body #afl .bt .you{top:8px!important;left:10px!important;font-size:11px!important;padding:2px 9px!important}',
     'html:root body #afl .bt.g{min-height:84px!important}html:root body #afl .bt.g .t b{font-size:17px!important}',
     'html:root body #afl .bt .go{align-self:center!important;margin-top:18px!important}',
+    /* بنر الموقع: صورة المدرسة كخلفية (أنوار + كتاب + اسم المدرسة + الهاتف والموقع) */
+    'html:root body #afl .hero{padding:0!important;height:auto!important;aspect-ratio:1268/723;background:#12081c!important}',
+    'html:root body #afl .hero .hbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;animation:aflKen 14s ease-in-out infinite alternate}',
+    '@keyframes aflKen{from{transform:scale(1)}to{transform:scale(1.07)}}',
+    'html:root body #afl .hero .d1,html:root body #afl .hero .d3{background:rgba(255,255,255,.07)}',
+    'html:root body #afl .hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(transparent,rgba(18,8,28,.55));pointer-events:none}',
+    'html:root body #afl .lgo{margin-top:-58px!important}',
+    /* الشعار تحت صورة البنر لا فوق الهاتف والموقع */
+    'html:root body #afl .hero{aspect-ratio:auto!important;height:0!important;padding:0 0 calc(57.02% + 64px)!important}',
+    'html:root body #afl .hero .hbg{height:calc(100% - 64px)!important;bottom:auto!important}',
+    'html:root body #afl .hero::after{display:none!important}',
+    'html:root body #afl .lgo{margin-top:-60px!important}',
   ].join('\n');
   D.head.appendChild(css);
 
@@ -279,7 +291,7 @@
     '</section>';
 
   root.innerHTML = '<div class="wrap"><div class="card">' +
-    '<div class="hero"><i class="d1"></i><i class="d2"></i><i class="d3"></i><div class="hi">أهلاً وسهلاً بكم في</div><h1>ثانوية الفارابي</h1><div class="sn">الأهلية للبنين</div><span class="mo">تربية هادفة و تعليم متميز</span></div>' +
+    '<div class="hero"><img class="hbg" src="' + BASE + 'shots/school-hero.jpg" alt="ثانوية الفارابي الأهلية للبنين"><i class="d1"></i><i class="d3"></i></div>' +
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
     '<button class="bt a" data-a="apk"><span class="lg2">' + I.and + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Android</bdi></b><small>تنزيل مباشر لنسخة <bdi dir="ltr">APK</bdi></small><em class="mt"><u id="afbv">أحدث إصدار</u><u id="afbs">تنزيل سريع</u></em></span>' + (isAnd ? badge('جهازك') : '') + '<span class="go">' + I.apk + '</span></button>' +
