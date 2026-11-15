@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.16-f';
+  var VER = '2026.11.16-g';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -243,14 +243,14 @@
     'html:root body #afl .bt.g{min-height:84px!important}html:root body #afl .bt.g .t b{font-size:17px!important}',
     'html:root body #afl .bt .go{align-self:center!important;margin-top:18px!important}',
     /* بنر الموقع: صورة المدرسة كخلفية (أنوار + كتاب + اسم المدرسة + الهاتف والموقع) */
-    'html:root body #afl .hero{padding:0!important;height:auto!important;aspect-ratio:1268/723;background:#12081c!important}',
+    'html:root body #afl .hero{padding:0!important;height:auto!important;aspect-ratio:1268/723;background:#0b1f6b!important}',
     'html:root body #afl .hero .hbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;animation:aflKen 14s ease-in-out infinite alternate}',
     '@keyframes aflKen{from{transform:scale(1)}to{transform:scale(1.07)}}',
     'html:root body #afl .hero .d1,html:root body #afl .hero .d3{background:rgba(255,255,255,.07)}',
     'html:root body #afl .hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(transparent,rgba(18,8,28,.55));pointer-events:none}',
     'html:root body #afl .lgo{margin-top:-58px!important}',
     /* الشعار تحت صورة البنر لا فوق الهاتف والموقع */
-    'html:root body #afl .hero{aspect-ratio:auto!important;height:0!important;padding:0 0 calc(57.02% + 64px)!important}',
+    'html:root body #afl .hero{aspect-ratio:auto!important;height:0!important;padding:0 0 calc(74.6% + 64px)!important}',
     'html:root body #afl .hero .hbg{height:calc(100% - 64px)!important;bottom:auto!important}',
     'html:root body #afl .hero::after{display:none!important}',
     'html:root body #afl .lgo{margin-top:-60px!important}',
