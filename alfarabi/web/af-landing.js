@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.15-f';
+  var VER = '2026.11.15-i';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -215,6 +215,33 @@
     'html:root body #afl .bt .you{position:static!important;order:0!important;margin:0!important;align-self:center!important;flex:none!important;font-size:12px!important;font-weight:800!important;padding:4px 12px!important;border-radius:999px!important;white-space:nowrap!important}',
     'html:root body #afl .bt .bd{flex:none!important;font-size:12.5px!important;padding:5px 12px!important;white-space:nowrap!important}',
     'html:root body #afl .bt.a .lg2{background:#fff!important}html:root body #afl .bt.i .lg2{background:#fff!important}',
+    /* ===== أزرار كاملة التفاصيل: لوحة أيقونة كبيرة + عنوان + وصف + شرائط معلومات + زر إجراء ===== */
+    'html:root body #afl .bt{min-height:118px!important;padding:0!important;overflow:hidden!important;gap:0!important;border-radius:28px!important;align-items:stretch!important}',
+    'html:root body #afl .bt .lg2{width:92px!important;min-width:92px!important;height:auto!important;border-radius:0!important;align-self:stretch!important;background:rgba(255,255,255,.96)!important;box-shadow:none!important;display:grid!important;place-items:center!important}',
+    'html:root body #afl .bt .lg2 svg{width:46px!important;height:46px!important}',
+    'html:root body #afl .bt.k .lg2{background:#eaf6ff!important}html:root body #afl .bt.g .lg2{background:rgba(255,255,255,.6)!important}',
+    'html:root body #afl .bt .t{padding:13px 14px!important;gap:4px!important}',
+    'html:root body #afl .bt .t b{font-size:19px!important}html:root body #afl .bt .t small{font-size:13.5px!important}',
+    'html:root body #afl .bt .mt{display:flex!important;flex-wrap:wrap;gap:5px;margin:5px 0 0!important;padding:0;font-style:normal;direction:rtl}',
+    'html:root body #afl .bt .mt u{text-decoration:none;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.22);color:inherit;border:1px solid rgba(255,255,255,.3);white-space:nowrap}',
+    'html:root body #afl .bt.k .mt u{background:#eaf6ff;color:#1d6fb8;border-color:#cfe6fb}',
+    'html:root body #afl .bt .go{flex:none;width:50px;align-self:center;margin-inline-end:12px;height:50px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:inherit}',
+    'html:root body #afl .bt .go svg{width:24px!important;height:24px!important;color:inherit;stroke:currentColor;fill:none}',
+    'html:root body #afl .bt.k .go{background:#eaf6ff;border-color:#cfe6fb;color:#0a86d6}',
+    'html:root body #afl .bt .you{position:absolute!important;top:10px!important;left:12px!important;margin:0!important;z-index:2}',
+    'html:root body #afl .bt.g{min-height:96px!important}html:root body #afl .bt.g .bd{align-self:center;margin-inline-end:14px!important}',
+    'html:root body #afl .bt:active .go{transform:scale(.9)}html:root body #afl .bt .go{transition:transform .15s}',
+    '@keyframes aflNudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}html:root body #afl .bt.a .go svg{animation:aflNudge 1.6s ease-in-out infinite}',
+    /* ضبط نهائي للأزرار الكاملة: بلا التفاف، مقاسات متوازنة */
+    'html:root body #afl .bt{min-height:104px!important}',
+    'html:root body #afl .bt .lg2{width:74px!important;min-width:74px!important}html:root body #afl .bt .lg2 svg{width:40px!important;height:40px!important}',
+    'html:root body #afl .bt .t{padding:12px 12px!important;gap:3px!important}',
+    'html:root body #afl .bt .t b{font-size:17px!important;white-space:nowrap!important}html:root body #afl .bt .t small{font-size:12.5px!important;white-space:nowrap!important}',
+    'html:root body #afl .bt .mt{flex-wrap:nowrap!important;gap:4px!important;margin-top:6px!important}html:root body #afl .bt .mt u{font-size:10.5px!important;padding:2px 7px!important}',
+    'html:root body #afl .bt .go{width:42px!important;height:42px!important;margin-inline-end:10px!important}html:root body #afl .bt .go svg{width:21px!important;height:21px!important}',
+    'html:root body #afl .bt .you{top:8px!important;left:10px!important;font-size:11px!important;padding:2px 9px!important}',
+    'html:root body #afl .bt.g{min-height:84px!important}html:root body #afl .bt.g .t b{font-size:17px!important}',
+    'html:root body #afl .bt .go{align-self:flex-end!important;margin-bottom:12px!important}',
   ].join('\n');
   D.head.appendChild(css);
 
@@ -255,9 +282,9 @@
     '<div class="hero"><i class="d1"></i><i class="d2"></i><i class="d3"></i><div class="hi">أهلاً وسهلاً بكم في</div><h1>ثانوية الفارابي</h1><div class="sn">الأهلية للبنين</div><span class="mo">تربية هادفة و تعليم متميز</span></div>' +
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
-    '<button class="bt a" data-a="apk"><span class="lg2">' + I.and + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Android</bdi></b><small>تنزيل مباشر لنسخة <bdi dir="ltr">APK</bdi></small></span>' + (isAnd ? badge('جهازك') : '') + '</button>' +
-    '<button class="bt k" id="afpwa" data-a="pwa" style="display:none"><span class="lg2">' + I.web + '</span><span class="t"><b>تثبيت من المتصفح</b><small>بدون ملفات، بضغطة واحدة</small></span></button>' +
-    '<button class="bt i" data-a="ios"><span class="lg2">' + I.app + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Apple</bdi></b><small><bdi dir="ltr">iPhone</bdi> و <bdi dir="ltr">iPad</bdi> من سفاري</small></span>' + (isIOS ? badge('جهازك') : '') + '</button>' +
+    '<button class="bt a" data-a="apk"><span class="lg2">' + I.and + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Android</bdi></b><small>تنزيل مباشر لنسخة <bdi dir="ltr">APK</bdi></small><em class="mt"><u id="afbv">أحدث إصدار</u><u id="afbs">تنزيل سريع</u><u><bdi dir="ltr">Android 8+</bdi></u></em></span>' + (isAnd ? badge('جهازك') : '') + '<span class="go">' + I.apk + '</span></button>' +
+    '<button class="bt k" id="afpwa" data-a="pwa" style="display:none"><span class="lg2">' + I.web + '</span><span class="t"><b>تثبيت من المتصفح</b><small>بدون ملفات، بضغطة واحدة</small><em class="mt"><u>Chrome</u><u>Edge</u><u>سريع</u></em></span><span class="go">' + I.web + '</span></button>' +
+    '<button class="bt i" data-a="ios"><span class="lg2">' + I.app + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Apple</bdi></b><small><bdi dir="ltr">iPhone</bdi> و <bdi dir="ltr">iPad</bdi> من سفاري</small><em class="mt"><u>خطوتان فقط</u><u>بدون ملفات</u><u>Safari</u></em></span>' + (isIOS ? badge('جهازك') : '') + '<span class="go">' + I.shr + '</span></button>' +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t"><b><bdi dir="ltr">App Store</bdi></b><small>قريباً على متجر آبل</small></span><span class="bd">قيد التطبيق</span></div>' +
     '<div class="pl"><span id="afv2">أحدث إصدار</span><span>Android 8 فأحدث</span><span>تحديثات تلقائية</span></div>' +
     '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div><div class="ft" style="opacity:.7;margin-top:2px">نسخة الموقع <bdi dir="ltr">' + VER + '</bdi></div>' +
@@ -289,6 +316,10 @@
       '<button class="ac" data-a="dev" style="margin-top:2px"><span class="ai ph" style="background:linear-gradient(135deg,#1f2a44,#14213d)">' + I.lock + '</span><span class="t">حساب المطوّر<small>للمطوّر فقط</small></span>' + I.chv + '</button>';
   }
 
+
+  /* حجم التطبيق داخل الزر */
+  setTimeout(function () { try { fetch(BASE + 'alfarabi.apk', { method: 'HEAD', cache: 'no-store' }).then(function (r) { var n = +r.headers.get('content-length') || 0, e = D.getElementById('afbs'); if (n && e) e.textContent = (n / 1048576).toFixed(1) + ' MB'; }).catch(function () { }); } catch (e) { } }, 900);
+
   /* حركات العرض: تبديل اللقطات + ظهور تدريجي عند التمرير */
   (function () {
     var i = 0, ph = root.querySelector('#afph'), dt = root.querySelector('#afdt'), cap = root.querySelector('#afcap');
@@ -313,7 +344,7 @@
 
   /* أحدث ملف APK: من نفس الاستضافة إن كان مرفوعاً، وإلا من المستودع */
   (function () {
-    function setVer(v) { apk.ver = v || ''; var e2 = D.getElementById('afv2'); if (e2 && v) e2.textContent = 'الإصدار ' + v; var el = D.getElementById('afv'); if (el) el.textContent = apk.ver ? 'أحدث نسخة ' + apk.ver + ' — تنزيل مباشر' : 'تنزيل مباشر'; }
+    function setVer(v) { apk.ver = v || ''; var e3 = D.getElementById('afbv'); if (e3 && v) e3.textContent = 'الإصدار ' + v; var e2 = D.getElementById('afv2'); if (e2 && v) e2.textContent = 'الإصدار ' + v; var el = D.getElementById('afv'); if (el) el.textContent = apk.ver ? 'أحدث نسخة ' + apk.ver + ' — تنزيل مباشر' : 'تنزيل مباشر'; }
     function remote() {
       try {
         fetch('https://api.github.com/repos/' + REPO + '/contents/' + DIR + '?ref=' + encodeURIComponent(BR)).then(function (r) { return r.json(); }).then(function (l) {
