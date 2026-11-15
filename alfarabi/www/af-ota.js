@@ -4,8 +4,13 @@
   'use strict';
   var A = window.Android, X = window.AFX;
   if (!A) return;
-  var PUB = {"kty":"EC","x":"g3WXfsTm_bLnvkCt22cCS_TW9lkGjtiUJimkkL2fszg","y":"qpRrJ88sAYSdykVNBVuGkHXNnQXpQCPjdHweUbgzqZs","crv":"P-256"};
-  var UIV = '2026.11.15-db2';
+  /* مفتاحان موثوقان: القديم (g3WX…) والجديد (9Ivm…). أي تحديث موقَّع بأحدهما يُقبل */
+  var PUBS = [
+    {"kty":"EC","x":"g3WXfsTm_bLnvkCt22cCS_TW9lkGjtiUJimkkL2fszg","y":"qpRrJ88sAYSdykVNBVuGkHXNnQXpQCPjdHweUbgzqZs","crv":"P-256"},
+    {"kty":"EC","x":"9IvmMNuga6JvjOjjBUFq4MYBDfjhllaUD8rByaS5iD0","y":"JyAh6qs9loudQZR3OnaSysYMTcy7vpZ-FuhME4BnpF8","crv":"P-256"}
+  ];
+  var PUB = PUBS[0];
+  var UIV = '2026.11.16-ota2';
   var CHUNK = 700 * 1024, MAXB = 25 * 1024 * 1024;
   var isApp = !!(A.otaBegin) && !A.__web;
   function base() { return window.FBBASE || ''; }
@@ -23,9 +28,13 @@
   function setS(k, t, pct) { S = { k: k, t: t || '', pct: pct || 0 }; subs.forEach(function (f) { try { f(S); } catch (e) { } }); }
   function when(v) { try { return new Date(v * 1000).toLocaleString('ar-IQ', { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return ''; } }
   function verifySig(m) {
-    return crypto.subtle.importKey('jwk', PUB, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']).then(function (k) {
-      return crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, k, b64u8(m.sig), msg(m.v, m.sha));
-    }).then(function (ok) { if (!ok) throw new Error('التوقيع غير صحيح'); });
+    function one(i) {
+      if (i >= PUBS.length) return Promise.resolve(false);
+      return crypto.subtle.importKey('jwk', PUBS[i], { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']).then(function (k) {
+        return crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, k, b64u8(m.sig), msg(m.v, m.sha));
+      }).then(function (ok) { return ok || one(i + 1); }, function () { return one(i + 1); });
+    }
+    return one(0).then(function (ok) { if (!ok) throw new Error('التوقيع غير صحيح'); });
   }
   function verify(bytes, meta) {
     return crypto.subtle.digest('SHA-256', bytes).then(function (h) {
@@ -190,7 +199,7 @@
   function importKey(file) {
     return file.text().then(function (t) {
       var j = JSON.parse(t); if (!j || j.kty !== 'EC' || !j.d) throw new Error('هذا ليس ملف مفتاح التحديث');
-      if (j.x !== PUB.x || j.y !== PUB.y) throw new Error('هذا المفتاح لا يطابق مفتاح التطبيق');
+      if (!PUBS.some(function (p) { return j.x === p.x && j.y === p.y; })) throw new Error('هذا المفتاح لا يطابق مفتاح التطبيق');
       return crypto.subtle.importKey('jwk', j, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']).then(function () { localStorage.setItem(KEYS, JSON.stringify(j)); });
     });
   }
