@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.15-c';
+  var VER = '2026.11.15-d';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -171,7 +171,38 @@
     '#afl .rw div{background:linear-gradient(135deg,#eaf6ff,#fff6dc);border:1.5px solid #e1e8f4;border-radius:16px;padding:10px 6px}',
     '#afl .rw small{display:block;font-size:12px;color:#5a6b8c;margin-bottom:3px}',
     '#afl .rw b{font-size:14.5px;color:#14213d;line-height:1.5}',
-    '@keyframes afu{from{transform:translateY(100%)}to{transform:none}}@keyframes aff{from{opacity:0}to{opacity:1}}@keyframes afb{50%{transform:translateY(8px)}}'
+    '@keyframes afu{from{transform:translateY(100%)}to{transform:none}}@keyframes aff{from{opacity:0}to{opacity:1}}@keyframes afb{50%{transform:translateY(8px)}}',
+    /* ===== صقل التصميم v2: بنر علوي، أزرار موحّدة، أيقونات أكبر، أحجام مرتبة ===== */
+    '#afl .card{padding:0 18px 20px;overflow:hidden;border-radius:32px;box-shadow:0 18px 44px rgba(30,100,170,.2)}',
+    '#afl .hero{position:relative;margin:0 -18px;padding:26px 18px 64px;background:linear-gradient(135deg,#1aa7f2,#2f5fd0 70%,#3a3fb8);color:#fff;overflow:hidden}',
+    '#afl .hero i{position:absolute;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}',
+    '#afl .hero .d1{width:190px;height:190px;top:-70px;left:-50px;animation:aflFloat 7s ease-in-out infinite}#afl .hero .d2{width:120px;height:120px;bottom:-30px;right:-20px;background:rgba(255,193,7,.22);animation:aflFloat 6s ease-in-out infinite reverse}#afl .hero .d3{width:60px;height:60px;top:40px;right:46px;background:rgba(255,255,255,.18);animation:aflFloat 4.5s ease-in-out infinite}',
+    '#afl .hero .hi{position:relative;font-size:14px;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:.2px}',
+    '#afl .hero h1{position:relative;margin:4px 0 0;font-size:36px;line-height:1.25;color:#fff;font-weight:800;text-shadow:0 4px 14px rgba(0,0,40,.25)}',
+    '#afl .hero .sn{position:relative;font-size:19px;font-weight:700;color:#fff;opacity:.96}',
+    '#afl .hero .mo{position:relative;margin:8px auto 0;display:inline-block;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:4px 14px}',
+    '#afl .lgo{width:104px;height:104px;margin:-52px auto 10px;position:relative;z-index:2;border:5px solid #fff;box-shadow:0 10px 26px rgba(20,60,140,.28)}',
+    '#afl .lgo img{object-fit:contain;padding:7px;background:#fff}',
+    '#afl .ds{font-size:14.5px;line-height:1.9;margin:6px 2px 16px;color:#42536f}',
+    '#afl .bt{min-height:74px;border-radius:22px;padding:12px 14px;gap:13px;font-size:17px;line-height:1.35;margin:0 0 12px}',
+    '#afl .bt .lg2{width:50px;height:50px;border-radius:16px;box-shadow:0 4px 12px rgba(0,0,0,.18)}#afl .bt .lg2 svg{width:30px;height:30px}',
+    '#afl .bt .t{text-align:right}#afl .bt small{font-size:12.5px;opacity:.9;margin-top:2px}',
+    '#afl .bt.a{background:linear-gradient(135deg,#0aa6f5,#2f6fe0);color:#fff;box-shadow:0 12px 26px rgba(20,110,230,.38)}',
+    '#afl .bt.i{background:linear-gradient(135deg,#243556,#0f1a33);color:#fff;border:0;box-shadow:0 12px 26px rgba(15,26,51,.32)}#afl .bt.i small{color:#fff;opacity:.8}',
+    '#afl .bt.g{min-height:62px;background:rgba(255,255,255,.7);border:1.5px dashed #b8c6df}',
+    '#afl .you{position:static;order:5;margin-inline-start:auto;align-self:flex-start;font-size:11.5px;padding:3px 11px;box-shadow:0 4px 10px rgba(255,193,7,.45)}',
+    '#afl .pl{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:2px 0 10px}#afl .pl span{font-size:12px;font-weight:700;color:#2a5da8;background:#eaf3ff;border-radius:999px;padding:4px 11px}',
+    '#afl .ft{font-size:12.5px;margin-top:8px}',
+    '#afl .sh2 b{font-size:25px;line-height:1.35}#afl .sh2 small{font-size:14px}',
+    '#afl .sh2 b::after{content:"";display:block;width:48px;height:4px;border-radius:4px;margin:9px auto 0;background:linear-gradient(90deg,#0aa6f5,#ffc107)}',
+    '#afl .phf{width:224px;border-width:8px}#afl .cap2{font-size:16px}',
+    '#afl .pv{background:linear-gradient(160deg,#ffffff,#e4f1ff 55%,#fff1dc)}',
+    '#afl .fg{gap:12px}#afl .fc{padding:16px 13px;border-radius:26px}',
+    '#afl .fc .fi{width:54px;height:54px;border-radius:18px;margin-bottom:10px}#afl .fc .fi svg{width:29px;height:29px;stroke-width:2}',
+    '#afl .fc b{font-size:16.5px}#afl .fc small{font-size:12.5px;line-height:1.7;margin-top:3px}',
+    '#afl .cb{padding:18px 15px}#afl .cb h4{font-size:18px;margin-bottom:12px}',
+    '#afl .msg .bb2{font-size:14.5px}#afl .msg .bb2 b{font-size:12.5px}',
+    '#afl .stg b{font-size:15px}#afl .stg small{font-size:12.5px}',
   ].join('\n');
   D.head.appendChild(css);
 
@@ -209,14 +240,15 @@
     '</section>';
 
   root.innerHTML = '<div class="wrap"><div class="card">' +
+    '<div class="hero"><i class="d1"></i><i class="d2"></i><i class="d3"></i><div class="hi">أهلاً وسهلاً بكم في</div><h1>ثانوية الفارابي</h1><div class="sn">الأهلية للبنين</div><span class="mo">تربية هادفة و تعليم متميز</span></div>' +
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
-    '<div class="hi">أهلاً وسهلاً</div><h1>ترحب بكم</h1><div class="sn">ثانوية الفارابي الأهلية للبنين</div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
     '<button class="bt a" data-a="apk">' + (isAnd ? badge('جهازك') : '') + '<span class="lg2">' + I.and + '</span>' + '<span class="t">تثبيت كتطبيق Android<small>تنزيل مباشر لنسخة APK</small></span></button>' +
     '<button class="bt k" id="afpwa" data-a="pwa" style="display:none"><span class="lg2">' + I.web + '</span><span class="t">تثبيت من المتصفح<small>بدون ملفات، بضغطة وحدة</small></span></button>' +
     '<button class="bt i" data-a="ios">' + (isIOS ? badge('جهازك') : '') + '<span class="lg2">' + I.app + '</span>' + '<span class="t">تثبيت كتطبيق Apple<small>iPhone و iPad من سفاري</small></span></button>' +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
-    '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div><div class="ft" style="opacity:.7;margin-top:2px">نسخة الموقع ' + VER + '</div>' +
+    '<div class="pl"><span id="afv2">أحدث إصدار</span><span>Android 8 فأحدث</span><span>تحديثات تلقائية</span></div>' +
+    '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div><div class="ft" style="opacity:.7;margin-top:2px">نسخة الموقع <bdi dir="ltr">' + VER + '</bdi></div>' +
     '</div>' + showcase + '<div class="doc" id="afdoc"></div></div>';
 
 
@@ -269,7 +301,7 @@
 
   /* أحدث ملف APK: من نفس الاستضافة إن كان مرفوعاً، وإلا من المستودع */
   (function () {
-    function setVer(v) { apk.ver = v || ''; var el = D.getElementById('afv'); if (el) el.textContent = apk.ver ? 'أحدث نسخة ' + apk.ver + ' — تنزيل مباشر' : 'تنزيل مباشر'; }
+    function setVer(v) { apk.ver = v || ''; var e2 = D.getElementById('afv2'); if (e2 && v) e2.textContent = 'الإصدار ' + v; var el = D.getElementById('afv'); if (el) el.textContent = apk.ver ? 'أحدث نسخة ' + apk.ver + ' — تنزيل مباشر' : 'تنزيل مباشر'; }
     function remote() {
       try {
         fetch('https://api.github.com/repos/' + REPO + '/contents/' + DIR + '?ref=' + encodeURIComponent(BR)).then(function (r) { return r.json(); }).then(function (l) {
