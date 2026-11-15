@@ -679,7 +679,12 @@ var m=document.querySelector('link[rel="manifest"]');if(m)m.href='manifest.json?
 @media(prefers-reduced-motion:reduce){#appleGuide .ag-sheet,#appleGuide .ag-arrow svg,#appleGuide .ag-top svg{animation:none}}
 
 </style>
-<style id="no-install-ui">#installAppBtn,#afDevEntry,#afDevShade,#appleGuide,#installChoice,#afl{display:none!important}</style></head>
+<style id="no-install-ui">#installAppBtn,#afDevEntry,#afDevShade,#appleGuide,#installChoice,#afl{display:none!important}</style><style id="af-loginbg">
+/* خلفية شاشات التسجيل والدخول: صورة لوحة المدرسة (التصميم كما هو بدون تغيير) */
+body:has(main.app>section.card:not([hidden])){background:#0b1f6b url(login-bg.jpg) center top/cover no-repeat!important}
+body:has(main.app>section.card:not([hidden])) #bgDeco,body:has(main.app>section.card:not([hidden])) .bg,body:has(main.app>section.card:not([hidden])) .bg-tint{display:none!important}
+</style>
+</head>
 <body>
 
 <div id="appleGuide" role="dialog" aria-modal="true" aria-labelledby="agTitle"><div class="ag-top"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span>زر المشاركة بالأعلى</span></div><div class="ag-sheet"><div class="ag-grab"></div>

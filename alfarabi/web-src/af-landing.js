@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.16-m';
+  var VER = '2026.11.17-a';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -263,7 +263,7 @@
     '#afz .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:14px;width:46px;height:46px;padding:0;display:grid;place-items:center;background:rgba(255,255,255,.16);box-shadow:none;font-size:24px}',
     /* ===== الصورة خلفية فقط: ألوان التصميم كما هي، وأطراف الصورة تتلاشى بشفافية داخل لون الصفحة ===== */
     'html:root body #afl .wrap{position:relative;padding-top:0!important}',
-    'html:root body #afl .pbg{position:absolute;top:0;left:0;right:0;height:min(112vw,470px);background:url(shots/school-hero.jpg) center 6%/cover no-repeat;z-index:0;cursor:zoom-in;-webkit-tap-highlight-color:transparent;-webkit-mask-image:linear-gradient(to bottom,#000 52%,rgba(0,0,0,.55) 74%,transparent 100%),linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,#000 52%,rgba(0,0,0,.55) 74%,transparent 100%),linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%);mask-composite:intersect}',
+    'html:root body #afl .pbg{position:absolute;top:0;left:0;right:0;height:min(112vw,470px);background:url(shots/school-hero2.jpg) center 6%/cover no-repeat;z-index:0;cursor:zoom-in;-webkit-tap-highlight-color:transparent;-webkit-mask-image:linear-gradient(to bottom,#000 70%,rgba(0,0,0,.6) 86%,transparent 100%);mask-image:linear-gradient(to bottom,#000 70%,rgba(0,0,0,.6) 86%,transparent 100%)}',
     'html:root body #afl .pbg .zm{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(20,33,61,.62);color:#fff;border-radius:999px;padding:5px 14px;font-size:12px;font-weight:700;pointer-events:none;white-space:nowrap}',
     'html:root body #afl .card{position:relative;z-index:1;margin-top:min(74vw,310px)!important;overflow:visible!important;padding-top:56px!important}',
     'html:root body #afl .lgo{margin-top:-108px!important;margin-bottom:12px!important}',
@@ -350,7 +350,7 @@
     function openZ() {
       if (D.getElementById('afz')) return;
       var o = D.createElement('div'); o.id = 'afz';
-      o.innerHTML = '<button class="x" aria-label="إغلاق">✕</button><img src="' + BASE + 'shots/school-hero.jpg" alt="ثانوية الفارابي الأهلية للبنين"><button class="bk">الرجوع للتثبيت</button>';
+      o.innerHTML = '<button class="x" aria-label="إغلاق">✕</button><img src="' + BASE + 'shots/school-hero2.jpg" alt="ثانوية الفارابي الأهلية للبنين"><button class="bk">الرجوع للتثبيت</button>';
       function shut() { o.remove(); }
       o.addEventListener('click', function (e) { if (e.target === o || (e.target.closest && e.target.closest('button'))) shut(); });
       D.body.appendChild(o);
