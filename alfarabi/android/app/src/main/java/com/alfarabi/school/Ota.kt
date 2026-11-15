@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream
  * - إذا لم تُفتح النسخة الجديدة بنجاح (otaOk) يرجع التطبيق تلقائياً للملفات الأصلية.
  */
 object Ota {
-    private val ALLOWED = setOf("html", "js", "css", "json", "svg", "png", "jpg", "jpeg", "webp", "woff2", "ttf", "ico", "txt", "mp3", "ogg")
+    private val ALLOWED = setOf("html", "js", "css", "json", "svg", "png", "jpg", "jpeg", "webp", "woff2", "ttf", "ico", "txt", "mp3", "ogg", "bcmap", "pfb", "webmanifest", "map")
     private const val MAX_TOTAL = 80L * 1024 * 1024
     private const val MAX_FILES = 800
 
