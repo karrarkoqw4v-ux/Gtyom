@@ -3,15 +3,16 @@
    الملازم وحساب الإدارة ومعلومات المدرسة وقوائمها لا تُمَس. */
 (function () {
   'use strict';
-  var WID = 'w20261115', ROLES = ['student', 'parent', 'teacher'];
+  var WID = 'w20261116', ROLES = ['student', 'parent', 'teacher'], CHK = ['ch', 'cp', 'cc'];   /* ch=القنوات cp=منشوراتها cc=التعليقات */
   /* يُنفَّذ قبل أن يقرأ التطبيق أي بيانات محلية: يمسح الرسائل ويُخرج الحساب فعلاً (بعد إعادة التحميل) */
   (function early() {
     try {
       /* أول تشغيل على قاعدة البيانات الجديدة: لا نرفع رسائل أو حسابات قديمة للقاعدة الجديدة */
-      if (localStorage.getItem('af_db_proj') !== 'ssjjs-591e7') { localStorage.setItem('af_db_proj', 'ssjjs-591e7'); localStorage.setItem('af_wipe_pending', WID); localStorage.setItem('af_wipe_seen', WID); }
+      if (localStorage.getItem('af_db_proj') !== 'ssjjs-w2') { localStorage.setItem('af_db_proj', 'ssjjs-w2'); localStorage.setItem('af_wipe_pending', WID); localStorage.setItem('af_wipe_seen', WID); }
       if (localStorage.getItem('af_wipe_pending') !== WID) return;
       localStorage.removeItem('af_wipe_pending');
       localStorage.removeItem('alfarabi_chat_v2');
+      try { var rc = JSON.parse(localStorage.getItem('alfarabi_rec_v1') || '[]'); if (Array.isArray(rc)) localStorage.setItem('alfarabi_rec_v1', JSON.stringify(rc.filter(function (r) { return r && CHK.indexOf(r.k) < 0; }))); } catch (e2) {}
       if (localStorage.getItem('alfarabi_session') !== 'admin') {
         localStorage.removeItem('alfarabi_session'); localStorage.removeItem('alfarabi_sess_acc');
         var d = JSON.parse(localStorage.getItem('alfarabi_db_v1') || '{"accounts":[]}');
@@ -87,12 +88,18 @@
       }).then(function (accs) {
         var nul = {}; Object.keys(accs || {}).forEach(function (k) { var a = accs[k]; if (a && ROLES.indexOf(a.role) > -1) nul[k] = null; });
         return Object.keys(nul).length ? put('/accounts', nul, 'PATCH').then(function (r) { if (!r.ok) fail++; }, function () { fail++; }) : null;
+      }).then(function () {
+        return gj('/records').catch(function () { return null; });
+      }).then(function (recs) {
+        var nul = {}; Object.keys(recs || {}).forEach(function (k) { var r = recs[k]; if (r && CHK.indexOf(r.k) > -1) nul[k] = null; });
+        return Object.keys(nul).length ? put('/records', nul, 'PATCH').then(function (r) { if (!r.ok) fail++; }, function () { fail++; }) : null;
       }).then(function () { return fail; });
     }
     function left() {
-      return Promise.all([gj('/chat?shallow=true').catch(function () { return null; }), gj('/accounts').catch(function () { return null; })]).then(function (r) {
+      return Promise.all([gj('/chat?shallow=true').catch(function () { return null; }), gj('/accounts').catch(function () { return null; }), gj('/records').catch(function () { return null; })]).then(function (r) {
         var accs = r[1] || {}, n = Object.keys(accs).filter(function (k) { return accs[k] && ROLES.indexOf(accs[k].role) > -1; }).length;
-        return (r[0] && Object.keys(r[0]).length ? 1 : 0) + n;
+        var rc = r[2] || {}, m = Object.keys(rc).filter(function (k) { return rc[k] && CHK.indexOf(rc[k].k) > -1; }).length;
+        return (r[0] && Object.keys(r[0]).length ? 1 : 0) + n + m;
       });
     }
     function until(i) {
@@ -104,28 +111,38 @@
     say('تنزيل نسخة احتياطية...');
     backup().then(function () {
       say('إعلان التنظيف لكل الأجهزة...');
-      var mk = { ts: ts, rev: ts, acc: 1, roles: ROLES, chat: true, records: false, by: 'admin', wid: WID };
+      var mk = { ts: ts, rev: ts, acc: 1, roles: ROLES, chat: true, records: false, by: 'admin', wid: WID };   /* records:false → لا نمسح الدرجات؛ القنوات تُمسح انتقائياً */
       return put('/config/reset', mk).then(function (r) { if (!r.ok) throw new Error('تعذّر نشر علامة التنظيف'); return mk; });
     }).then(function (mk) {
       /* نمسح نسخة جهاز الإدارة قبل الحذف حتى لا يعيد رفعها */
-      try { localStorage.removeItem('alfarabi_chat_v2'); } catch (e) {}
+      try { localStorage.removeItem('alfarabi_chat_v2'); var rc2 = JSON.parse(localStorage.getItem('alfarabi_rec_v1') || '[]'); if (Array.isArray(rc2)) localStorage.setItem('alfarabi_rec_v1', JSON.stringify(rc2.filter(function (r) { return r && CHK.indexOf(r.k) < 0; }))); } catch (e) {}
       try { if (window.AFSetAccMk) window.AFSetAccMk(mk); } catch (e) {}
       say('مسح الرسائل والحسابات من القاعدة...');
       return until(0);
     }).then(function () {
       return put('/config/wipe_done', WID);
     }).then(function () {
-      LS('af_wipe_seen', WID); LS('af_wipe_pending', WID);
+      LS('af_wipe_seen', WID); LS('af_wipe_adm', WID); LS('af_wipe_pending', WID);
       say('تم التنظيف ✓ جاري إعادة تشغيل التطبيق...');
       setTimeout(restart, 1800);
     }).catch(function (e) { say(String(e && e.message || e), true); });
   }
   function adminJob() {
-    if (LS('alfarabi_session') !== 'admin' || !base() || LS('af_wipe_seen') === WID) return;
-    gj('/config/wipe_done').then(function (v) { if (v === WID) { LS('af_wipe_seen', WID); return; } if (!document.getElementById('afWipeM')) ask(); }).catch(function () {});
+    if (LS('alfarabi_session') !== 'admin' || !base() || LS('af_wipe_adm') === WID) return;
+    if (Date.now() - (+LS('af_wipe_cancel') || 0) < 6 * 3600e3) return;
+    gj('/config/wipe_done').then(function (v) {
+      if (v === WID) { LS('af_wipe_adm', WID); return; }
+      if (document.getElementById('afWipeM')) return;
+      var n = 10, o = modal('<h3 style="margin:0 0 8px;font-size:19px">بدء تنظيف البيانات تلقائياً</h3><p style="margin:0 0 8px;line-height:1.8;font-size:15px">سيُمسح من القاعدة: <b>كل الرسائل</b> و<b>الحسابات المسجلة</b> (طلاب وأولياء أمور ومدرسين) و<b>القنوات ومنشوراتها وتعليقاتها</b>، ويسجّل الجميع من جديد. ينزل ملف نسخة احتياطية أولاً.</p><p style="margin:0;font-size:14px;color:#51647e">يبدأ بعد <b id="afWc">' + n + '</b> ثوانٍ</p><button id="afWx" style="' + BT + 'background:#eef3fb;color:#14213d">إلغاء</button>');
+      var t = setInterval(function () {
+        n--; var e = document.getElementById('afWc'); if (e) e.textContent = n;
+        if (n <= 0) { clearInterval(t); run(); }
+      }, 1000);
+      o.querySelector('#afWx').onclick = function () { clearInterval(t); LS('af_wipe_cancel', String(Date.now())); o.remove(); };
+    }).catch(function () {});
   }
 
   setTimeout(device, 4000); setInterval(device, 120000);
-  /* التنظيف اليدوي من الإدارة معطّل في هذه النسخة (القاعدة جديدة وفارغة) */
+  setTimeout(adminJob, 7000);
   window.AFWIPE = { adminJob: adminJob };
 })();

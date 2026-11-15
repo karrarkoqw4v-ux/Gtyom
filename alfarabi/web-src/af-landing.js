@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.16-c';
+  var VER = '2026.11.16-d';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -37,7 +37,7 @@
   css.textContent = [
     '#afl{position:fixed;inset:0;z-index:2147483647;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;max-width:100vw;direction:rtl;font-family:"Cairo","Noto Naskh Arabic",sans-serif;color:#14213d;background:radial-gradient(420px 320px at 100% 0,rgba(127,211,255,.55),transparent 70%),radial-gradient(380px 300px at 0 100%,rgba(255,215,106,.5),transparent 70%),linear-gradient(180deg,#eaf6ff 0%,#f4f8ff 45%,#fff6dc 100%);background-attachment:local;-webkit-overflow-scrolling:touch}',
     '#afl *{box-sizing:border-box}',
-    'html.afl-on body>*:not(#afl):not(#afs):not(#aftoast):not(#afar){display:none!important}',
+    'html.afl-on body>*:not(#afl):not(#afs):not(#afz):not(#aftoast):not(#afar){display:none!important}',
     '#afl{contain:layout paint;will-change:scroll-position;-webkit-overflow-scrolling:touch}',
     '#afl .bg{position:fixed;inset:0;overflow:hidden;pointer-events:none}',
     '#afl .bl{position:absolute;border-radius:50%;filter:blur(46px);opacity:.55;pointer-events:none}',
@@ -254,6 +254,13 @@
     'html:root body #afl .hero .hbg{height:calc(100% - 64px)!important;bottom:auto!important}',
     'html:root body #afl .hero::after{display:none!important}',
     'html:root body #afl .lgo{margin-top:-60px!important}',
+    /* عرض صورة المدرسة كاملة عند الضغط على البنر */
+    'html:root body #afl .hero{cursor:zoom-in;-webkit-tap-highlight-color:transparent}',
+    'html:root body #afl .hero .zm{position:absolute;top:12px;left:12px;z-index:3;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.55);color:#fff;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;pointer-events:none}',
+    '#afz{position:fixed;inset:0;z-index:2147483647;background:rgba(8,4,14,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px;direction:rtl;font-family:"Cairo","Noto Naskh Arabic",sans-serif;animation:aff .25s}',
+    '#afz img{width:100%;max-width:760px;max-height:72vh;object-fit:contain;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:aflPop .4s both}',
+    '#afz button{border:0;border-radius:999px;padding:14px 30px;font:800 17px inherit;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0aa6f5,#2f6fe0);box-shadow:0 10px 24px rgba(10,120,230,.45)}',
+    '#afz .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:14px;width:46px;height:46px;padding:0;display:grid;place-items:center;background:rgba(255,255,255,.16);box-shadow:none;font-size:24px}',
   ].join('\n');
   D.head.appendChild(css);
 
@@ -291,7 +298,7 @@
     '</section>';
 
   root.innerHTML = '<div class="wrap"><div class="card">' +
-    '<div class="hero"><img class="hbg" src="' + BASE + 'shots/school-hero.jpg" alt="ثانوية الفارابي الأهلية للبنين"><i class="d1"></i><i class="d3"></i></div>' +
+    '<div class="hero"><img class="hbg" src="' + BASE + 'shots/school-hero.jpg" alt="ثانوية الفارابي الأهلية للبنين"><i class="d1"></i><i class="d3"></i><span class="zm">اضغط للتكبير</span></div>' +
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
     '<button class="bt a" data-a="apk"><span class="lg2">' + I.and + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Android</bdi></b><small>تنزيل مباشر لنسخة <bdi dir="ltr">APK</bdi></small><em class="mt"><u id="afbv">أحدث إصدار</u><u id="afbs">تنزيل سريع</u></em></span>' + (isAnd ? badge('جهازك') : '') + '<span class="go">' + I.apk + '</span></button>' +
@@ -330,6 +337,21 @@
 
   /* حجم التطبيق داخل الزر */
   setTimeout(function () { try { fetch(BASE + 'alfarabi.apk', { method: 'HEAD', cache: 'no-store' }).then(function (r) { var n = +r.headers.get('content-length') || 0, e = D.getElementById('afbs'); if (n && e) e.textContent = (n / 1048576).toFixed(1) + ' MB'; }).catch(function () { }); } catch (e) { } }, 900);
+
+
+  /* الضغط على صورة البنر: تظهر كاملة، وزر للرجوع إلى التثبيت */
+  (function () {
+    var h = root.querySelector('.hero'); if (!h) return;
+    function openZ() {
+      if (D.getElementById('afz')) return;
+      var o = D.createElement('div'); o.id = 'afz';
+      o.innerHTML = '<button class="x" aria-label="إغلاق">✕</button><img src="' + BASE + 'shots/school-hero.jpg" alt="ثانوية الفارابي الأهلية للبنين"><button class="bk">الرجوع للتثبيت</button>';
+      function shut() { o.remove(); }
+      o.addEventListener('click', function (e) { if (e.target === o || (e.target.closest && e.target.closest('button'))) shut(); });
+      D.body.appendChild(o);
+    }
+    h.addEventListener('click', openZ);
+  })();
 
   /* حركات العرض: تبديل اللقطات + ظهور تدريجي عند التمرير */
   (function () {

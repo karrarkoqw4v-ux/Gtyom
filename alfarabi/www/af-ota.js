@@ -10,7 +10,7 @@
     {"kty":"EC","x":"9IvmMNuga6JvjOjjBUFq4MYBDfjhllaUD8rByaS5iD0","y":"JyAh6qs9loudQZR3OnaSysYMTcy7vpZ-FuhME4BnpF8","crv":"P-256"}
   ];
   var PUB = PUBS[0];
-  var UIV = '2026.11.16-ota2';
+  var UIV = '2026.11.16-wipe2';
   var CHUNK = 700 * 1024, MAXB = 25 * 1024 * 1024;
   var isApp = !!(A.otaBegin) && !A.__web;
   function base() { return window.FBBASE || ''; }
