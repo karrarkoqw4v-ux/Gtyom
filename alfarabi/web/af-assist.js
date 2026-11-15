@@ -29,10 +29,7 @@
     '#afa .q button:active{transform:scale(.95);background:#27407a}',
     '#afa .q button.go{background:linear-gradient(135deg,#0aa6f5,#2f6fe0);color:#fff;flex-basis:100%;box-shadow:0 8px 20px rgba(10,120,230,.4)}',
     '#afa .q button.wa{background:#12663a;color:#fff}',
-    '#afb{position:fixed;left:14px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:2147482000;width:56px;height:56px;border:0;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6d4cf0);box-shadow:0 10px 26px rgba(60,80,230,.45);display:none;place-items:center;cursor:pointer;animation:afaOrb 2.6s infinite}',
-    '#afb svg{width:30px;height:30px;fill:#fff}',
-    'body:has(main.app>section.card:not([hidden])) #afb{display:grid}',
-    '@media (prefers-reduced-motion:reduce){#afa *,#afb{animation:none!important}}'
+    '@media (prefers-reduced-motion:reduce){#afa *{animation:none!important}}'
   ].join('\n');
   D.head.appendChild(css);
 
@@ -129,9 +126,5 @@
     e.stopImmediatePropagation(); e.preventDefault(); open();
   }, true);
 
-  /* زر المساعد الدائم العائم على شاشات الدخول */
-  var fb = D.createElement('button'); fb.id = 'afb'; fb.setAttribute('aria-label', 'المساعد'); fb.innerHTML = SPARK; fb.onclick = open;
-  function mountFab() { if (D.body) D.body.appendChild(fb); else setTimeout(mountFab, 50); }
-  mountFab();
   window.AFAssist = { open: open };
 })();
