@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.15-i';
+  var VER = '2026.11.15-l';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -241,7 +241,7 @@
     'html:root body #afl .bt .go{width:42px!important;height:42px!important;margin-inline-end:10px!important}html:root body #afl .bt .go svg{width:21px!important;height:21px!important}',
     'html:root body #afl .bt .you{top:8px!important;left:10px!important;font-size:11px!important;padding:2px 9px!important}',
     'html:root body #afl .bt.g{min-height:84px!important}html:root body #afl .bt.g .t b{font-size:17px!important}',
-    'html:root body #afl .bt .go{align-self:flex-end!important;margin-bottom:12px!important}',
+    'html:root body #afl .bt .go{align-self:center!important;margin-top:18px!important}',
   ].join('\n');
   D.head.appendChild(css);
 
@@ -282,8 +282,7 @@
     '<div class="hero"><i class="d1"></i><i class="d2"></i><i class="d3"></i><div class="hi">أهلاً وسهلاً بكم في</div><h1>ثانوية الفارابي</h1><div class="sn">الأهلية للبنين</div><span class="mo">تربية هادفة و تعليم متميز</span></div>' +
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
-    '<button class="bt a" data-a="apk"><span class="lg2">' + I.and + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Android</bdi></b><small>تنزيل مباشر لنسخة <bdi dir="ltr">APK</bdi></small><em class="mt"><u id="afbv">أحدث إصدار</u><u id="afbs">تنزيل سريع</u><u><bdi dir="ltr">Android 8+</bdi></u></em></span>' + (isAnd ? badge('جهازك') : '') + '<span class="go">' + I.apk + '</span></button>' +
-    '<button class="bt k" id="afpwa" data-a="pwa" style="display:none"><span class="lg2">' + I.web + '</span><span class="t"><b>تثبيت من المتصفح</b><small>بدون ملفات، بضغطة واحدة</small><em class="mt"><u>Chrome</u><u>Edge</u><u>سريع</u></em></span><span class="go">' + I.web + '</span></button>' +
+    '<button class="bt a" data-a="apk"><span class="lg2">' + I.and + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Android</bdi></b><small>تنزيل مباشر لنسخة <bdi dir="ltr">APK</bdi></small><em class="mt"><u id="afbv">أحدث إصدار</u><u id="afbs">تنزيل سريع</u></em></span>' + (isAnd ? badge('جهازك') : '') + '<span class="go">' + I.apk + '</span></button>' +
     '<button class="bt i" data-a="ios"><span class="lg2">' + I.app + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Apple</bdi></b><small><bdi dir="ltr">iPhone</bdi> و <bdi dir="ltr">iPad</bdi> من سفاري</small><em class="mt"><u>خطوتان فقط</u><u>بدون ملفات</u><u>Safari</u></em></span>' + (isIOS ? badge('جهازك') : '') + '<span class="go">' + I.shr + '</span></button>' +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t"><b><bdi dir="ltr">App Store</bdi></b><small>قريباً على متجر آبل</small></span><span class="bd">قيد التطبيق</span></div>' +
     '<div class="pl"><span id="afv2">أحدث إصدار</span><span>Android 8 فأحدث</span><span>تحديثات تلقائية</span></div>' +
@@ -374,8 +373,7 @@
 
   function andSheet() {
     sheet('<h2>تثبيت كتطبيق Android</h2><p class="sb">اختر الطريقة المناسبة</p>' +
-      '<button class="bt p" data-a="apk">' + I.apk + '<span class="t">تثبيت كتطبيق APK<small id="afv">' + (apk.ver ? 'أحدث نسخة ' + esc(apk.ver) + ' — تنزيل مباشر' : 'تنزيل أحدث نسخة مباشرة') + '</small></span></button>' +
-      '<button class="bt y" id="afpw" data-a="pwa">' + I.web + '<span class="t">تثبيت كتطبيق من المتصفح<small>' + (dip ? 'تثبيت مباشر بضغطة وحدة' : 'من قائمة المتصفح ⋮ ← تثبيت التطبيق') + '</small></span></button>');
+      '<button class="bt p" data-a="apk">' + I.apk + '<span class="t">تثبيت كتطبيق APK<small id="afv">' + (apk.ver ? 'أحدث نسخة ' + esc(apk.ver) + ' — تنزيل مباشر' : 'تنزيل أحدث نسخة مباشرة') + '</small></span></button>');
   }
   function iosSheet() {
     var head = '<h2>تثبيت كتطبيق Apple</h2>';
