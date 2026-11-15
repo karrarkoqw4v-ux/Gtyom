@@ -27,9 +27,14 @@
         "pass": {
           ".validate": "!newData.isString() || newData.val().length <= 500"
         },
+        "phone": {
+          ".validate": "!newData.isString() || newData.val().length <= 40"
+        },
         "photo": {
           ".validate": "!newData.isString() || newData.val().length <= 3000000"
         },
+        "createdAt": {},
+        "kicked": {},
         "$f": {
           ".validate": "!newData.isString() || newData.val().length <= 3000000"
         }
@@ -44,10 +49,48 @@
           "id"
         ],
         "$msg": {
+          "t": {
+            ".validate": "!newData.isString() || newData.val().length <= 8000"
+          },
+          "n": {
+            ".validate": "!newData.isString() || newData.val().length <= 200"
+          },
+          "u": {},
+          "r": {
+            ".validate": "!newData.isString() || newData.val().length <= 30"
+          },
+          "ts": {},
+          "id": {},
+          "c": {},
+          "cid": {},
+          "img": {
+            ".validate": "!newData.isString() || newData.val().length <= 8000000"
+          },
+          "vid": {
+            ".validate": "!newData.isString() || newData.val().length <= 8000000"
+          },
+          "aud": {
+            ".validate": "!newData.isString() || newData.val().length <= 8000000"
+          },
+          "f": {
+            ".validate": "!newData.isString() || newData.val().length <= 8000000"
+          },
+          "q": {},
+          "o": {},
+          "ed": {},
+          "dl": {},
+          "rt": {},
           "$f": {
             ".validate": "!newData.isString() || newData.val().length <= 8000000"
           }
         }
+      }
+    },
+    "typing": {
+      ".read": true,
+      ".write": true,
+      "$room": {
+        "$uid": {}
       }
     },
     "records": {
@@ -58,7 +101,8 @@
         "k",
         "gr",
         "id",
-        "cid"
+        "cid",
+        "ch"
       ],
       "$rec": {
         "$f": {
@@ -79,7 +123,19 @@
     },
     "school": {
       ".read": true,
-      ".write": true
+      ".write": true,
+      "students": {},
+      "teachers": {},
+      "groups": {},
+      "info": {},
+      "schedule": {},
+      "name": {
+        ".validate": "!newData.isString() || newData.val().length <= 300"
+      },
+      "logo": {
+        ".validate": "!newData.isString() || newData.val().length <= 3000000"
+      },
+      "$other": {}
     },
     "ministry": {
       ".read": true,
@@ -101,13 +157,6 @@
       ".read": true,
       ".write": true
     },
-    "typing": {
-      ".read": true,
-      ".write": true,
-      "$room": {
-        "$uid": {}
-      }
-    },
     "devices": {
       ".read": true,
       ".write": true,
@@ -121,9 +170,15 @@
     },
     "lastdev": {
       ".read": true,
+      ".write": true
+    },
+    "fcm": {
+      ".read": true,
       ".write": true,
       "$uid": {
-        ".validate": "true"
+        "$device": {
+          ".validate": "newData.val() === null || (newData.hasChildren(['t']) && newData.child('t').isString() && newData.child('t').val().length > 20 && newData.child('t').val().length < 400)"
+        }
       }
     },
     "config": {
@@ -135,7 +190,17 @@
         }
       },
       "reset": {},
-      "accarchive": {}
+      "wipe_done": {},
+      "accarchive": {},
+      "push": {
+        "url": {
+          ".validate": "!newData.isString() || newData.val().length <= 500"
+        },
+        "key": {
+          ".validate": "!newData.isString() || newData.val().length <= 200"
+        }
+      },
+      "$other": {}
     },
     "handouts": {
       ".read": true,
@@ -180,15 +245,6 @@
     "site_apk": {
       ".read": true,
       ".write": true
-    },
-    "fcm": {
-      ".read": true,
-      ".write": true,
-      "$uid": {
-        "$device": {
-          ".validate": "newData.val() === null || (newData.hasChildren(['t']) && newData.child('t').isString() && newData.child('t').val().length > 20 && newData.child('t').val().length < 400)"
-        }
-      }
     },
     "$other": {
       ".read": true,
