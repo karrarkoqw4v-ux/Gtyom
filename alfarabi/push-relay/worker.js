@@ -36,6 +36,7 @@ export default {
     /* الصيغة الجديدة: items=[{uids, d:{...}}] — كل عنصر إشعار دقيق (محادثة/تحضير/إعلان/درجة) يُرسل فوراً */
     const items = Array.isArray(b.items) ? b.items : [{ uids: b.uids, d: { title: b.title, body: b.body, tag: b.tag, call: b.call ? '1' : '0' } }];
 
+    const DB = String(env.RTDB || DB_DEFAULT).replace(/\/$/, '');
     const sa = JSON.parse(env.SA_JSON);
     const tok = await accessToken(sa);
     const url = 'https://fcm.googleapis.com/v1/projects/' + sa.project_id + '/messages:send';

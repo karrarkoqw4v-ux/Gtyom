@@ -4,7 +4,7 @@
   'use strict';
   var RELAY = '', KEY = '', ts = 0;
   function LSget(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function base() { return window.FBBASE || (window.AFSyncInfo && window.AFSyncInfo().base) || LSget('alfarabi_fbbase_shhb') || ''; }
+  function base() { return window.FBBASE || (window.AFSyncInfo && window.AFSyncInfo().base) || LSget('alfarabi_fbbase_ssjjs') || ''; }
   function cfg() {
     if (Date.now() - ts < (RELAY ? 600000 : 15000)) return; ts = Date.now();
     var b = base(); if (!b) return;

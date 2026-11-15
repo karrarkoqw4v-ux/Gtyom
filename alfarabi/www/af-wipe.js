@@ -7,6 +7,8 @@
   /* يُنفَّذ قبل أن يقرأ التطبيق أي بيانات محلية: يمسح الرسائل ويُخرج الحساب فعلاً (بعد إعادة التحميل) */
   (function early() {
     try {
+      /* أول تشغيل على قاعدة البيانات الجديدة: لا نرفع رسائل أو حسابات قديمة للقاعدة الجديدة */
+      if (localStorage.getItem('af_db_proj') !== 'ssjjs-591e7') { localStorage.setItem('af_db_proj', 'ssjjs-591e7'); localStorage.setItem('af_wipe_pending', WID); localStorage.setItem('af_wipe_seen', WID); }
       if (localStorage.getItem('af_wipe_pending') !== WID) return;
       localStorage.removeItem('af_wipe_pending');
       localStorage.removeItem('alfarabi_chat_v2');
@@ -20,7 +22,7 @@
   })();
   var A = window.Android;
   function LS(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) {} return null; }
-  function base() { return String(window.FBBASE || (window.AFSyncInfo && window.AFSyncInfo().base) || LS('alfarabi_fbbase_shhb') || '').replace(/\/$/, ''); }
+  function base() { return String(window.FBBASE || (window.AFSyncInfo && window.AFSyncInfo().base) || LS('alfarabi_fbbase_ssjjs') || '').replace(/\/$/, ''); }
   function gj(p) { return fetch(base() + p + '.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }); }
   function put(p, v, m) { return fetch(base() + p + '.json', { method: m || 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(v) }); }
   function del(p) { return fetch(base() + p + '.json', { method: 'DELETE' }); }
@@ -124,5 +126,6 @@
   }
 
   setTimeout(device, 4000); setInterval(device, 120000);
-  setTimeout(adminJob, 7000);
+  /* التنظيف اليدوي من الإدارة معطّل في هذه النسخة (القاعدة جديدة وفارغة) */
+  window.AFWIPE = { adminJob: adminJob };
 })();

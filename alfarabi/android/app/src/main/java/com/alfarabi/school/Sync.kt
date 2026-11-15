@@ -21,9 +21,9 @@ object Sync {
     private val calls = HashMap<String, Boolean>()
     private val GN = mapOf("1" to "الأول متوسط", "2" to "الثاني متوسط", "3" to "الثالث متوسط", "4" to "الرابع العلمي", "5" to "الخامس العلمي")
     private val CANDS = listOf(
-        "https://shhb-1ae9e-default-rtdb.firebaseio.com",
-        "https://shhb-1ae9e-default-rtdb.europe-west1.firebasedatabase.app",
-        "https://shhb-1ae9e-default-rtdb.asia-southeast1.firebasedatabase.app"
+        "https://ssjjs-591e7-default-rtdb.firebaseio.com",
+        "https://ssjjs-591e7-default-rtdb.europe-west1.firebasedatabase.app",
+        "https://ssjjs-591e7-default-rtdb.asia-southeast1.firebasedatabase.app"
     )
 
     fun healthy() = System.currentTimeMillis() - lastOk < 90_000
@@ -63,7 +63,7 @@ object Sync {
     } catch (_: Throwable) { null }
 
     private fun baseUrl(c: Context): String? {
-        p(c).getString("base", "")?.takeIf { it.startsWith("http") }?.let { return it }
+        p(c).getString("base", "")?.takeIf { it.startsWith("http") && it.contains("ssjjs-591e7") }?.let { return it }
         for (b in CANDS) if (get(b, "/school.json?shallow=true") != null) { p(c).edit().putString("base", b).apply(); return b }
         return null
     }

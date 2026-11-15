@@ -273,7 +273,7 @@ object WebHolder {
         }
 
         @JavascriptInterface
-        fun setBase(url: String) { if (url.startsWith("http")) prefs(app).edit().putString("base", url).apply() }
+        fun setBase(url: String) { if (url.startsWith("http") && url.contains("ssjjs-591e7")) prefs(app).edit().putString("base", url).apply() }
 
         /** هل مزامنة الخلفية الأصلية شغالة؟ إذا نعم الصفحة ما ترسل إشعارات حتى ما تتكرر */
         @JavascriptInterface

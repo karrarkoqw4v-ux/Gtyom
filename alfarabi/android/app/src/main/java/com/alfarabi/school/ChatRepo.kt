@@ -11,9 +11,9 @@ data class Msg(val id: Long, val uid: String, val name: String, val role: String
 /** طبقة الشبكة الأصلية للمحادثات (REST على Firebase Realtime Database) */
 object ChatRepo {
     private val CANDS = listOf(
-        "https://shhb-1ae9e-default-rtdb.firebaseio.com",
-        "https://shhb-1ae9e-default-rtdb.europe-west1.firebasedatabase.app",
-        "https://shhb-1ae9e-default-rtdb.asia-southeast1.firebasedatabase.app"
+        "https://ssjjs-591e7-default-rtdb.firebaseio.com",
+        "https://ssjjs-591e7-default-rtdb.europe-west1.firebasedatabase.app",
+        "https://ssjjs-591e7-default-rtdb.asia-southeast1.firebasedatabase.app"
     )
 
     class Me(val uid: String, val role: String, val grade: String, val name: String)
@@ -36,7 +36,7 @@ object ChatRepo {
 
     fun base(c: Context): String? {
         val p = WebHolder.prefs(c)
-        p.getString("base", "")?.takeIf { it.startsWith("http") }?.let { return it }
+        p.getString("base", "")?.takeIf { it.startsWith("http") && it.contains("ssjjs-591e7") }?.let { return it }
         for (b in CANDS) if (call("$b/school.json?shallow=true", "GET") != null) { p.edit().putString("base", b).apply(); return b }
         return null
     }

@@ -9,7 +9,7 @@
 3. من إعدادات الـWorker ← Variables and Secrets:
    - `SA_JSON` (Secret): الصق محتوى ملف JSON كاملاً.
    - `PUSH_KEY` (Secret): كلمة طويلة عشوائية تختارها (مثلاً 32 حرفاً).
-   - `RTDB` (Text): `https://shhb-1ae9e-default-rtdb.firebaseio.com` (أو عنوان قاعدتك إن كان مختلفاً).
+   - `RTDB` (Text): `https://ssjjs-591e7-default-rtdb.firebaseio.com` (أو عنوان قاعدتك إن كان مختلفاً).
 4. اربط الوسيط بالتطبيق **بدون أي تحديث**: في Firebase ← Realtime Database (قاعدة المدرسة) أنشئ العقدة `config/push` بالقيمتين `url` (رابط الـWorker، يبدأ بـ https) و`key` (نفس قيمة `PUSH_KEY`). يلتقطها التطبيق تلقائياً خلال دقائق.
 
 ## كيف يعمل
