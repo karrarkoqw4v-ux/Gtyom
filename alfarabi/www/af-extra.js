@@ -10,6 +10,7 @@
 
   var THEME = 'light'; try { LS.removeItem('af_theme'); } catch (e) {}             // light | dark
   if (g('af_gfx_mig20', '') !== '1') { s('af_gfx', 'auto'); s('af_gfx_mig20', '1'); }
+  if (g('af_gfx_mig22', '') !== '1') { s('af_gfx', 'static'); s('af_gfx_mig22', '1'); }   // أخف مستوى رسوميات للجميع: بدون تقطيع وبلمس سريع
   var GFX = g('af_gfx', 'auto');                  // auto (افتراضي) | static | lite | mid | full
   var TIER = { static: 0, lite: 1, mid: 2, full: 3 };
   var ORDER = ['static', 'lite', 'mid', 'full'];
@@ -319,7 +320,7 @@
     'html:root body:not(#zz) .af-hq-btn:nth-child(4){--c1:#a78bfa;--c2:#7c3aed}',
     'html:root body:not(#zz) .af-hq-btn:nth-child(5){--c1:#60a5fa;--c2:#2563eb}',
     'html:root body:not(#zz) .af-hq-grid{grid-template-columns:1fr 1fr!important;grid-template-rows:1fr 1fr 98px!important;gap:12px!important}',
-    'html:root body:not(#zz) .af-hq-btn{flex-direction:column!important;align-items:flex-start!important;justify-content:space-between!important;padding:15px 16px!important;border-radius:28px!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);text-align:right}',
+    'html:root body:not(#zz) .af-hq-btn{flex-direction:column!important;align-items:flex-start!important;justify-content:space-between!important;padding:15px 16px!important;border-radius:28px!important;text-align:right}',
     'html:root body:not(#zz) .af-hq-ic{width:54px!important;height:54px!important;border-radius:50%!important;background:linear-gradient(145deg,var(--c1),var(--c2))!important;box-shadow:0 8px 16px color-mix(in srgb,var(--c2) 40%,transparent),inset 0 0 0 2px rgba(255,255,255,.35)}',
     'html:root body:not(#zz) .af-hq-ic svg{width:26px!important;height:26px!important}',
     'html:root body:not(#zz) .af-hq-btn>div{width:100%;text-align:right!important}',
@@ -367,6 +368,12 @@
     /* نافذة الدرجات الجديدة: عناوين البطاقات واضحة على الخلفية الفاتحة */
     'html:root body:not(#zz) .gp .gc b,html:root body:not(#zz) .sheet .gc b{color:#14213d!important}',
     'html:root body:not(#zz) .gp .gc small,html:root body:not(#zz) .sheet .gc small{color:#51647e!important}',
+    /* وضع الرسوميات الخفيف: بدون حركات مستمرة ولا تمويه */
+    'html.af-lite .af-hq-ic,html.af-lite .af-hq-btn,html.af-lite .hbn,html.af-lite .hbn::after,html.af-lite .rows .rw,html.af-lite #card .tc{animation:none!important}',
+    'html.af-lite *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}',
+    'html.af-lite #bgDeco{display:none!important}',
+    'html.af-lite #sheet.open,html.af-lite #sheet.open .option[data-k]::before{animation:none!important}',
+    'html.af-lite .af-hq-btn,html.af-lite .nb{transition:none!important}',
   ].join('\n');
   var MENUCSS = '#drawer .option:nth-child(2),#drawer .option:nth-child(3),#drawer .option:nth-child(4),#drawer .option[data-id=afupd]{background:linear-gradient(135deg,#1768bd,#0aa6f5)!important;border-color:transparent!important;color:#fff!important;box-shadow:0 6px 16px rgba(23,104,189,.3)!important}#drawer .option:nth-child(2) *,#drawer .option:nth-child(3) *,#drawer .option:nth-child(4) *,#drawer .option[data-id=afupd] *{color:#fff!important;stroke:#fff}#drawer .option:nth-child(2) .opt-ico,#drawer .option:nth-child(3) .opt-ico,#drawer .option:nth-child(4) .opt-ico,#drawer .option[data-id=afupd] .opt-ico{background:rgba(255,255,255,.22)!important}';
   CSS += MENUCSS;
