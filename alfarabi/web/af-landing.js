@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.16-g';
+  var VER = '2026.11.16-m';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -261,6 +261,12 @@
     '#afz img{width:100%;max-width:760px;max-height:72vh;object-fit:contain;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:aflPop .4s both}',
     '#afz button{border:0;border-radius:999px;padding:14px 30px;font:800 17px inherit;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0aa6f5,#2f6fe0);box-shadow:0 10px 24px rgba(10,120,230,.45)}',
     '#afz .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:14px;width:46px;height:46px;padding:0;display:grid;place-items:center;background:rgba(255,255,255,.16);box-shadow:none;font-size:24px}',
+    /* ===== الصورة خلفية فقط: ألوان التصميم كما هي، وأطراف الصورة تتلاشى بشفافية داخل لون الصفحة ===== */
+    'html:root body #afl .wrap{position:relative;padding-top:0!important}',
+    'html:root body #afl .pbg{position:absolute;top:0;left:0;right:0;height:min(112vw,470px);background:url(shots/school-hero.jpg) center 6%/cover no-repeat;z-index:0;cursor:zoom-in;-webkit-tap-highlight-color:transparent;-webkit-mask-image:linear-gradient(to bottom,#000 52%,rgba(0,0,0,.55) 74%,transparent 100%),linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,#000 52%,rgba(0,0,0,.55) 74%,transparent 100%),linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%);mask-composite:intersect}',
+    'html:root body #afl .pbg .zm{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(20,33,61,.62);color:#fff;border-radius:999px;padding:5px 14px;font-size:12px;font-weight:700;pointer-events:none;white-space:nowrap}',
+    'html:root body #afl .card{position:relative;z-index:1;margin-top:min(74vw,310px)!important;overflow:visible!important;padding-top:56px!important}',
+    'html:root body #afl .lgo{margin-top:-108px!important;margin-bottom:12px!important}',
   ].join('\n');
   D.head.appendChild(css);
 
@@ -297,8 +303,7 @@
     '<div class="stg"><div><b>المرحلة المتوسطة</b><small>كادر التدريس · الطالب · ولي الأمر</small></div><div><b>المرحلة الإعدادية</b><small>كادر التدريس · الطلاب · ولي الأمر</small></div></div></div>' +
     '</section>';
 
-  root.innerHTML = '<div class="wrap"><div class="card">' +
-    '<div class="hero"><img class="hbg" src="' + BASE + 'shots/school-hero.jpg" alt="ثانوية الفارابي الأهلية للبنين"><i class="d1"></i><i class="d3"></i><span class="zm">اضغط للتكبير</span></div>' +
+  root.innerHTML = '<div class="wrap"><div class="pbg" id="afpb"><span class="zm">اضغط على الصورة للتكبير</span></div><div class="card">' +
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
     '<button class="bt a" data-a="apk"><span class="lg2">' + I.and + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Android</bdi></b><small>تنزيل مباشر لنسخة <bdi dir="ltr">APK</bdi></small><em class="mt"><u id="afbv">أحدث إصدار</u><u id="afbs">تنزيل سريع</u></em></span>' + (isAnd ? badge('جهازك') : '') + '<span class="go">' + I.apk + '</span></button>' +
@@ -341,7 +346,7 @@
 
   /* الضغط على صورة البنر: تظهر كاملة، وزر للرجوع إلى التثبيت */
   (function () {
-    var h = root.querySelector('.hero'); if (!h) return;
+    var h = root.querySelector('#afpb'); if (!h) return;
     function openZ() {
       if (D.getElementById('afz')) return;
       var o = D.createElement('div'); o.id = 'afz';
