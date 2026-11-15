@@ -124,7 +124,7 @@
       function ic(k, z) { return '<svg class="tgi" viewBox="0 0 24 24"' + (z ? ' style="width:' + z + 'px;height:' + z + 'px"' : '') + '>' + (ICN[k] || '') + '</svg>'; }
       var SEND = ic('send'), PLUS = ic('plus');
       var MC = {};            // ذاكرة مؤقتة للملفات المنزّلة
-      var BASE_DEF = 'https://shhb-1ae9e-default-rtdb.firebaseio.com';
+      var BASE_DEF = 'https://ssjjs-591e7-default-rtdb.firebaseio.com';
 
       /* ===== أداء: قراءة السجلات من التخزين مرة كل 600ms كحد أقصى (التحليل المتكرر لملف كبير كان سبب التقطيع) ===== */
       var _rawC = null, _recC = [], _tC = 0;
@@ -147,7 +147,7 @@
       function tmf(ts) { return new Date(ts).toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' }); }
       function dyf(ts) { var d = new Date(ts), n = new Date(); if (d.toDateString() === n.toDateString()) return 'اليوم'; return d.toLocaleDateString('ar', { day: 'numeric', month: 'long' }); }
       function A() { return window.Android || (P && P.Android) || null; }
-      function fbase() { return P.FBBASE || (function () { try { return P.localStorage.getItem('alfarabi_fbbase_shhb'); } catch (e) { return ''; } })() || BASE_DEF; }
+      function fbase() { return P.FBBASE || (function () { try { return P.localStorage.getItem('alfarabi_fbbase_ssjjs'); } catch (e) { return ''; } })() || BASE_DEF; }
       function gcol(c) { return COLS[(c && c.col) || 0] || COLS[0]; }
 
       /* ---- نوع الملف حسب الصيغة ---- */

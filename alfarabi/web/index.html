@@ -13,10 +13,11 @@
   <title>ثانوية الفارابي</title>
   <link rel="stylesheet" href="fonts/fonts.css">
   <script src="af-webshim.js?v=1794060001"></script>
-  <script src="af-landing.js?v=26e858e0"></script>
-  <script src="af-dev.js?v=26e858e0"></script>
+  <script src="af-landing.js?v=c2b746d0"></script>
+  <script src="af-dev.js?v=c2b746d0"></script>
   
   <script src="af-push.js?v=1794060002"></script>
+  <script src="af-wipe.js?v=1794060003"></script>
   <script src="af-android.js?v=1794060001"></script>
   <script src="af-sync.js?v=20261108x"></script>
   <script src="af-extra.js?v=20261108m"></script>
@@ -1142,7 +1143,7 @@ window.importSchool=function(t){try{var o=JSON.parse(t);if(!Array.isArray(o.stud
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 /* ===== المزامنة مع Firebase Realtime Database (REST + SSE) ===== */
 (function(){
-var DBK='alfarabi_db_v1',CK='alfarabi_chat_v2',SK=KEY,BK='alfarabi_fbbase_shhb',PROJ='shhb-1ae9e-default-rtdb';
+var DBK='alfarabi_db_v1',CK='alfarabi_chat_v2',SK=KEY,BK='alfarabi_fbbase_ssjjs',PROJ='ssjjs-591e7-default-rtdb';
 var cands=['https://'+PROJ+'.firebaseio.com','https://'+PROJ+'.europe-west1.firebasedatabase.app','https://'+PROJ+'.asia-southeast1.firebasedatabase.app'];
 var base=null,hold=1,raw=Storage.prototype.setItem,q=[],busy=0,ready={},mir={c:null,v:null,cr:0,vr:0},seen={a:{},m:{},v:{},s:''},pend={},dS=0,er=0;
 var SDo=window.SD;
@@ -1179,7 +1180,7 @@ function run(){if(hold||busy||!base||!q.length)return;busy=1;var it=q[0],del=it[
  .then(function(r){if(!r.ok)throw r.status;q.shift();delete pend[it[0]];if(it[0].indexOf('school')===0&&!q.some(function(x){return x[0].indexOf('school')===0}))dS=0;busy=0;run()}).catch(function(e){busy=0;st('غير متصل '+(typeof e==='number'?'['+e+']':''));if(q.length>1)q.push(q.shift());setTimeout(run,700)})}
 /* من الجهاز إلى الخادم */
 var ckT=0,ckV=null;
-function schedChat(v){ckV=v;if(ckT)return;ckT=setTimeout(function(){ckT=0;var x=ckV;ckV=null;try{pushChat(typeof x==='string'?JSON.parse(x):x)}catch(e){}},700)}
+function schedChat(v){ckV=v;if(ckT)return;ckT=setTimeout(function(){ckT=0;var x=ckV;ckV=null;try{pushChat(typeof x==='string'?JSON.parse(x):x)}catch(e){}},0)}
 Storage.prototype.setItem=function(k,v){raw.apply(this,arguments);if(this!==localStorage)return;try{if(k===DBK)pushAcc(JSON.parse(v));else if(k===CK)schedChat(v);else if(k===SK)pushSchool()}catch(e){}};
 /* إرسال فوري لآخر رسائل المحادثة المفتوحة فقط (بدون فحص كل الرسائل) */
 window.AFPushTail=function(o,g){try{pushChat(typeof o==='string'?JSON.parse(o):o,{g:g,n:40})}catch(e){}};

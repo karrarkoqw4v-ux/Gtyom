@@ -11,8 +11,8 @@
 
   /* ---------- شبكة (قاعدة بيانات المدرسة) + كاش فوري ---------- */
   var HD_LIST_CACHE_KEY = 'af_hd_list_cache_v1';
-  var DEF_BASES = ['https://shhb-1ae9e-default-rtdb.firebaseio.com', 'https://shhb-1ae9e-default-rtdb.europe-west1.firebasedatabase.app', 'https://shhb-1ae9e-default-rtdb.asia-southeast1.firebasedatabase.app'];
-  function base() { return window.FBBASE || localStorage.getItem('alfarabi_fbbase_shhb') || DEF_BASES[0]; }
+  var DEF_BASES = ['https://ssjjs-591e7-default-rtdb.firebaseio.com', 'https://ssjjs-591e7-default-rtdb.europe-west1.firebasedatabase.app', 'https://ssjjs-591e7-default-rtdb.asia-southeast1.firebasedatabase.app'];
+  function base() { return window.FBBASE || localStorage.getItem('alfarabi_fbbase_ssjjs') || DEF_BASES[0]; }
   function okk(k) { return String(k).replace(/[.#$\[\]\/]/g, '_'); }
   function req(path, opt, ms) {
     var b = base(); if (!b) return Promise.reject(new Error('ما اكو اتصال بقاعدة البيانات، تأكد من الإنترنت ثم حاول'));

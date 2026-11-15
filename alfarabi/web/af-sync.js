@@ -6,8 +6,8 @@
    - معالج ذكي لمشاكل الاتصال (Connection Troubleshooter & Auto-Repair) يفحص ويعالج الاتصال بضغطة واحدة أو تلقائياً. */
 (function () {
   'use strict';
-  var CK = 'alfarabi_chat_v2', DBK = 'alfarabi_db_v1', BK = 'alfarabi_fbbase_shhb';
-  var PROJ = 'shhb-1ae9e-default-rtdb';
+  var CK = 'alfarabi_chat_v2', DBK = 'alfarabi_db_v1', BK = 'alfarabi_fbbase_ssjjs';
+  var PROJ = 'ssjjs-591e7-default-rtdb';
   var CANDS = [
     'https://' + PROJ + '.firebaseio.com',
     'https://' + PROJ + '.europe-west1.firebasedatabase.app',

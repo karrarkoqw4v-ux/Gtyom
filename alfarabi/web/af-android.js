@@ -133,7 +133,7 @@
     if (!u || !u.uid || !A.fcmToken || !rf) return;
     var t = ''; try { t = A.fcmToken(); } catch (e) {} if (!t) return;
     var dev = ''; try { dev = A.deviceToken(); } catch (e) {} if (!dev) return;
-    var base2 = base || LS.getItem('alfarabi_fbbase_shhb') || ''; if (!base2) return;
+    var base2 = base || LS.getItem('alfarabi_fbbase_ssjjs') || ''; if (!base2) return;
     var sig = u.uid + '|' + t, last = +LS.getItem('af_fcm_ts') || 0;
     if (LS.getItem('af_fcm_sig') === sig && Date.now() - last < 6 * 3600e3) return;
     LS.setItem('af_fcm_ts', String(Date.now() - 6 * 3600e3 + 60000)); /* لا نكرر الطلب كل 3 ثوان إن فشل */
