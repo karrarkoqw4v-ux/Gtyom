@@ -6,6 +6,7 @@ rm -rf web && mkdir web && cp -r www/. web/
 mv web/manifest.webmanifest web/manifest.json   # بعض الاستضافات المجانية تمنع امتداد webmanifest
 sed -i 's#manifest\.webmanifest#manifest.json#g' web/index.html
 cp web-src/icons/* web/
+mkdir -p web/shots && cp web-src/shots/* web/shots/
 : > web/android-responsive.css
 cp web-src/af-webshim.js web-src/af-landing.js web-src/af-dev.js web-src/sw.js web/
 python3 - <<'P'

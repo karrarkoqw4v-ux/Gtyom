@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.15-b';
+  var VER = '2026.11.15-c';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -48,6 +48,42 @@
     '#afl .card{margin-top:auto;width:100%;max-width:420px;background:#fdfeff;border:1.5px solid rgba(255,255,255,.9);border-radius:30px;padding:26px 20px 20px;box-shadow:0 6px 18px rgba(30,100,170,.14);text-align:center}',
     '#afl .lgo{position:static;width:112px;height:112px;margin:0 auto 12px;border-radius:50%;background:#fff;box-shadow:0 4px 12px rgba(10,166,245,.3);overflow:hidden;display:grid;place-items:center}',
     '#afl .lgo img{width:100%;height:100%;object-fit:cover}',
+    /* ===== واجهة العرض: لقطات حية، مميزات، فريق الفارابي ===== */
+    '#afl .sw{width:100%;max-width:420px;display:flex;flex-direction:column;gap:18px;margin-bottom:8px}',
+    '#afl .sh2{text-align:center;margin:6px 0 -4px}#afl .sh2 b{display:block;font-size:22px;color:#14213d;font-weight:800}#afl .sh2 small{font-size:13px;color:#51647e}',
+    '@keyframes aflRing{0%{box-shadow:0 0 0 0 rgba(10,166,245,.45)}100%{box-shadow:0 0 0 22px rgba(10,166,245,0)}}',
+    '@keyframes aflShine{0%{transform:translateX(-120%) skewX(-18deg)}60%,100%{transform:translateX(220%) skewX(-18deg)}}',
+    '@keyframes aflUp{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}',
+    '@keyframes aflFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}',
+    '@keyframes aflPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06);opacity:1}100%{transform:scale(1);opacity:1}}',
+    '@keyframes aflNote{0%,8%{transform:translateY(-130%);opacity:0}16%,70%{transform:none;opacity:1}80%,100%{transform:translateY(-130%);opacity:0}}',
+    '@keyframes aflDot{0%,100%{opacity:.25}50%{opacity:1}}',
+    '#afl .lgo{animation:aflRing 2.4s ease-out infinite}',
+    '#afl .bt.a{position:relative;overflow:hidden}#afl .bt.a::after{content:"";position:absolute;inset:0;width:38%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:aflShine 3.2s ease-in-out infinite}',
+    '#afl .rv{opacity:0;transform:translateY(26px)}#afl .rv.in{animation:aflUp .6s cubic-bezier(.2,.8,.3,1) both}',
+    '#afl .pv{display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px 12px 14px;background:linear-gradient(160deg,rgba(255,255,255,.9),rgba(232,244,255,.85));border:1.5px solid #fff;border-radius:30px;box-shadow:0 10px 30px rgba(30,100,170,.14);position:relative;overflow:hidden}',
+    '#afl .pvn{position:absolute;top:10px;right:12px;left:12px;z-index:3;display:flex;gap:10px;align-items:center;background:rgba(20,33,61,.94);color:#fff;border-radius:18px;padding:9px 12px;box-shadow:0 10px 24px rgba(0,0,0,.3);animation:aflNote 7s ease-in-out infinite}',
+    '#afl .pvn i{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#38bdf8,#2563eb);display:grid;place-items:center;font-style:normal;font-weight:800;flex:none}',
+    '#afl .pvn b{display:block;font-size:13px}#afl .pvn span{font-size:12px;opacity:.85;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}',
+    '#afl .phf{position:relative;width:206px;aspect-ratio:392/820;border-radius:34px;border:7px solid #14213d;background:#14213d;box-shadow:0 18px 40px rgba(20,33,61,.38);overflow:hidden;animation:aflFloat 5s ease-in-out infinite}',
+    '#afl .phf img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity .7s ease,transform .9s ease}#afl .phf img.on{opacity:1;transform:none}',
+    '#afl .dts{display:flex;gap:7px}#afl .dts i{width:8px;height:8px;border-radius:99px;background:#c3d4ea;transition:all .3s}#afl .dts i.on{width:24px;background:#0aa6f5}',
+    '#afl .cap2{font-size:15px;font-weight:800;color:#14213d;min-height:22px;transition:opacity .3s}',
+    '#afl .fg{display:grid;grid-template-columns:1fr 1fr;gap:11px}',
+    '#afl .fc{background:rgba(255,255,255,.92);border:1.5px solid #fff;border-radius:24px;padding:14px 12px;box-shadow:0 8px 20px rgba(30,100,170,.1);text-align:right}',
+    '#afl .fc .fi{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;margin-bottom:8px;box-shadow:0 8px 16px rgba(0,0,0,.14)}#afl .fc .fi svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}',
+    '#afl .fc b{display:block;font-size:15px;color:#14213d;font-weight:800}#afl .fc small{display:block;font-size:12px;color:#51647e;line-height:1.6;margin-top:2px}',
+    '#afl .cb{background:rgba(255,255,255,.94);border-radius:26px;padding:16px 14px;box-shadow:0 8px 22px rgba(30,100,170,.12);border:1.5px solid #fff}',
+    '#afl .cb h4{margin:0 0 10px;font-size:16px;color:#14213d}',
+    '#afl .msg{display:flex;gap:8px;align-items:flex-end;margin-bottom:8px;opacity:0}',
+    '#afl .cb.in .msg{animation:aflPop .5s both}#afl .cb.in .msg:nth-child(2){animation-delay:.5s}#afl .cb.in .msg:nth-child(3){animation-delay:1.1s}#afl .cb.in .msg:nth-child(4){animation-delay:1.7s}',
+    '#afl .msg .av2{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;flex:none}',
+    '#afl .msg .bb2{background:#182533;color:#fff;border-radius:16px 16px 16px 4px;padding:8px 12px;font-size:13.5px;line-height:1.6;max-width:78%}#afl .msg .bb2 b{display:block;font-size:11.5px;margin-bottom:1px}',
+    '#afl .msg.me{flex-direction:row-reverse}#afl .msg.me .bb2{background:linear-gradient(180deg,#31608f,#27527f);border-radius:16px 16px 4px 16px}',
+    '#afl .typ{display:flex;gap:4px;padding:6px 2px}#afl .typ i{width:7px;height:7px;border-radius:50%;background:#7f91a4;animation:aflDot 1.2s infinite}#afl .typ i:nth-child(2){animation-delay:.2s}#afl .typ i:nth-child(3){animation-delay:.4s}',
+    '#afl .team{display:flex;justify-content:center;margin:2px 0 10px;direction:ltr}#afl .team span{width:52px;height:52px;border-radius:50%;border:3px solid #fff;margin-left:-14px;display:grid;place-items:center;box-shadow:0 6px 14px rgba(0,0,0,.18);animation:aflPop .5s both}#afl .team span svg{width:34px;height:34px}',
+    '#afl .stg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}#afl .stg div{background:linear-gradient(135deg,#eaf6ff,#fff6dc);border-radius:18px;padding:11px 12px;text-align:right}#afl .stg b{display:block;font-size:14px;color:#14213d}#afl .stg small{font-size:11.5px;color:#51647e;line-height:1.6;display:block}',
+    '@media (prefers-reduced-motion:reduce){#afl *{animation:none!important;transition:none!important}#afl .rv,#afl .msg{opacity:1!important;transform:none!important}}',
     '#afl .hi{font-size:15px;color:#5a6b8c;font-weight:700}',
     '#afl h1{margin:2px 0 4px;font-size:32px;line-height:1.3;color:#1e90ff;font-weight:800}',
     '#afl .sn{font-size:18px;font-weight:800;color:#14213d}',
@@ -142,6 +178,36 @@
   var root = D.createElement('div'); root.id = 'afl';
   var logo = BASE + 'logo.jpg', ico = BASE + 'icon-192.png';
   function badge(t) { return '<span class="you">' + t + '</span>'; }
+
+  function svgi(d) { return '<svg viewBox="0 0 24 24">' + d + '</svg>'; }
+  var AVA = function (c1, c2, face) { return '<svg viewBox="0 0 40 40"><defs><linearGradient id="g' + face + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient></defs><rect width="40" height="40" fill="url(#g' + face + ')"/><circle cx="20" cy="15" r="7.5" fill="#fff" opacity=".95"/><path d="M5 40c1.500-9 8-13 15-13s13.500 4 15 13z" fill="#fff" opacity=".95"/></svg>'; };
+  var SHOTS = [['home', 'الرئيسية بتصميم عصري'], ['chat', 'محادثات الجروب بتصميم تيليجرام'], ['grades', 'درجات امتحاناتك بالألوان'], ['plans', 'تحاضير الدروس اليومية'], ['schedule', 'جدول الأسبوع والدوام']];
+  var FEATS = [
+    ['المحادثات الفورية', 'جروب الصف ومحادثة خاصة مع المدرس، تصلك الرسالة بالثانية.', 'linear-gradient(135deg,#38bdf8,#2563eb)', '<path d="M4 5h16v11H9l-5 4z"/>'],
+    ['إشعارات بصورة المرسل', 'اسم المرسل وصورته ورسالته على شاشتك حتى لو التطبيق مغلق.', 'linear-gradient(135deg,#fb7185,#e11d48)', '<path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z"/><path d="M10 21h4"/>'],
+    ['درجاتك أولاً بأول', 'درجة كل امتحان مع المادة والنسبة، لك ولولي أمرك.', 'linear-gradient(135deg,#4ade80,#16a34a)', '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],
+    ['تحاضير وملازم', 'تحضير الدرس ووصفه واسم المدرس، والملازم بقارئ داخل التطبيق.', 'linear-gradient(135deg,#a78bfa,#7c3aed)', '<path d="M5 4h10l4 4v12H5z"/><path d="M9 13h6M9 17h6"/>'],
+    ['قنوات المدرسين', 'منشورات وصور وتعليقات من قناة كل مادة بتصميم أنيق.', 'linear-gradient(135deg,#fbbf24,#f97316)', '<path d="M3 11v3l12 5V6zM15 9a4 4 0 0 1 0 6"/>'],
+    ['جدول ودوام وعطل', 'جدول الحصص الأسبوعي وأيام الدوام والعطل بمتناول يدك.', 'linear-gradient(135deg,#2dd4bf,#0d9488)', '<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/>']
+  ];
+  var showcase = '<section class="sw">' +
+    '<div class="sh2 rv"><b>شاهد التطبيق من الداخل</b><small>لقطات حقيقية من تطبيق ثانوية الفارابي</small></div>' +
+    '<div class="pv rv"><div class="pvn"><i>م</i><div><b>أستاذ الرياضيات</b><span>وصلت الملزمة الجديدة، حمّلوها من قسم الملازم</span></div></div>' +
+    '<div class="phf" id="afph">' + SHOTS.map(function (x, i) { return '<img' + (i ? '' : ' class="on"') + ' src="' + BASE + 'shots/' + x[0] + '.jpg" alt="' + x[1] + '" loading="lazy">'; }).join('') + '</div>' +
+    '<div class="cap2" id="afcap">' + SHOTS[0][1] + '</div><div class="dts" id="afdt">' + SHOTS.map(function (x, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('') + '</div></div>' +
+    '<div class="sh2 rv"><b>كل ما يحتاجه الطالب</b><small>في تطبيق واحد سريع وخفيف</small></div>' +
+    '<div class="fg">' + FEATS.map(function (f, i) { return '<div class="fc rv" style="animation-delay:' + (i * .07) + 's"><div class="fi" style="background:' + f[2] + '">' + svgi(f[3]) + '</div><b>' + f[0] + '</b><small>' + f[1] + '</small></div>'; }).join('') + '</div>' +
+    '<div class="cb rv" id="afcb"><h4>رسالة تصل بالثانية</h4>' +
+    '<div class="msg"><div class="av2" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)">م</div><div class="bb2"><b style="color:#a78bfa">أستاذ الرياضيات</b>الامتحان الشهري يوم الأحد الساعة التاسعة</div></div>' +
+    '<div class="msg me"><div class="bb2">ان شاء الله، هل يشمل الفصل الثالث؟</div></div>' +
+    '<div class="msg"><div class="av2" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)">م</div><div class="bb2"><b style="color:#a78bfa">أستاذ الرياضيات</b>نعم، من الفصل الأول إلى الثالث</div></div>' +
+    '<div class="msg"><div class="typ"><i></i><i></i><i></i></div></div></div>' +
+    '<div class="cb rv"><h4>أسرة ثانوية الفارابي</h4><div class="team">' +
+    [['#38bdf8', '#2563eb', 1], ['#fb7185', '#e11d48', 2], ['#4ade80', '#16a34a', 3], ['#a78bfa', '#7c3aed', 4], ['#fbbf24', '#f97316', 5]].map(function (c, i) { return '<span style="animation-delay:' + (i * .12) + 's">' + AVA(c[0], c[1], c[2]) + '</span>'; }).join('') +
+    '</div><div class="sn" style="text-align:center;font-size:16px">ثانوية الفارابي الأهلية للبنين</div><p class="ds" style="text-align:center;margin:4px 0 0">تربية هادفة و تعليم متميز</p>' +
+    '<div class="stg"><div><b>المرحلة المتوسطة</b><small>كادر التدريس · الطالب · ولي الأمر</small></div><div><b>المرحلة الإعدادية</b><small>كادر التدريس · الطلاب · ولي الأمر</small></div></div></div>' +
+    '</section>';
+
   root.innerHTML = '<div class="wrap"><div class="card">' +
     '<div class="lgo"><img src="' + logo + '" alt="شعار المدرسة"></div>' +
     '<div class="hi">أهلاً وسهلاً</div><h1>ترحب بكم</h1><div class="sn">ثانوية الفارابي الأهلية للبنين</div>' +
@@ -151,7 +217,7 @@
     '<button class="bt i" data-a="ios">' + (isIOS ? badge('جهازك') : '') + '<span class="lg2">' + I.app + '</span>' + '<span class="t">تثبيت كتطبيق Apple<small>iPhone و iPad من سفاري</small></span></button>' +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t">تطبيق App Store</span><span class="bd">قيد التطبيق</span></div>' +
     '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div><div class="ft" style="opacity:.7;margin-top:2px">نسخة الموقع ' + VER + '</div>' +
-    '</div><div class="doc" id="afdoc"></div></div>';
+    '</div>' + showcase + '<div class="doc" id="afdoc"></div></div>';
 
 
   var STM = [['m1', 'أول متوسط'], ['m2', 'ثاني متوسط'], ['m3', 'ثالث متوسط']], STP = [['p4', 'الرابع العلمي'], ['p5', 'الخامس العلمي']];
@@ -178,6 +244,21 @@
       '<div class="rw"><div><small>المشرف</small><b>الأستاذ زين العابدين</b></div><div><small>المصمم</small><b>كرار حيدر</b></div></div></div>' +
       '<button class="ac" data-a="dev" style="margin-top:2px"><span class="ai ph" style="background:linear-gradient(135deg,#1f2a44,#14213d)">' + I.lock + '</span><span class="t">حساب المطوّر<small>للمطوّر فقط</small></span>' + I.chv + '</button>';
   }
+
+  /* حركات العرض: تبديل اللقطات + ظهور تدريجي عند التمرير */
+  (function () {
+    var i = 0, ph = root.querySelector('#afph'), dt = root.querySelector('#afdt'), cap = root.querySelector('#afcap');
+    function go(n) { var im = ph.querySelectorAll('img'), ds = dt.querySelectorAll('i'); im[i].classList.remove('on'); ds[i].classList.remove('on'); i = n % im.length; im[i].classList.add('on'); ds[i].classList.add('on'); cap.textContent = SHOTS[i][1]; }
+    if (ph) { setInterval(function () { go(i + 1); }, 2800); dt.addEventListener('click', function (e) { var k = Array.prototype.indexOf.call(dt.children, e.target); if (k > -1) go(k); }); }
+    function reveal() {
+      var els = root.querySelectorAll('.rv,.cb');
+      if (!('IntersectionObserver' in W)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { root: root, threshold: .15 });
+      els.forEach(function (e) { io.observe(e); });
+    }
+    setTimeout(reveal, 80);
+  })();
+
   function mount() { if (!D.body) return setTimeout(mount, 30); D.body.appendChild(root); D.documentElement.classList.add('afl-on'); D.documentElement.style.overflow = 'hidden'; D.documentElement.style.overflowX = 'hidden'; D.body.style.overflowX = 'hidden'; }
   mount();
   function renderDoc() { var d = root.querySelector('#afdoc'); if (d) d.innerHTML = docHtml(); }
