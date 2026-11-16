@@ -3,6 +3,7 @@
 (function () {
   'use strict';
   var W = window, D = document, PUB = {"kty":"EC","x":"9IvmMNuga6JvjOjjBUFq4MYBDfjhllaUD8rByaS5iD0","y":"JyAh6qs9loudQZR3OnaSysYMTcy7vpZ-FuhME4BnpF8","crv":"P-256"}, EMAIL_H = 'a00925dce925b9dd79013eb6524f845bf2d4e8d14ab8ae1e6e7325622e5ca05e';
+  var BUILD_TS = 1794816704000; /* وقت بناء ملفات الاستضافة: أي نسخة مرفوعة من حساب المطوّر قبله تُتجاهل حتى لا تُرجع ملفات أقدم (مثل الزر العائم القديم) */
   var CHUNK = 700 * 1024, MAXB = 25 * 1024 * 1024, KEYS = 'af_ota_key', CACHE = 'alfarabi-ota-web';
   var BASE = (function () { var s = D.currentScript; var u = s && s.src ? s.src : location.href; return u.replace(/[^\/]*([?#].*)?$/, ''); })();
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -120,10 +121,11 @@
       }
       waitBase(20000).then(function () { return fj('/ota_web/current.json'); }).then(function (m) {
         if (!m || !m.v || !m.n) return;
+        if (m.ts && m.ts < BUILD_TS) { try { if ((+ls.getItem('af_web_ota_v') || 0) && (+ls.getItem('af_web_ota_ts') || 0) < BUILD_TS) { caches.delete(CACHE); ls.removeItem('af_web_ota_v'); } } catch (e) { } return; }
         var cur = +ls.getItem('af_web_ota_v') || 0, bad = +ls.getItem('af_web_ota_bad') || 0;
         if (m.v <= cur || m.v <= bad) return;
         return download('/ota_web_files', m, 'web').then(function (bytes) { return applyZip(bytes); }).then(function () {
-          ls.setItem('af_web_ota_v', String(m.v)); ls.setItem('af_web_ota_pending', '0'); location.reload();
+          ls.setItem('af_web_ota_v', String(m.v)); ls.setItem('af_web_ota_ts', String(m.ts || Date.now())); ls.setItem('af_web_ota_pending', '0'); location.reload();
         });
       }).catch(function () { });
     } catch (e) { }

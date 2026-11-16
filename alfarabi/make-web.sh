@@ -53,3 +53,5 @@ if [ -n "$APK" ]; then cp "$APK" web/alfarabi.apk; basename "$APK" | sed -E 's/a
 sed -i 's/,#afl{display:none!important}/{display:none!important}/' web/index.html
 # مظهر iPhone للتطبيق المثبّت على آيفون فقط (لا يدخل في APK)
 sed -i 's#<script src="af-webshim.js#<script src="af-ios.js"></script>\n  <script src="af-webshim.js#' web/index.html
+# وقت البناء داخل af-dev.js (يتجاهل نسخاً قديمة مرفوعة من حساب المطوّر)
+sed -i "s/__BUILD_TS__/$(date +%s)000/" web/af-dev.js
