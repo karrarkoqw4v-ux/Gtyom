@@ -86,6 +86,13 @@
         }
       }
     },
+    "seen": {
+      ".read": true,
+      ".write": true,
+      "$room": {
+        "$uid": {}
+      }
+    },
     "typing": {
       ".read": true,
       ".write": true,
