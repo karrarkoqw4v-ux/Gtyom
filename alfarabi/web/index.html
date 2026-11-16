@@ -13,8 +13,8 @@
   <title>ثانوية الفارابي</title>
   <link rel="stylesheet" href="fonts/fonts.css">
   <script src="af-webshim.js?v=1794060001"></script>
-  <script src="af-landing.js?v=5a7a5c6b"></script>
-  <script src="af-dev.js?v=5a7a5c6b"></script>
+  <script src="af-landing.js?v=8acba08e"></script>
+  <script src="af-dev.js?v=8acba08e"></script>
   
   <script src="af-push.js?v=1794060002"></script>
   <script src="af-assist.js?v=1794060004"></script>
@@ -1866,11 +1866,11 @@ no.onclick=function(){o.remove()};
 ok.onclick=function(){var c=doc.createElement('canvas');c.width=c.height=sz;var sd=S/k;c.getContext('2d').drawImage(im,im.width/2-tx/k-sd/2,im.height/2-ty/k-sd/2,sd,sd,0,0,sz,sz);o.remove();cb(c.toDataURL('image/jpeg',.88))};
 o.appendChild(g);o.appendChild(bx);o.appendChild(tt);o.appendChild(no);o.appendChild(ok);doc.body.appendChild(o);ap()};im.src=rd.result};rd.readAsDataURL(file)};
 window.cropRect=function(doc,file,cb){var sz=1200;var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){
-var w=doc.defaultView,W=w.innerWidth,H=w.innerHeight,bw=W-16,bh=Math.round(210*bw/W),mn=Math.max(bw/im.width,bh/im.height),k=mn,tx=0,ty=0,pts={},d0=1,k0=1;
+var w=doc.defaultView,W=w.innerWidth,H=w.innerHeight,bw=W-16,bh=Math.round(170*bw/W),mn=Math.max(bw/im.width,bh/im.height),k=mn,tx=0,ty=0,pts={},d0=1,k0=1;
 var o=doc.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:99999;background:#000;touch-action:none;overflow:hidden;direction:ltr;font-family:Cairo,sans-serif';
 var g=doc.createElement('img');g.src=rd.result;g.draggable=false;g.style.cssText='position:absolute;left:0;top:0;max-width:none;width:'+im.width+'px;height:'+im.height+'px;pointer-events:none;transform-origin:0 0';
 var bx=doc.createElement('div');bx.style.cssText='position:absolute;left:8px;top:'+((H-bh)/2)+'px;width:'+bw+'px;height:'+bh+'px;border:2px solid #fff;box-shadow:0 0 0 3000px rgba(0,0,0,.62);pointer-events:none';
-var tt=doc.createElement('div');tt.textContent='حرّك الصورة وكبّرها داخل الدائرة';tt.style.cssText='position:absolute;top:calc(18px + var(--sa-top,env(safe-area-inset-top,0px)));left:0;right:0;text-align:center;color:#fff;font-weight:700;font-size:15px;pointer-events:none';
+var tt=doc.createElement('div');tt.textContent='حرّك الصورة وكبّرها داخل المربع';tt.style.cssText='position:absolute;top:calc(18px + var(--sa-top,env(safe-area-inset-top,0px)));left:0;right:0;text-align:center;color:#fff;font-weight:700;font-size:15px;pointer-events:none';
 function bt(c,t,side){var b=doc.createElement('button');b.type='button';b.textContent=t;b.style.cssText='position:absolute;bottom:calc(26px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));'+side+':26px;width:62px;height:62px;border-radius:50%;border:0;background:'+c+';color:#fff;font-size:30px;line-height:1;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.4)';return b}
 var no=bt('#e5384a','✕','left'),ok=bt('#1fb26b','✓','right');
 function dist(){var a=Object.keys(pts).map(function(i){return pts[i]});return Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1}

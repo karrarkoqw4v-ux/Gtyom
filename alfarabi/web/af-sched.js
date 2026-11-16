@@ -62,6 +62,54 @@
       render();
     };
 
+
+    /* ===== إعدادات الصفحة (صفحة المدرسة): غلاف + دائرة الشعار + الاسم والوصف والروابط والموقع ===== */
+    T.schoolpage = 'إعدادات الصفحة';
+    V.schoolpage = function () {
+      mark('settings');
+      var I = SD.info = SD.info || {}; I.phones = I.phones || []; I.links = I.links || []; I.loc = I.loc || {};
+      function val(i) { var e = $(i); return e ? e.value : null; }
+      function grab() {
+        var n = val('spn'); if (n === null) return;
+        n = n.trim(); if (n.length >= 3) SD.name = n;
+        I.bio = (val('spb') || '').trim(); I.loc.t = (val('spl') || '').trim();
+      }
+      function draw() {
+        shell('إعدادات الصفحة', '', '<div class="sc"><style>' +
+          '.spx{position:relative;height:180px;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,#7cc6f5,#2f7fb0);background-size:cover;background-position:center;box-shadow:0 8px 22px rgba(40,90,150,.18);margin:0 0 12px}' +
+          '.spx .cvb{position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:0;border-radius:18px;background:rgba(255,255,255,.88);color:#14213d;font:inherit;font-weight:800;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.18)}' +
+          '.spx .cvb svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}' +
+          '.spx .cvx{position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;border-radius:50%;background:rgba(229,56,74,.9);color:#fff;font-size:16px;cursor:pointer}' +
+          '.spx .lg{position:absolute;left:50%;top:50%;width:104px;height:104px;margin:-52px 0 0 -52px;border-radius:50%;border:4px solid #fff;background:#fff;box-shadow:0 10px 26px rgba(20,60,110,.28);overflow:hidden;padding:0;cursor:pointer}' +
+          '.spx .lg img{width:100%;height:100%;object-fit:cover;display:block}' +
+          '.spx .lg i{position:absolute;bottom:0;left:0;right:0;height:26px;background:rgba(10,134,214,.85);color:#fff;font-style:normal;font-size:11px;font-weight:800;display:grid;place-items:center}' +
+          '.spl{font-size:13px;font-weight:800;color:#51647e;margin:12px 4px 4px}.spx2{width:100%;min-height:90px;border:1.5px solid #e1e8f4;border-radius:16px;padding:10px 12px;font:inherit;font-size:15px;background:#fff;resize:vertical}' +
+          '</style>' +
+          '<div class="spx" id="spx"' + (I.cover ? ' style="background-image:url(' + I.cover + ')"' : '') + '>' +
+          '<button type="button" class="cvb" id="cvb"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg>' + (I.cover ? 'تغيير الخلفية' : 'إضافة خلفية') + '</button>' +
+          (I.cover ? '<button type="button" class="cvx" id="cvx" aria-label="إزالة الخلفية">✕</button>' : '') +
+          '<button type="button" class="lg" id="splg"><img src="' + esc(SD.logo || P.DEFLOGO) + '" alt=""><i>تغيير الصورة</i></button></div>' +
+          '<div class="spl">اسم المدرسة</div><div class="fd"><input id="spn" placeholder="اسم المدرسة" value="' + esc(SD.name) + '"></div>' +
+          '<div class="spl">وصف المدرسة</div><textarea class="spx2" id="spb" placeholder="اكتب وصفاً للمدرسة">' + esc(I.bio || '') + '</textarea>' +
+          '<div class="spl">الروابط</div><div id="spll"></div><div class="fd"><input id="splt" placeholder="عنوان الرابط (مثل: صفحتنا على فيسبوك)"></div><div class="fd"><input id="splu" placeholder="https://..." style="direction:ltr;text-align:right"></div><button class="bt ghost" id="spla">+ إضافة رابط</button>' +
+          '<div class="spl">الموقع</div><div class="fd"><input id="spl" placeholder="العنوان (اكتبه يدوياً)" value="' + esc(I.loc.t || '') + '"></div><button class="bt ghost" id="spgp">' + (I.loc.lat ? 'تحديث الموقع على الخريطة' : 'تحديد موقعي الحالي على الخريطة') + '</button>' +
+          '<div class="spl">أرقام الهاتف</div><div id="sppl"></div><div class="fd"><input id="sppt" placeholder="الاسم (مثل: الإدارة)"></div><div class="fd"><input id="sppv" inputmode="tel" placeholder="الرقم" style="direction:ltr;text-align:right"></div><button class="bt ghost" id="sppa">+ إضافة رقم</button>' +
+          '<button class="bt" id="spsv" style="margin-top:14px">حفظ</button></div>', V.stageMenu);
+        $('sppl').innerHTML = I.phones.map(function (p, i) { return '<div class="li"><div>' + esc(p.t || 'هاتف') + '<small dir="ltr">' + esc(p.v) + '</small></div><button data-p="' + i + '">حذف</button></div>'; }).join('');
+        $('spll').innerHTML = I.links.map(function (p, i) { return '<div class="li"><div>' + esc(p.t || 'رابط') + '<small dir="ltr">' + esc(p.u) + '</small></div><button data-l="' + i + '">حذف</button></div>'; }).join('');
+        $('sppl').onclick = function (e) { var b = e.target.closest('[data-p]'); if (b) { grab(); I.phones.splice(+b.dataset.p, 1); save(); draw(); } };
+        $('spll').onclick = function (e) { var b = e.target.closest('[data-l]'); if (b) { grab(); I.links.splice(+b.dataset.l, 1); save(); draw(); } };
+        $('sppa').onclick = function () { var v = $('sppv').value.trim(), t = $('sppt').value.trim(); if (!/^[0-9+\s]{6,20}$/.test(v)) return toast('اكتب رقماً صحيحاً'); grab(); I.phones.push({ t: t, v: v }); save(); draw(); toast('تمت إضافة الرقم'); };
+        $('spla').onclick = function () { var u = $('splu').value.trim(), t = $('splt').value.trim(); if (!/^https?:\/\/\S+\.\S+/i.test(u)) return toast('اكتب رابطاً صحيحاً يبدأ بـ https://'); grab(); I.links.push({ t: t, u: u }); save(); draw(); toast('تمت إضافة الرابط'); };
+        $('spgp').onclick = function () { grab(); var g = (P.navigator || navigator).geolocation; if (!g) return toast('الجهاز لا يدعم تحديد الموقع'); g.getCurrentPosition(function (pos) { I.loc.lat = +pos.coords.latitude.toFixed(5); I.loc.lng = +pos.coords.longitude.toFixed(5); save(); draw(); toast('تم تحديد الموقع على الخريطة'); }, function () { toast('تعذّر تحديد الموقع، اكتبه يدوياً'); }, { timeout: 10000 }); };
+        $('cvb').onclick = function () { grab(); pick('image/*', function (x) { P.cropRect(document, x, function (d) { I.cover = d; save(); draw(); toast('تم تركيب الخلفية على صفحة المدرسة'); }); }); };
+        if ($('cvx')) $('cvx').onclick = function () { grab(); delete I.cover; save(); draw(); toast('تمت إزالة الخلفية'); };
+        $('splg').onclick = function () { grab(); pickImg(function (d) { SD.logo = d; save(); document.querySelectorAll('.logo img').forEach(function (i) { i.src = d; }); draw(); toast('تم تغيير صورة المدرسة'); }); };
+        $('spsv').onclick = function () { grab(); save(); toast('تم حفظ إعدادات الصفحة'); V.stageMenu(); };
+      }
+      draw();
+    };
+
     /* تحاضير الدروس: عرض كل التحاضير لإدارة الصف الحالي */
     V.plans = function () {
       mark('');
@@ -182,7 +230,9 @@
     if (s) {
       var a = '\nhome();\n})();';
       var i = s.lastIndexOf(a);
-      if (i > -1) { s = s.slice(0, i) + ASRC + s.slice(i); window.ADMIN_SRC = s; }
+      if (i > -1) { s = s.slice(0, i) + ASRC + s.slice(i); }
+      s = s.split("['posts','announcements','holidays','verify','name',").join("['schoolpage','posts','announcements','holidays','verify','name',");
+      window.ADMIN_SRC = s;
     }
   } catch (e) { try { console.warn('af-sched admin', e); } catch (x) { } }
   try {
