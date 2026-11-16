@@ -10,7 +10,7 @@
     {"kty":"EC","x":"9IvmMNuga6JvjOjjBUFq4MYBDfjhllaUD8rByaS5iD0","y":"JyAh6qs9loudQZR3OnaSysYMTcy7vpZ-FuhME4BnpF8","crv":"P-256"}
   ];
   var PUB = PUBS[0];
-  var UIV = '2026.11.18-page';
+  var UIV = '2026.11.19-ota';
   var CHUNK = 700 * 1024, MAXB = 25 * 1024 * 1024;
   var isApp = !!(A.otaBegin) && !A.__web;
   function base() { return window.FBBASE || ''; }
@@ -42,12 +42,38 @@
       return verifySig(meta);
     });
   }
+  /* ---- موافقة المستخدم قبل التنزيل: يُسأل مرة وحدة لكل تحديث (نعم/لا). «لا» = يبقى متاحاً بزر «آخر تحديثات» ---- */
+  var ASK = 'af_ota_ask', pend = null;
+  function toastU(t) { try { var e = document.createElement('div'); e.textContent = t; e.style.cssText = 'position:fixed;left:16px;right:16px;bottom:30px;z-index:2147483647;background:#14213d;color:#fff;border-radius:14px;padding:12px;text-align:center;font:700 14px Cairo,Tahoma,sans-serif;direction:rtl'; document.body.appendChild(e); setTimeout(function () { e.remove(); }, 4200); } catch (x) { } }
+  function closeAsk() { var o = document.getElementById('afUpdAsk'); if (o) o.remove(); }
+  function askUser(m, onYes) {
+    if (lsg(ASK) === String(m.v) || !document.body || document.getElementById('afUpdAsk')) return;
+    lss(ASK, String(m.v));
+    var o = document.createElement('div'); o.id = 'afUpdAsk';
+    o.style.cssText = 'position:fixed;inset:0;z-index:2147483200;background:rgba(10,20,40,.55);display:flex;align-items:center;justify-content:center;padding:22px;direction:rtl;font-family:Cairo,Tahoma,sans-serif';
+    var c = document.createElement('div');
+    c.style.cssText = 'background:#fff;color:#14213d;width:100%;max-width:360px;border-radius:24px;padding:22px 18px 16px;box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center';
+    var mb = m.size ? ' · ' + (m.size / 1048576).toFixed(1) + ' ميغا' : '';
+    c.innerHTML = '<div style="width:54px;height:54px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#1768bd,#0aa6f5);display:grid;place-items:center"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>' +
+      '<h3 style="margin:0 0 6px;font-size:18px">تحديث جديد من الإدارة</h3><p style="margin:0 0 6px;font-size:14px;line-height:1.8;color:#42536f"></p><p style="margin:0 0 14px;font-size:12px;color:#7a8aa3">' + (m.ts ? new Date(m.ts).toLocaleString('ar-IQ', { dateStyle: 'medium', timeStyle: 'short' }) : '') + mb + '</p>';
+    c.querySelector('p').textContent = m.note ? m.note : 'تحسينات وإصلاحات للتطبيق.';
+    var q = document.createElement('p'); q.textContent = 'تحب تنزّل التحديث الآن؟'; q.style.cssText = 'margin:0 0 12px;font-weight:800;font-size:15px'; c.insertBefore(q, c.lastChild);
+    var y = document.createElement('button'), n = document.createElement('button');
+    y.type = n.type = 'button'; y.textContent = 'نعم، نزّل التحديث'; n.textContent = 'لا، لاحقاً';
+    y.style.cssText = 'width:100%;border:0;border-radius:14px;padding:13px;background:linear-gradient(135deg,#1768bd,#0aa6f5);color:#fff;font:700 15px Cairo,Tahoma,sans-serif;cursor:pointer;margin-bottom:8px';
+    n.style.cssText = 'width:100%;border:0;border-radius:14px;padding:12px;background:#edf3fa;color:#18385e;font:700 14px Cairo,Tahoma,sans-serif;cursor:pointer';
+    c.appendChild(y); c.appendChild(n); o.appendChild(c); document.body.appendChild(o);
+    y.onclick = function () { closeAsk(); onYes(); };
+    n.onclick = function () { closeAsk(); toastU('تمام، التحديث يبقى متاحاً بزر «آخر تحديثات» وتنزّله متى تحب'); };
+  }
+  function deletedMsg() { pend = null; webLatest = 0; closeAsk(); lss(ASK, ''); setS('err', 'تم حذف التحديث من الإدارة، لن يتم تنزيله'); toastU('تم حذف التحديث من الإدارة'); }
   function apply(m) {
     var parts = [], i = 0, total = 0;
     setS('down', 'جاري تنزيل التحديث...', 0);
     function next() {
       if (i >= m.n) return;
       return fj('/ota_files/v' + m.v + '/c' + i + '.json').then(function (s) {
+        if (s === null) throw new Error('deleted');
         if (typeof s !== 'string') throw new Error('ملف ناقص');
         var u = b64u8(s); total += u.length; if (total > MAXB) throw new Error('حجم التحديث كبير');
         parts.push(u); i++; setS('down', 'جاري تنزيل التحديث... ' + Math.round(i / m.n * 100) + '%', i / m.n); return next();
@@ -73,15 +99,22 @@
     if (!base()) { if (manual) setS('err', 'لا يوجد اتصال بالخادم الآن، جرّب بعد قليل'); return Promise.resolve(); }
     busy = true; if (manual) setS('chk', 'جاري البحث عن تحديث...');
     return fj('/ota/current.json').then(function (m) {
-      if (!m || !m.v || !m.n || !m.sha || !m.sig) { setS('ok', 'أنت على آخر نسخة ✓'); return; }
+      if (!m || !m.v || !m.n || !m.sha || !m.sig) { if (pend) { deletedMsg(); return; } closeAsk(); if (S.k === 'new') setS('ok', 'أنت على آخر نسخة ✓'); else setS('ok', 'أنت على آخر نسخة ✓'); return; }
       var cur = +A.otaVersion() || 0, bad = +A.otaBad() || 0;
-      if (m.v <= cur || m.v <= bad || m.v === (+lsg(REJ) || 0)) { setS('ok', 'أنت على آخر نسخة ✓'); return; }
-      /* نتحقق من التوقيع قبل التنزيل: تحديث غير موقّع بالمفتاح الصحيح لا يُنزَّل أصلاً */
-      return verifySig(m).catch(function () { lss(REJ, m.v); throw new Error('skip'); }).then(function () { return apply(m); });
+      if (m.v <= cur || m.v <= bad || m.v === (+lsg(REJ) || 0)) { pend = null; setS('ok', 'أنت على آخر نسخة ✓'); return; }
+      /* نتحقق من التوقيع قبل أي شيء: تحديث غير موقّع بالمفتاح الصحيح يُتجاهل */
+      return verifySig(m).catch(function () { lss(REJ, m.v); throw new Error('skip'); }).then(function () {
+        if (manual) { pend = null; return apply(m); }
+        /* فحص صامت: لا ننزّل شيئاً بدون موافقة. نعرض الحالة ونسأل مرة وحدة */
+        pend = m;
+        setS('new', 'يوجد تحديث جديد' + (m.note ? ': ' + m.note : '') + ' — اضغط «تنزيل التحديث الآن»');
+        askUser(m, function () { check(true); });
+      });
     }).catch(function (e) {
       if (e && e.message === 'skip') setS('ok', 'أنت على آخر نسخة ✓');
+      else if (e && e.message === 'deleted') deletedMsg();
       else if (manual || S.k === 'down') setS('err', 'تعذّر التحديث: ' + (e && e.message || e));
-      else setS('idle', '');
+      else if (S.k !== 'new') setS('idle', '');
     }).then(function () { busy = false; });
   }
   if (isApp) {
@@ -96,13 +129,16 @@
   function webPoll() {
     if (isApp || document.hidden || !base()) return;
     fj('/ota/current.json').then(function (m) {
-      if (!m || !m.v || !m.sha || !m.sig) return;
+      if (!m || !m.v || !m.sha || !m.sig) { if (pend) deletedMsg(); closeAsk(); return; }
       return verifySig(m).then(function () {
         webLatest = m.v; var seen = +lsg(SEEN) || 0;
         if (!seen) { lss(SEEN, m.v); return; }
-        if (m.v > seen) setS('new', 'يوجد تحديث جديد — اضغط «تحديث الصفحة الآن»');
+        if (m.v > seen) { pend = m; setS('new', 'يوجد تحديث جديد — اضغط «تحديث الصفحة الآن»'); askUser(m, webRefreshChecked); }
       });
     }).catch(function () { });
+  }
+  function webRefreshChecked() {
+    fj('/ota/current.json').then(function (m) { if (!m || !m.v || (pend && m.v !== pend.v && false)) { deletedMsg(); return; } webRefresh(); }).catch(function () { webRefresh(); });
   }
   function webRefresh() {
     setS('down', 'جاري تحديث الموقع...', 0.5);
@@ -168,17 +204,18 @@
     var go = mk('button', 'go', isApp ? 'تحقق من التحديث الآن' : 'تحديث الصفحة الآن'); go.type = 'button'; c.appendChild(go);
     c.appendChild(mk('h4', '', 'سجل التحديثات'));
     var ul = mk('ul'); c.appendChild(ul);
-    c.appendChild(mk('div', 'ft', isApp ? 'التحديثات تُنزَّل وتُثبَّت تلقائياً بدون أي إجراء منك.' : 'الموقع يتنبّه تلقائياً عند وجود تحديث جديد.'));
+    c.appendChild(mk('div', 'ft', isApp ? 'عند وصول تحديث نسألك أولاً: تنزّله أو لا. إذا رفضت يبقى متاحاً هنا وتنزّله متى تحب. وإذا حذفته الإدارة يختفي عند الجميع.' : 'الموقع يتنبّه تلقائياً عند وجود تحديث جديد.'));
     function paint(s) {
       st.className = 'st ' + (s.k === 'ok' || s.k === 'done' ? 'ok' : s.k === 'err' ? 'err' : s.k === 'new' ? 'new' : '');
       st.textContent = s.t || (isApp ? 'اضغط للتحقق من وجود تحديث جديد.' : 'اضغط لتحميل أحدث نسخة من الموقع.');
       pb.style.display = s.k === 'down' ? 'block' : 'none'; pbi.style.width = Math.round((s.pct || 0) * 100) + '%';
       go.disabled = s.k === 'chk' || s.k === 'down' || s.k === 'done';
+      go.textContent = s.k === 'new' ? (isApp ? 'تنزيل التحديث الآن' : 'تحديث الصفحة الآن') : (isApp ? 'تحقق من التحديث الآن' : 'تحديث الصفحة الآن');
     }
     subs.push(paint); paint(S);
     function close() { var i = subs.indexOf(paint); if (i > -1) subs.splice(i, 1); o.remove(); }
     x.onclick = close; o.addEventListener('click', function (e) { if (e.target === o) close(); });
-    go.onclick = function () { if (isApp) check(true); else webRefresh(); };
+    go.onclick = function () { if (isApp) check(true); else webRefreshChecked(); };
     document.body.appendChild(o);
     Promise.all([fj('/ota/current.json').catch(function () { return null; }), fj('/updates.json').catch(function () { return null; })]).then(function (r) {
       var m = r[0], u = r[1];
@@ -263,7 +300,7 @@
         '<div class="afp-c"><h3>إرسال التحديث من الاستضافة</h3><p>اكتب رابط ملف ZIP المرفوع على الاستضافة، وأجلبه وأرسله للتطبيقات المثبّتة.</p>' +
         '<input id="mhost" dir="ltr" placeholder="https://alfara.unaux.com/update.zip" style="width:100%;border:1.5px solid #cfdaed;border-radius:12px;padding:10px;font:inherit;margin:8px 0">' +
         '<button class="afbtn" id="mhg" style="width:100%">جلب من الاستضافة وإرسال</button></div>' +
-        '<div class="afp-c" id="mst"><h3>الحالة والإحصائيات</h3><p>جاري التحميل...</p></div><div class="afp-c" id="mmsg" style="display:none"></div>';
+        '<div class="afp-c" id="mcur"><h3>التحديث المُرسل حالياً</h3><p>جاري التحميل...</p></div><div class="afp-c" id="mst"><h3>الحالة والإحصائيات</h3><p>جاري التحميل...</p></div><div class="afp-c" id="mmsg" style="display:none"></div>';
     }
     X.panel(doc, 'الصيانة والتحديثات', html(), function (p) {
       var m = p.querySelector('#mmsg');
@@ -276,16 +313,37 @@
       }
       p.querySelector('#mgo').onclick = function () { var f = p.querySelector('#mzf').files[0]; if (!f) return say('اختر ملف ZIP', 1); run(function () { return f.arrayBuffer().then(function (b) { return new Uint8Array(b); }); }, this); };
       p.querySelector('#mhg').onclick = function () { var u = p.querySelector('#mhost').value.trim(); if (!/^https:\/\//i.test(u)) return say('اكتب رابطاً يبدأ بـ https://', 1); run(function () { return fromHost(u); }, this); };
+      /* إلغاء التحديث المُرسل / حذف رسالة تحديث: يُحذف من كل الأجهزة، ومن حاول تنزيله بعدها يظهر له «تم حذف التحديث من الإدارة» */
+      function cancelUpd(v) {
+        v = String(v);
+        return fj('/updates/u' + v + '.json', { method: 'DELETE' }).catch(function () { })
+          .then(function () { return fj('/ota/current.json').catch(function () { return null; }); })
+          .then(function (c) { if (c && String(c.v) === v) return fj('/ota/current.json', { method: 'DELETE' }); })
+          .then(function () { return fj('/ota_files/v' + v + '.json', { method: 'DELETE' }); });
+      }
+      function paintCur() {
+        var box = p.querySelector('#mcur');
+        fj('/ota/current.json').catch(function () { return null; }).then(function (c) {
+          if (!c || !c.v) { box.innerHTML = '<h3>التحديث المُرسل حالياً</h3><p>لا يوجد تحديث مُعدّ. الأجهزة على آخر نسخة.</p>'; return; }
+          box.innerHTML = '<h3>التحديث المُرسل حالياً</h3><p><b>' + esc(c.note || 'بدون وصف') + '</b><br>' + ago(c.ts || 0) + (c.size ? ' · ' + (c.size / 1048576).toFixed(1) + ' ميغا' : '') + '</p><p>الأجهزة تسأل المستخدم قبل التنزيل. إذا ألغيته يختفي عند الجميع، ومن يحاول تنزيله بعد الإلغاء تظهر له رسالة «تم حذف التحديث من الإدارة».</p><button class="afbtn" id="mdel" style="width:100%;background:#d9283d">إلغاء التحديث وحذفه من الجميع</button>';
+          box.querySelector('#mdel').onclick = function () {
+            var w = doc.defaultView || window; if (!w.confirm('إلغاء هذا التحديث وحذفه من كل الأجهزة؟')) return;
+            this.disabled = true; cancelUpd(c.v).then(function () { say('تم إلغاء التحديث وحذفه ✓'); paintCur(); }).catch(function (x) { say('تعذّر الإلغاء: ' + (x && x.message || x), 1); });
+          };
+        });
+      }
+      paintCur();
       /* الحالة */
       Promise.all([fj('/ota/current.json').catch(function () { return null; }), fj('/stats/visitors.json').catch(function () { return null; }), fj('/stats/installs.json').catch(function () { return null; }), fj('/usage.json').catch(function () { return null; }), fj('/usagesrc.json').catch(function () { return null; }), fj('/updates.json').catch(function () { return null; })]).then(function (r) {
         var cur = r[0], vis = r[1] || {}, ins = r[2] || {}, use = r[3] || {}, src = r[4] || {}, upd = r[5] || {};
         var tot = Object.keys(use).map(function (k) { var d = use[k] || {}, t = 0; Object.keys(d).forEach(function (x) { t += +d[x] || 0; }); return { k: k, t: t, s: src[k] || 'app' }; }).sort(function (a, b) { return b.t - a.t; }).slice(0, 8);
-        var ul = Object.keys(upd).map(function (k) { return upd[k]; }).filter(Boolean).sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(0, 5);
+        var ul = Object.keys(upd).map(function (k) { var o = upd[k]; return o && typeof o === 'object' ? Object.assign({ __k: k }, o) : null; }).filter(Boolean).sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); }).slice(0, 5);
         var h = '<h3>الحالة والإحصائيات</h3><p>آخر تحديث مُرسل: <b>' + (cur ? ago(cur.ts) : 'لا يوجد') + '</b>' + (isApp ? ' · نسخة هذا الجهاز: ' + (A.otaVersion() || 'الأصلية') : '') + '</p>' +
           '<p>ثبّتوا من المتصفح: <b>' + cnt(ins) + '</b> · زوّار الموقع: <b>' + cnt(vis) + '</b></p><h3 style="margin-top:10px">الأكثر استخداماً</h3>' +
           (tot.length ? '<ol style="padding-right:18px;margin:6px 0">' + tot.map(function (x) { return '<li id="mn_' + esc(x.k) + '">' + esc(x.k.replace(/^a/, '')) + ' — ' + (x.s === 'web' ? 'الموقع' : 'التطبيق') + ' — <b>' + fmt(x.t) + '</b></li>'; }).join('') + '</ol>' : '<p>ما توجد بيانات بعد.</p>') +
-          (ul.length ? '<h3 style="margin-top:10px">آخر التحديثات</h3><ul style="padding-right:18px;margin:6px 0">' + ul.map(function (x) { return '<li>' + esc(x.v || '') + ' ' + esc(x.note || '') + ' <small>' + new Date(x.ts || 0).toLocaleDateString('ar-IQ') + '</small></li>'; }).join('') + '</ul>' : '');
+          (ul.length ? '<h3 style="margin-top:10px">آخر التحديثات</h3><ul style="padding-right:18px;margin:6px 0">' + ul.map(function (x) { return '<li>' + esc(x.v || '') + ' ' + esc(x.note || '') + ' <small>' + new Date(x.ts || 0).toLocaleDateString('ar-IQ') + '</small> <button type="button" data-du="' + esc(x.__k) + '" style="border:0;background:#fdecee;color:#d9283d;border-radius:8px;padding:2px 10px;font:inherit;font-size:12px;cursor:pointer">حذف</button></li>'; }).join('') + '</ul>' : '');
         p.querySelector('#mst').innerHTML = h;
+        p.querySelector('#mst').onclick = function (e) { var b = e.target.closest && e.target.closest('[data-du]'); if (!b) return; var w = doc.defaultView || window; if (!w.confirm('حذف رسالة التحديث هذه من الجميع؟')) return; var k = b.dataset.du; cancelUpd(String(k).replace(/^u/, '')).then(function () { return fj('/updates/' + k + '.json', { method: 'DELETE' }); }).then(function () { say('تم حذف رسالة التحديث من الجميع ✓'); b.closest('li').remove(); paintCur(); }).catch(function (x) { say('تعذّر الحذف: ' + (x && x.message || x), 1); }); };
         tot.forEach(function (x) { fj('/accounts/' + x.k + '/name.json').then(function (n) { var e = p.querySelector('[id="mn_' + x.k + '"]'); if (e && n) e.innerHTML = e.innerHTML.replace(esc(x.k.replace(/^a/, '')), esc(String(n))); }).catch(function () { }); });
       });
     });
