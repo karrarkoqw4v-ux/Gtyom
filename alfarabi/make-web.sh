@@ -8,7 +8,7 @@ sed -i 's#manifest\.webmanifest#manifest.json#g' web/index.html
 cp web-src/icons/* web/
 mkdir -p web/shots && cp web-src/shots/* web/shots/
 : > web/android-responsive.css
-cp web-src/af-webshim.js web-src/af-landing.js web-src/af-dev.js web-src/sw.js web/
+cp web-src/af-ios.js web/ && cp web-src/af-webshim.js web-src/af-landing.js web-src/af-dev.js web-src/sw.js web/
 python3 - <<'P'
 import re,json
 p='web/index.html'; s=open(p,encoding='utf8').read()
@@ -51,3 +51,5 @@ APK=$(ls -1 dist/alfarabi-v*.apk 2>/dev/null | sort -V | tail -1)
 if [ -n "$APK" ]; then cp "$APK" web/alfarabi.apk; basename "$APK" | sed -E 's/alfarabi-v(.*)\.apk/\1/' | tr -d '\n' > web/apk-version.txt; fi
 # نسخة الـAPK تُخفي واجهة التثبيت (#afl)؛ في نسخة الموقع نُظهر شاشة تثبيت التطبيق
 sed -i 's/,#afl{display:none!important}/{display:none!important}/' web/index.html
+# مظهر iPhone للتطبيق المثبّت على آيفون فقط (لا يدخل في APK)
+sed -i 's#<script src="af-webshim.js#<script src="af-ios.js"></script>\n  <script src="af-webshim.js#' web/index.html

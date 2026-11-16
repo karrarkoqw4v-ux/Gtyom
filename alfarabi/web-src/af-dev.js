@@ -111,8 +111,12 @@
       if (ls.getItem('af_web_ota_pending') === '1') {          // النسخة السابقة ما أكدت سلامتها: نرجع للأصل
         caches.delete(CACHE); ls.setItem('af_web_ota_bad', ls.getItem('af_web_ota_v') || '0'); ls.removeItem('af_web_ota_v'); ls.setItem('af_web_ota_pending', '0');
       } else if (ls.getItem('af_web_ota_v')) {
-        setTimeout(function () { ls.setItem('af_web_ota_pending', '0'); }, 9000);
+        /* نعتبر النسخة سليمة بمجرد أن ترسم الواجهة (لا ننتظر 9 ثوانٍ: إذا أعاد المستخدم تحميل الصفحة قبلها كانت النسخة تُسحب وتُعلَّم تالفة خطأً) */
         ls.setItem('af_web_ota_pending', '1');
+        var okd = false;
+        var okNow = function () { if (okd) return; try { if (D.body && D.body.children.length > 2) { okd = true; ls.setItem('af_web_ota_pending', '0'); } } catch (e) { } };
+        setTimeout(okNow, 1200); setTimeout(okNow, 3000); setTimeout(okNow, 8000);
+        W.addEventListener('pagehide', okNow); D.addEventListener('visibilitychange', okNow);
       }
       waitBase(20000).then(function () { return fj('/ota_web/current.json'); }).then(function (m) {
         if (!m || !m.v || !m.n) return;
