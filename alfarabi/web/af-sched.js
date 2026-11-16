@@ -222,9 +222,51 @@
     })();
   };
 
+
+  /* =========================== الأرقام: اضغط الرقم ← اختر اتصال أو واتساب =========================== */
+  /* الروابط tel: داخل الإطار كانت تكسر الصفحة وترجّعك لتسجيل الدخول. نعترضها ونعرض نافذة اختيار. */
+  var PHONE = function () {
+    if (window.__afPhone) return; window.__afPhone = 1;
+    var D = document, W = window;
+    function top() { try { return W.top || W.parent || W; } catch (e) { return W; } }
+    function digits(n) { var s = String(n || '').replace(/[^\d+]/g, ''); if (/^00/.test(s)) s = '+' + s.slice(2); return s; }
+    function wa(n) { var s = digits(n).replace(/^\+/, ''); if (/^0\d{9,10}$/.test(s)) s = '964' + s.slice(1); return s; }
+    function go(u, same) { try { if (same) top().location.href = u; else { var w = W.open(u, '_blank', 'noopener,noreferrer'); if (!w) top().location.href = u; } } catch (e) { try { top().location.href = u; } catch (x) { } } }
+    function close() { var o = D.getElementById('afPhS'); if (o) o.remove(); }
+    function sheet(n, label) {
+      close();
+      var o = D.createElement('div'); o.id = 'afPhS';
+      o.style.cssText = 'position:fixed;inset:0;z-index:2147483600;background:rgba(10,20,40,.5);display:flex;align-items:flex-end;justify-content:center;direction:rtl;font-family:Cairo,Tahoma,sans-serif';
+      var c = D.createElement('div');
+      c.style.cssText = 'width:100%;max-width:430px;background:#fff;color:#14213d;border-radius:26px 26px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.25)';
+      var B = 'display:flex;align-items:center;gap:12px;width:100%;border:0;border-radius:16px;padding:14px 16px;margin:0 0 9px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;text-align:right;';
+      c.innerHTML = '<div style="width:44px;height:5px;border-radius:9px;background:#d7e0ef;margin:0 auto 12px"></div><div style="text-align:center;margin:0 0 12px"><b style="font-size:17px;display:block">' + String(label || 'رقم الهاتف').replace(/[<>&]/g, '') + '</b><span dir="ltr" style="font-size:14px;color:#51647e;display:block;margin-top:2px;unicode-bidi:embed">' + String(n).replace(/[<>&"]/g, '') + '</span></div>' +
+        '<button type="button" data-k="call" style="' + B + 'background:linear-gradient(135deg,#0aa6f5,#2a7de1);color:#fff"><span style="font-size:22px">📞</span><span>اتصال</span></button>' +
+        '<button type="button" data-k="wa" style="' + B + 'background:#25a244;color:#fff"><span style="font-size:22px">💬</span><span>واتساب</span></button>' +
+        '<button type="button" data-k="cp" style="' + B + 'background:#eef3fa;color:#18385e"><span style="font-size:22px">📋</span><span>نسخ الرقم</span></button>' +
+        '<button type="button" data-k="x" style="width:100%;border:0;background:none;color:#5a6b8c;font:inherit;font-weight:700;padding:10px;cursor:pointer">إلغاء</button>';
+      o.appendChild(c); D.body.appendChild(o);
+      o.addEventListener('click', function (e) {
+        var b = e.target.closest && e.target.closest('[data-k]');
+        if (e.target === o || (b && b.dataset.k === 'x')) return close();
+        if (!b) return;
+        var k = b.dataset.k;
+        if (k === 'call') { close(); go('tel:' + digits(n), true); }
+        else if (k === 'wa') { close(); go('https://wa.me/' + wa(n), false); }
+        else if (k === 'cp') { try { (W.navigator.clipboard ? W.navigator.clipboard.writeText(n) : Promise.reject()).catch(function () { }); } catch (x) { } close(); }
+      });
+    }
+    D.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest && e.target.closest('a[href]'); if (!a) return;
+      var h = a.getAttribute('href') || '';
+      if (/^tel:/i.test(h)) { e.preventDefault(); e.stopPropagation(); var t = (a.textContent || '').split('—'); sheet(decodeURIComponent(h.slice(4)), t.length > 1 ? t[0].trim() : ''); }
+      else if (/^https?:\/\/(wa\.me|api\.whatsapp\.com)\//i.test(h)) { e.preventDefault(); e.stopPropagation(); go(h, false); }
+    }, true);
+  };
+
   /* =========================== الحقن (نفس أسلوب af-menu.js) =========================== */
-  var ASRC = '\n/* ===== af-sched: إدارة ===== */\n(' + ADMIN.toString() + ')();\n';
-  var USRC = '\n/* ===== af-sched: مستخدم ===== */\n(' + USER.toString() + ')();\n';
+  var ASRC = '\n/* ===== af-sched: إدارة ===== */\n(' + ADMIN.toString() + ')();\n(' + PHONE.toString() + ')();\n';
+  var USRC = '\n/* ===== af-sched: مستخدم ===== */\n(' + USER.toString() + ')();\n(' + PHONE.toString() + ')();\n';
   try {
     var s = window.ADMIN_SRC;
     if (s) {
