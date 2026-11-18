@@ -17,7 +17,8 @@
   var rawSet = Storage.prototype.setItem;
   var origFetch = window.fetch ? window.fetch.bind(window) : null;
 
-  function J(k, d) { try { return JSON.parse(LS.getItem(k)) || d; } catch (e) { return d; } }
+  var __jc = {};
+  function J(k, d) { try { var s = LS.getItem(k); if (k === CK && s && s.length > 20000) { var c = __jc[k]; if (c && c.s === s) return c.o; var o = JSON.parse(s) || d; __jc[k] = { s: s, o: o }; return o; } return JSON.parse(s) || d; } catch (e) { return d; } }
   function rawW(k, v) { try { rawSet.call(LS, k, typeof v === 'string' ? v : JSON.stringify(v)); } catch (e) {} }
   function ok(k) { return String(k == null ? '' : k).replace(/[.#$\[\]\/]/g, '_'); }
   function toArr(v) {
@@ -251,7 +252,7 @@
     Object.keys(remObj).forEach(function (k) {
       var m = remObj[k];
       if (!m || typeof m !== 'object' || m.id == null) return;
-      var rm = JSON.parse(JSON.stringify(m));
+      var rm = Object.assign({}, m);   /* نسخة سطحية: remObj نتيجة جلب جديدة تُرمى بعد الدمج، فلا داعي لنسخ عميق (الصور base64 كانت تُنسخ كل 750ms) */
       if (rm.o) {
         var vs = (votesObj && votesObj[k]) || {};
         rm.o = toArr(rm.o).map(function (opt) { return { t: opt && opt.t ? opt.t : '', v: [] }; });

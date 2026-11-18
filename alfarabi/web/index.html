@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="fonts/fonts.css">
   <script src="af-ios.js"></script>
   <script src="af-webshim.js?v=1794060001"></script>
-  <script src="af-landing.js?v=e1c04389"></script>
-  <script src="af-dev.js?v=e1c04389"></script>
+  <script src="af-landing.js?v=4b783dcc"></script>
+  <script src="af-dev.js?v=4b783dcc"></script>
   
   <script src="af-push.js?v=1794060002"></script>
   <script src="af-assist.js?v=1794060004"></script>
@@ -1152,7 +1152,7 @@ var SDo=window.SD;
 function ok(k){return String(k).replace(/[.#$\[\]\/]/g,'_')}
 function authQ(u){return u}
 function sj(x){if(x&&typeof x==='object'){if(Array.isArray(x))return '['+x.map(sj).join(',')+']';return '{'+Object.keys(x).sort().map(function(k){return JSON.stringify(k)+':'+sj(x[k])}).join(',')+'}'}return JSON.stringify(x)}
-function J(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+var __jc={};function J(k,d){try{var s=localStorage.getItem(k);if(k==='alfarabi_chat_v2'&&s&&s.length>20000){var c=__jc[k];if(c&&c.s===s)return c.o;var o=JSON.parse(s)||d;__jc[k]={s:s,o:o};return o}return JSON.parse(s)||d}catch(e){return d}}
 function toArr(v){return Array.isArray(v)?v.filter(function(x){return x!=null}):(v&&typeof v==='object'?Object.keys(v).sort(function(a,b){return a-b}).map(function(k){return v[k]}):[])}
 var badT=null;
 function st(t){window.FBSTATE=t;var e=document.getElementById('fbst');if(e)e.textContent='الاتصال بالخادم: '+t;
@@ -1223,13 +1223,16 @@ function applyAcc(cur){if(window.tryRestore&&!window.CUR)setTimeout(window.tryRe
  list=list.filter(function(a){return !killed(a)});
  list.sort(function(x,y){return (x.createdAt||0)-(y.createdAt||0)});
  if(sj(list)!==sj(loc))raw.call(localStorage,DBK,JSON.stringify({accounts:list}))}
+var __cmw=typeof WeakMap!=='undefined'?new WeakMap():null;
+function __lt(x){return JSON.stringify(x,function(k,v){return typeof v==='string'&&v.length>200?v.length+':'+v.slice(0,12)+v.slice(-12):v})}
+function __cl(src,key){if(src.o||!__cmw){var m0=JSON.parse(JSON.stringify(src));seen.m[key]=csj(m0);return m0}var sg=__lt(src),h=__cmw.get(src);if(h&&h.sg===sg){seen.m[key]=h.cs;return h.m}var m=JSON.parse(JSON.stringify(src)),cs=csj(m);seen.m[key]=cs;__cmw.set(src,{sg:sg,m:m,cs:cs});return m}
 function applyChat(){if(!mir.cr||!mir.vr)return;var rc=mir.c||{},rv=mir.v||{},out={},loc=J(CK,{});
- Object.keys(rc).forEach(function(gk){var g=gk.slice(1);out[g]=Object.keys(rc[gk]&&typeof rc[gk]==='object'?rc[gk]:{}).filter(function(k){var x=rc[gk][k];return x&&typeof x==='object'&&x.id}).map(function(k){var m=JSON.parse(JSON.stringify(rc[gk][k]));seen.m[gk+k]=csj(m);
+ Object.keys(rc).forEach(function(gk){var g=gk.slice(1);out[g]=Object.keys(rc[gk]&&typeof rc[gk]==='object'?rc[gk]:{}).filter(function(k){var x=rc[gk][k];return x&&typeof x==='object'&&x.id}).map(function(k){var m=__cl(rc[gk][k],gk+k);
   if(m.o){var vs=(rv[gk]||{})[k]||{},vm={};m.o=toArr(m.o).map(function(x){return{t:x.t,v:[]}});Object.keys(vs).forEach(function(u){var i=vs[u];vm[u]=i;if(m.o[i])m.o[i].v.push(/^\d+$/.test(u.slice(1))?Number(u.slice(1)):u.slice(1))});seen.v[gk+k]=vm}return m})});
  var now0=Date.now();Object.keys(loc).forEach(function(g){var gk='g'+g;(loc[g]||[]).forEach(function(m){if(!m||!m.id)return;var rm=(rc[gk]||{})['m'+m.id];if(!rm&&(pend['chat/'+gk+'/m'+m.id]||now0-(m.ts||0)<120000)){(out[g]=out[g]||[]).push(m)}else if(rm&&(m.ed||m.dl)&&!rm.ed&&!rm.dl&&pend['chat/'+gk+'/m'+m.id]){var a0=out[g]||[];for(var i=0;i<a0.length;i++)if(a0[i].id===m.id)a0[i]=m}})});
  Object.keys(out).forEach(function(g){out[g].sort(function(a,b){return (a.ts||0)-(b.ts||0)})});
  if(!ready.c){ready.c=1;pushChat(loc)}
- var so=JSON.stringify(out);if(so!==JSON.stringify(loc)){raw.call(localStorage,CK,so);try{window.__afChat&&window.__afChat()}catch(e){}try{if(window.__afChatListeners)window.__afChatListeners.forEach(function(fn){try{fn()}catch(x){}})}catch(e){}}}
+ var so=JSON.stringify(out);if(so!==(localStorage.getItem(CK)||'')&&so!==JSON.stringify(loc)){raw.call(localStorage,CK,so);try{window.__afChat&&window.__afChat()}catch(e){}try{if(window.__afChatListeners)window.__afChatListeners.forEach(function(fn){try{fn()}catch(x){}})}catch(e){}}}
 function arrish(v){return v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).every(function(k){return /^\d+$/.test(k)})?toArr(v):v}
 function applySchool(cur){if(dS)return;if(!cur||typeof cur!=='object'){if(!ready.s&&(SDo.students.length||SDo.teachers.length))pushSchool(true);ready.s=1;return}
  var sc=cur.schedule||{};Object.keys(sc).forEach(function(g){if(!sc[g]||typeof sc[g]!=='object')return;sc[g].days=sc[g].days||{};Object.keys(sc[g].days).forEach(function(d){sc[g].days[d]=toArr(sc[g].days[d])})});
@@ -1276,8 +1279,9 @@ window.AFChatLoad=function(g,cb,first){if(window.AFSYNC&&window.AFSYNC.loadRoom)
 function start(){window.FBBASE=base;fresh(start2)}
 function start2(){var d0=0;function go0(){if(d0)return;d0=1;start3()}pullMk(go0);setTimeout(go0,3500);setInterval(function(){if(!document.hidden)pullMk()},60000)}
 function start3(){st('متصل');run();setInterval(function(){if(!base||sseOk)return;fetch(authQ(base+'/school.json'),{cache:'no-store'}).then(function(r){return r.json()}).then(function(c){if(c&&!dS)applySchool(c)}).catch(function(){});fetch(authQ(base+'/accounts.json'),{cache:'no-store'}).then(function(r){return r.json()}).then(function(c){if(c)applyAcc(c)}).catch(function(){})},45000);
- function pollAll(){['chat','votes','records'].forEach(function(r){fetch(authQ(base+'/'+r+'.json'),{cache:'no-store'}).then(function(x){return x.json()}).then(function(c){if(r==='chat'){mir.c=c;mir.cr=1;applyChat()}else if(r==='votes'){mir.v=c;mir.vr=1;applyChat()}else applyRec(c)}).catch(function(){})})}
- setInterval(function(){if(base&&!sseOk)pollAll()},1200);
+ var __pl={};
+ function pollAll(){['chat','votes','records'].forEach(function(r){fetch(authQ(base+'/'+r+'.json'),{cache:'no-store'}).then(function(x){return x.text()}).then(function(tx){if(__pl[r]===tx)return;__pl[r]=tx;var c=JSON.parse(tx);if(r==='chat'){mir.c=c;mir.cr=1;applyChat()}else if(r==='votes'){mir.v=c;mir.vr=1;applyChat()}else applyRec(c)}).catch(function(){})})}
+ setInterval(function(){if(base&&!sseOk&&!document.hidden)pollAll()},2000);
  stream('school',applySchool);stream('accounts',applyAcc);stream('records',applyRec);
  stream('chat',function(c){mir.c=c;mir.cr=1;applyChat()});stream('votes',function(c){mir.v=c;mir.vr=1;applyChat()});
  setTimeout(function(){if(mir.cr&&!mir.vr){mir.vr=1;applyChat()}},5000)}
@@ -2737,7 +2741,7 @@ var CHK='<svg viewBox="0 0 24 24"><path d="M2 13l4 4L14 8M10 15l2 2L22 8"/></svg
 var MENU=[['schedule','جدول الأسبوع'],['announcements','الإعلانات المدرسية'],['plans','تحاضير الدروس'],['handouts','ملازم الثالث متوسط 2027'],['absence','غيابات الطلبة'],['grades','درجات الامتحانات'],['chat','محادثة المدرسين'],['support','الدعم'],['afupd','آخر تحديثات'],['logout','تسجيل الخروج']];MENU.splice(MENU.length-2,0,['tools','أدوات مفيدة للطلبة']);if(U.role==='student'&&String(U.grade)==='3')MENU.splice(MENU.length-2,0,['ministryView','أسئلة وزارية']);V.handouts=function(){mark('');try{parent.afHandouts(document)}catch(e){toast('تعذّر فتح الملازم')}};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tmr);tmr=setTimeout(function(){t.classList.remove('show')},2200)}
-function J(k,d){try{return JSON.parse(LS.getItem(k))||d}catch(e){return d}}
+var __jc={};function J(k,d){try{var s=LS.getItem(k);if(k===CK&&s&&s.length>20000){var c=__jc[k];if(c&&c.s===s)return c.o;var o=JSON.parse(s)||d;__jc[k]={s:s,o:o};return o}return JSON.parse(s)||d}catch(e){return d}}
 function W(k,v){try{var s=JSON.stringify(v);LS.setItem(k,s);try{if(k===CK){if(P.AFPushTail)P.AFPushTail(v,cg);if(P.AFPushKey)P.AFPushKey(k,v)}else if(P.AFPushKey)P.AFPushKey(k,v)}catch(x){}return 1}catch(e){toast('امتلأ التخزين، قلّل حجم الملف');return 0}}
 function DB(){return J(DBK,{accounts:[]})}
 function saveMe(f){var d=DB(),i=d.accounts.findIndex(function(a){return a.email===U.email});if(i<0)return 0;f(d.accounts[i]);W(DBK,d);Object.assign(U,d.accounts[i]);return 1}
@@ -5267,6 +5271,8 @@ try{document.head.insertAdjacentHTML('beforeend',CSSY)}catch(e){}
 </script>
 <script src="af-menu.js?v=20261112m2"></script>
 <script src="af-sched.js?v=20261116a"></script>
+<script src="af-xgr.js?v=20261118a"></script>
+<script src="af-lite.js?v=20261118a"></script>
 <script src="af-admin-edit.js?v=20261112m2"></script>
 <script src="af-channels.js?v=20261112m2"></script>
 <script src="af-tgch.js?v=20261112m2"></script>
