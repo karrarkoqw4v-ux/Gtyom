@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.28-b';
+  var VER = '2026.11.28-c';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -429,7 +429,11 @@
       if (hex !== DHASH) { m.textContent = 'كلمة السر غير صحيحة'; return; }
       try { localStorage.setItem('af_designer', '1'); } catch (e) { }   /* هذي النسخة لا تستلم تحديثات الموقع الجماعية (zip المطوّر) */
       if (dip) { dip.prompt(); dip.userChoice.then(function (c) { dip = null; if (c && c.outcome === 'accepted') close(); }); m.style.color = '#0b7a3b'; m.textContent = 'اضغط «تثبيت» بالنافذة اللي ظهرت'; }
-      else { m.style.color = '#0b7a3b'; m.innerHTML = 'تم التحقق ✓<br>افتح قائمة كروم ⋮ ثم اختر <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>'; }
+      else {
+        /* الموقع على http (غير آمن) فكروم يمنع تثبيت PWA: نكمل تلقائياً بتنزيل التطبيق (APK) مباشرة بعد التحقق */
+        m.style.color = '#0b7a3b'; m.innerHTML = 'تم التحقق ✓ جاري تنزيل التطبيق...<br>بعد ما ينتهي افتح الملف واسمح بالتثبيت.';
+        setTimeout(function () { act('apk'); }, 400);
+      }
     });
   }
   function refreshPwa() { var c = D.getElementById('afpwa'); if (c && dip && !isIOS) c.style.display = '';  var s = D.getElementById('afpw'); if (s) s.querySelector('small').textContent = dip ? 'تثبيت مباشر بضغطة وحدة' : 'من قائمة المتصفح ⋮ ← تثبيت التطبيق'; }
