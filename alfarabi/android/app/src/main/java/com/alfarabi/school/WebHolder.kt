@@ -44,6 +44,7 @@ object WebHolder {
     const val REQ_MEDIA = 32
     const val REQ_NOTIF = 33
     const val REQ_MEDIA2 = 34
+    const val REQ_CAM = 35
 
     lateinit var app: Application
     var activity: MainActivity? = null
@@ -53,6 +54,27 @@ object WebHolder {
     /** طلبات الكاميرا/المايك المعلّقة (قد يصل أكثر من طلب بنفس الوقت: كاميرا + تسجيل صوت) */
     val pendingPerms = ArrayList<PermissionRequest>()
     @Volatile var askingMedia = false
+    /** مسار صورة/فيديو الكاميرا الذي ننتظره من تطبيق الكاميرا (للحقول input type=file capture) */
+    var capUri: Uri? = null
+    var pendingParams: WebChromeClient.FileChooserParams? = null
+
+    /** تشغيل تطبيق الكاميرا مباشرة (صورة أو فيديو قصير) بدل منتقي الملفات */
+    fun launchCapture(a: MainActivity, p: WebChromeClient.FileChooserParams): Boolean {
+        return try {
+            val types = p.acceptTypes.joinToString(",").lowercase()
+            val video = types.contains("video") && !types.contains("image")
+            val dir = java.io.File(app.cacheDir, "share"); dir.mkdirs()
+            val f = java.io.File(dir, "cap_" + System.currentTimeMillis() + (if (video) ".mp4" else ".jpg"))
+            val uri = FileProvider.getUriForFile(app, app.packageName + ".fp", f)
+            capUri = uri
+            val i = Intent(if (video) MediaStore.ACTION_VIDEO_CAPTURE else MediaStore.ACTION_IMAGE_CAPTURE)
+            i.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            if (video) { i.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 10); i.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0) }
+            i.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            a.startActivityForResult(i, REQ_FILE)
+            true
+        } catch (e: Throwable) { capUri = null; false }
+    }
 
     fun mediaNeeds(r: PermissionRequest): List<String> {
         val need = ArrayList<String>()
@@ -161,6 +183,16 @@ object WebHolder {
                 fileCb = cb
                 val a = activity
                 if (a == null) { fileCb = null; cb.onReceiveValue(null); return true }
+                capUri = null
+                if (p.isCaptureEnabled) {
+                    /* «التقاط صورة/فيديو»: نفتح الكاميرا مباشرة (كان يفتح معرض الصور فقط) */
+                    if (a.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        if (launchCapture(a, p)) return true
+                    } else {
+                        pendingParams = p
+                        try { a.requestPermissions(arrayOf(Manifest.permission.CAMERA), REQ_CAM); return true } catch (_: Throwable) { pendingParams = null }
+                    }
+                }
                 return try { a.startActivityForResult(p.createIntent(), REQ_FILE); true } catch (e: Exception) { fileCb = null; cb.onReceiveValue(null); true }
             }
 

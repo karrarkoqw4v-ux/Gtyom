@@ -226,6 +226,16 @@ class MainActivity : Activity() {
     }
 
     // ===== الصلاحيات =====
+    /** إذا المستخدم رفض الإذن نهائياً (لا تظهر نافذة الطلب)، نوجّهه لإعدادات التطبيق */
+    fun permDeniedHint(perm: String) {
+        try {
+            if (!shouldShowRequestPermissionRationale(perm)) {
+                android.widget.Toast.makeText(this, "فعّل إذن الكاميرا والمايك من إعدادات التطبيق ← الأذونات", android.widget.Toast.LENGTH_LONG).show()
+                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")))
+            }
+        } catch (_: Throwable) {}
+    }
+
     fun askMediaPermissions() {
         try {
             val miss = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO).filter { checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
@@ -242,8 +252,23 @@ class MainActivity : Activity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            WebHolder.REQ_MEDIA -> WebHolder.flushPerms()
+            WebHolder.REQ_MEDIA -> {
+                val deniedPerm = permissions.indices.firstOrNull { grantResults.getOrNull(it) != PackageManager.PERMISSION_GRANTED }?.let { permissions[it] }
+                WebHolder.flushPerms()
+                if (deniedPerm != null) permDeniedHint(deniedPerm)
+            }
             WebHolder.REQ_MEDIA2 -> { /* طلب استباقي: لا شيء معلّق */ }
+            WebHolder.REQ_CAM -> {
+                val p = WebHolder.pendingParams; WebHolder.pendingParams = null
+                val ok = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                if (ok && p != null && WebHolder.launchCapture(this, p)) { /* الكاميرا اشتغلت */ }
+                else {
+                    if (!ok) permDeniedHint(Manifest.permission.CAMERA)
+                    /* نرجع لمنتقي الملفات العادي حتى ما يبقى الطلب معلّقاً */
+                    try { if (p != null) startActivityForResult(p.createIntent(), WebHolder.REQ_FILE) else { WebHolder.fileCb?.onReceiveValue(null); WebHolder.fileCb = null } }
+                    catch (_: Throwable) { WebHolder.fileCb?.onReceiveValue(null); WebHolder.fileCb = null }
+                }
+            }
             WebHolder.REQ_NOTIF -> if (firstRun) { firstRun = false; showSettings(true) }
         }
     }
@@ -253,7 +278,9 @@ class MainActivity : Activity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == WebHolder.REQ_FILE) {
             val cb = WebHolder.fileCb; WebHolder.fileCb = null
-            cb?.onReceiveValue(if (resultCode == RESULT_OK) WebChromeClient.FileChooserParams.parseResult(resultCode, data) else null)
+            val cu = WebHolder.capUri; WebHolder.capUri = null
+            if (cu != null) cb?.onReceiveValue(if (resultCode == RESULT_OK) arrayOf(cu) else null)
+            else cb?.onReceiveValue(if (resultCode == RESULT_OK) WebChromeClient.FileChooserParams.parseResult(resultCode, data) else null)
         }
     }
 

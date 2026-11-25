@@ -3533,12 +3533,13 @@ function openChat(g){cg=g;document.body.classList.add('cho');ch.classList.add('o
   var VR=null;
  window.__vrStop=function(){if(VR)VR.fin(false)};
  $('cmic').onclick=function(){
+  var b=$('cmic');
   if(!(cg&&cg[0]==='d'&&cg.indexOf('dsup_')!==0))return;
   if(VR)return;
   if(!window.MediaRecorder||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('التسجيل الصوتي غير مدعوم في هذا المتصفح');return}
   if(P.permOK&&!P.permOK('mic')){P.askPerm(document,'mic',function(){$('cmic')&&$('cmic').onclick()});return}
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
-   var types=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'],mt='';
+   var types=/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)?['audio/mp4','audio/webm;codecs=opus','audio/webm']:['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'],mt='';
    for(var i=0;i<types.length;i++){if(MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(types[i])){mt=types[i];break}}
    var rec;try{rec=new MediaRecorder(st,mt?{mimeType:mt,audioBitsPerSecond:24000}:{audioBitsPerSecond:24000})}catch(x){st.getTracks().forEach(function(t){t.stop()});toast('تعذّر بدء التسجيل');return}
    var chunks=[],t0=Date.now(),key=cg,want=false,strip=document.createElement('div');
@@ -3562,7 +3563,7 @@ function openChat(g){cg=g;document.body.classList.add('cho');ch.classList.add('o
    strip.querySelector('.vx').onclick=function(){fin(false)};
    strip.querySelector('.vs').onclick=function(){fin(true)};
    VR={fin:fin};rec.start(250)
-  }).catch(function(){toast('اسمح للتطبيق باستخدام المايك')})};
+  }).catch(function(e){var n=e&&e.name||'';try{console.warn('vn',n,e&&e.message)}catch(x){}toast(/NotAllowed|Security|Permission/i.test(n)?'اسمح للتطبيق باستخدام المايك (الإعدادات ← التطبيقات ← الأذونات)':/NotFound|Overconstrained/i.test(n)?'ما لقيت مايك بهذا الجهاز':'تعذّر التسجيل الصوتي ('+(n||'خطأ')+')')})};
  })();
  lpBind($('cl'));$('cl').onclick=function(e){if(Date.now()-lpd<700)return;var rd=e.target.closest('[data-redial]');if(rd){callUI();return}var o=e.target.closest('.po');if(o)return vote(+o.dataset.m,+o.dataset.o);var m=e.target.closest('[data-iv]');if(m)return openIv(m.src);var d=e.target.closest('.dl');if(d){var id=+d.dataset.d;S('<h2>حذف الرسالة؟</h2><button class="bt" id="dy">حذف</button>');$('dy').onclick=function(){P.chatDel(cg,id);close();drawMsgs()}}}}
 
