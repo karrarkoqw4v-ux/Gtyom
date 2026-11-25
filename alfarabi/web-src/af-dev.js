@@ -107,6 +107,7 @@
   }
   function webOta() {
     try {
+      if (W.localStorage.getItem('af_designer') === '1') return;   /* نسخة المصممين: لا تستلم تحديثات الموقع الجماعية */
       if (!W.caches || !W.DecompressionStream || !navigator.serviceWorker) return;
       var ls = W.localStorage;
       if (ls.getItem('af_web_ota_pending') === '1') {          // النسخة السابقة ما أكدت سلامتها: نرجع للأصل

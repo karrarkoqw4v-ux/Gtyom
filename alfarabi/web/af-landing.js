@@ -10,7 +10,7 @@
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.28-a';
+  var VER = '2026.11.28-b';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -188,6 +188,7 @@
     '#afl .bt .lg2{width:50px;height:50px;border-radius:16px;box-shadow:0 4px 12px rgba(0,0,0,.18)}#afl .bt .lg2 svg{width:30px;height:30px}',
     '#afl .bt .t{text-align:right}#afl .bt small{font-size:12.5px;opacity:.9;margin-top:2px}',
     '#afl .bt.a{background:linear-gradient(135deg,#0aa6f5,#2f6fe0);color:#fff;box-shadow:0 12px 26px rgba(20,110,230,.38)}',
+    '#afl .bt.d{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:0;box-shadow:0 12px 26px rgba(79,70,229,.32)}#afl .bt.d small{color:#fff;opacity:.9}',
     '#afl .bt.i{background:linear-gradient(135deg,#243556,#0f1a33);color:#fff;border:0;box-shadow:0 12px 26px rgba(15,26,51,.32)}#afl .bt.i small{color:#fff;opacity:.8}',
     '#afl .bt.g{min-height:62px;background:rgba(255,255,255,.7);border:1.5px dashed #b8c6df}',
     '#afl .you{position:static;order:5;margin-inline-start:auto;align-self:flex-start;font-size:11.5px;padding:3px 11px;box-shadow:0 4px 10px rgba(255,193,7,.45)}',
@@ -308,6 +309,7 @@
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
     '<button class="bt a" data-a="apk"><span class="lg2">' + I.and + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Android</bdi></b><small>تنزيل مباشر لنسخة <bdi dir="ltr">APK</bdi></small><em class="mt"><u id="afbv">أحدث إصدار</u><u id="afbs">تنزيل سريع</u></em></span>' + (isAnd ? badge('جهازك') : '') + '<span class="go">' + I.apk + '</span></button>' +
     '<button class="bt i" data-a="ios"><span class="lg2">' + I.app + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Apple</bdi></b><small><bdi dir="ltr">iPhone</bdi> و <bdi dir="ltr">iPad</bdi> من سفاري</small><em class="mt"><u>خطوتان فقط</u><u>بدون ملفات</u><u>Safari</u></em></span>' + (isIOS ? badge('جهازك') : '') + '<span class="go">' + I.shr + '</span></button>' +
+    (isIOS ? '' : '<button class="bt d" data-a="designer"><span class="lg2"><svg viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M9 10l2 2 4-4"/></svg></span><span class="t"><b>تثبيت كتطبيق للمصممين</b><small>للمصمم والمسؤول فقط — يحتاج كلمة سر</small></span></button>') +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t"><b><bdi dir="ltr">App Store</bdi></b><small>قريباً على متجر آبل</small></span><span class="bd">قيد التطبيق</span></div>' +
     '<div class="pl"><span id="afv2">أحدث إصدار</span><span>Android 8 فأحدث</span><span>تحديثات تلقائية</span></div>' +
     '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div><div class="ft" style="opacity:.7;margin-top:2px">نسخة الموقع <bdi dir="ltr">' + VER + '</bdi></div>' +
@@ -408,6 +410,28 @@
     o.addEventListener('click', function (e) { var t = e.target; if (t === o) { o.remove(); return; } var b = t.closest && t.closest('[data-a]'); if (!b) return; act(b.getAttribute('data-a')); });
     D.body.appendChild(o);
   }
+
+  /* ===== تثبيت كتطبيق للمصممين (أندرويد فقط): بكلمة سر، نفس النسخة الأصلية، ولا يستلم تحديثات الموقع الجماعية ===== */
+  var DHASH = '0d3f4081f6970a42d19d75caa6ce60ca8632ec2322817eef56ee686e3d978b6e';
+  function designerSheet() {
+    sheet('<h2>تثبيت كتطبيق للمصممين</h2><p class="sb">للمصمم والمسؤول فقط. اكتب كلمة السر ثم يثبّت التطبيق على جهاز الأندرويد مثل التطبيقات من جوجل.</p>' +
+      '<input id="afdpw" type="password" autocomplete="off" placeholder="كلمة السر" style="width:100%;border:2px solid #e1e8f4;border-radius:14px;padding:13px;font:inherit;margin:0 0 10px;background:#f6f9fd;direction:ltr;text-align:center">' +
+      '<div id="afdm" style="color:#d9283d;font-weight:700;font-size:13px;min-height:20px;text-align:center"></div>' +
+      '<button class="bt p" data-a="dgo"><span class="t"><b>تثبيت</b></span></button>');
+    var i = D.getElementById('afdpw'); if (i) { i.focus(); i.addEventListener('keydown', function (e) { if (e.key === 'Enter') designerGo(); }); }
+  }
+  function designerGo() {
+    var i = D.getElementById('afdpw'), m = D.getElementById('afdm'); if (!i || !m) return;
+    if (!W.crypto || !crypto.subtle) { m.textContent = 'افتح الموقع عبر رابط HTTPS'; return; }
+    m.textContent = 'جاري التحقق...';
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode('alfarabi-designer:' + i.value.trim())).then(function (h) {
+      var hex = Array.prototype.map.call(new Uint8Array(h), function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+      if (hex !== DHASH) { m.textContent = 'كلمة السر غير صحيحة'; return; }
+      try { localStorage.setItem('af_designer', '1'); } catch (e) { }   /* هذي النسخة لا تستلم تحديثات الموقع الجماعية (zip المطوّر) */
+      if (dip) { dip.prompt(); dip.userChoice.then(function (c) { dip = null; if (c && c.outcome === 'accepted') close(); }); m.style.color = '#0b7a3b'; m.textContent = 'اضغط «تثبيت» بالنافذة اللي ظهرت'; }
+      else { m.style.color = '#0b7a3b'; m.innerHTML = 'تم التحقق ✓<br>افتح قائمة كروم ⋮ ثم اختر <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>'; }
+    });
+  }
   function refreshPwa() { var c = D.getElementById('afpwa'); if (c && dip && !isIOS) c.style.display = '';  var s = D.getElementById('afpw'); if (s) s.querySelector('small').textContent = dip ? 'تثبيت مباشر بضغطة وحدة' : 'من قائمة المتصفح ⋮ ← تثبيت التطبيق'; }
 
   function andSheet() {
@@ -495,6 +519,8 @@
     var ar = D.getElementById('afar'); if (ar && a !== 'share') ar.remove();
     if (a === 'and') return andSheet();
     if (a === 'ios') return iosSheet();
+    if (a === 'designer') return designerSheet();
+    if (a === 'dgo') return designerGo();
     if (a === 'sc') { var s = D.getElementById('afs'); if (s) s.remove(); if (ar) ar.remove(); return; }
     if (a === 'apk') {
       try { var tk = localStorage.getItem('af_web_tok') || 'x'; if (W.FBBASE) fetch(W.FBBASE + '/stats/apkdl/' + tk + '.json', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ last: Date.now() }) }).catch(function () { }); } catch (e) { }
