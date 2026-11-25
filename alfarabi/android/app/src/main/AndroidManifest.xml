@@ -27,6 +27,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="ثانوية الفارابي"
         android:supportsRtl="true"
+        android:allowBackup="false"
         android:hardwareAccelerated="true"
         android:largeHeap="true"
         android:usesCleartextTraffic="false"

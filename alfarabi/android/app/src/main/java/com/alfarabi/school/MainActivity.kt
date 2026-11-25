@@ -15,6 +15,7 @@ import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.webkit.WebChromeClient
 import android.widget.Button
 import android.widget.EditText
@@ -32,7 +33,17 @@ class MainActivity : Activity() {
     private var firstRun = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        /* حماية: منع لقطات الشاشة وتسجيلها وإخفاء محتوى التطبيق من قائمة التطبيقات الأخيرة */
+        try { window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE) } catch (_: Throwable) {}
         super.onCreate(savedInstanceState)
+        /* 90/120 هرتز: اختيار أعلى معدل تحديث تدعمه الشاشة */
+        try {
+            if (Build.VERSION.SDK_INT >= 23) {
+                @Suppress("DEPRECATION")
+                val best = windowManager.defaultDisplay.supportedModes.maxByOrNull { it.refreshRate }
+                if (best != null) { val lp = window.attributes; lp.preferredDisplayModeId = best.modeId; window.attributes = lp }
+            }
+        } catch (_: Throwable) {}
         Notifier.init(this)
         WebHolder.activity = this
         root = FrameLayout(this)

@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 class NativeChatActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        try { window.setFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE, android.view.WindowManager.LayoutParams.FLAG_SECURE) } catch (_: Throwable) {}
         val me = ChatRepo.me(this)
         if (me == null) { finish(); return }
         val room = ChatRepo.roomOf(me)

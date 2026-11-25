@@ -86,6 +86,13 @@
         }
       }
     },
+    "acc_dev": {
+      ".read": true,
+      ".write": true,
+      "$acc": {
+        "$dev": {}
+      }
+    },
     "seen": {
       ".read": true,
       ".write": true,

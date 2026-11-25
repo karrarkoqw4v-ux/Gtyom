@@ -547,75 +547,19 @@
     ['نسيت المعرّف أو كلمة السر', 'من أول شاشة اضغط «معرفة حسابي»، ثم اكتب اسمك الثلاثي ورقم حسابك (مثل S266) أو امسح الباركود، واضغط «عرض معلومات حسابي». تظهر لك بياناتك. وإذا ما نفع، اختر «التواصل مع الإدارة».'],
     ['الدرجات والغيابات', 'من الصفحة الرئيسية افتح «درجات الامتحانات» أو «غيابات الطلبة». وتوصلك إشعارات مباشرة لما تنزل درجة أو يُسجَّل غياب.'],
     ['التحاضير والإعلانات', 'من الصفحة الرئيسية افتح «تحاضير الدروس» أو «الإعلانات المدرسية». وكل تحضير أو إعلان جديد يوصلك إشعار فيه العنوان والتفاصيل.'],
-    ['معلومات عن طالب', 'اكتب اسم الطالب الثلاثي هنا وأعرض لك: الاسم والصف ودروس اليوم. وبعدها اكتب معرّف حسابه (مثل S266) لأعرض مستواه ودرجاته وغياباته وتقييم المدرسين ومدة استخدامه للتطبيق.'],
     ['التواصل مع الإدارة', 'اكتب رسالتك هنا بالتفصيل (بدون كلمة السر) وتوصل للإدارة وتردّ عليك بنفس المحادثة. وتقدر تتواصل أيضاً عن طريق زر «الدعم» من أول الشاشة.']
   ];
   window.AF_SUP = SUP;
   var GN5 = { 1: 'الأول متوسط', 2: 'الثاني متوسط', 3: 'الثالث متوسط', 4: 'الرابع العلمي', 5: 'الخامس العلمي' };
   var EVL = { 5: 'ممتاز', 4: 'جيد جداً', 3: 'جيد', 2: 'متوسط', 1: 'ضعيف' };
-  var usageCache = {};
-  function nrm(t) { return String(t || '').replace(/[\sً-ْ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').toLowerCase(); }
-  function sameN(a, b) { var x = nrm(a), y = nrm(b); return x.length > 5 && y.length > 5 && (x === y || x.indexOf(y) > -1 || y.indexOf(x) > -1); }
-  function students() {
-    var roster = (J('alfarabi_school_v1', {}).students || []).filter(function (x) { return x && x.name; });
-    return roster;
-  }
-  function pct(v) { var m = String(v || '').match(/(\d+(?:\.\d+)?)\s*[\/من]\s*(\d+(?:\.\d+)?)/); if (m && +m[2] > 0) return +m[1] / +m[2] * 100; var n = parseFloat(v); return isNaN(n) ? null : (n <= 100 ? n : null); }
-  function accOfName(name) { return ((J('alfarabi_db_v1', { accounts: [] }).accounts) || []).filter(function (a) { return a.role === 'student' && sameN(a.name, name); })[0]; }
-  function fetchUsage(name) {
-    var a = accOfName(name); if (!a || !window.FBBASE) return;
-    var uid = String(a.createdAt || a.name);
-    fetch(window.FBBASE + '/usage/a' + uid.replace(/[.#$\[\]\/]/g, '_') + '.json').then(function (r) { return r.json(); }).then(function (d) { usageCache[nrm(name)] = d || {}; }).catch(function () {});
-  }
-  function usageText(name) {
-    var d = usageCache[nrm(name)]; if (!d) return 'جاري حسابها، اكتب المعرّف مرة ثانية بعد لحظات';
-    var days = Object.keys(d), tot = 0, today = 0, week = 0, now = new Date(), t0 = ymd(now), cut = Date.now() - 7 * 864e5;
-    days.forEach(function (k) { var sec = +d[k] || 0; tot += sec; if (k === t0) today = sec; var y = +k.slice(0, 4), m = +k.slice(4, 6) - 1, dd = +k.slice(6, 8); if (new Date(y, m, dd).getTime() >= cut) week += sec; });
-    if (!tot) return 'لا توجد بيانات استخدام بعد';
-    function f(sec) { var m = Math.round(sec / 60); return m < 60 ? m + ' دقيقة' : Math.floor(m / 60) + ' ساعة و' + (m % 60) + ' دقيقة'; }
-    return 'اليوم ' + f(today) + ' • آخر 7 أيام ' + f(week) + ' • المجموع ' + f(tot);
-  }
-  function ymd(d) { return d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
-  function todayLessons(grade) {
-    var D = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'], w = new Date().getDay(); if (w > 4) return 'لا توجد دروس اليوم (عطلة)';
-    var sc = (J('alfarabi_school_v1', {}).schedule || {})[grade], arr = sc && sc.days && sc.days[D[w]];
-    return Array.isArray(arr) && arr.length ? arr.join('، ') : 'غير محدد';
-  }
-  var lastStu = null;
-  function basicStudent(st) {
-    lastStu = st; fetchUsage(st.name);
-    return '👤 الطالب: ' + st.name + '\n🎓 الصف: ' + (GN5[st.grade] || st.grade || '—') + '\n📚 دروس اليوم: ' + todayLessons(st.grade) +
-      '\n\nلعرض مستوى الطالب والدرجات والغيابات وتقييم المدرسين ومدة استخدامه للتطبيق، اكتب معرّف حسابه (مثل S266).';
-  }
-  function fullStudent(st) {
-    var R = J('alfarabi_rec_v1', []) || [], g = R.filter(function (r) { return r && r.k === 'g' && sameN(r.n, st.name); }), a = R.filter(function (r) { return r && r.k === 'a' && sameN(r.n, st.name); }), ev = R.filter(function (r) { return r && r.k === 'ev' && sameN(r.n, st.name); });
-    var ps = g.map(function (r) { return pct(r.v); }).filter(function (x) { return x != null; }), avg = ps.length ? ps.reduce(function (x, y) { return x + y; }, 0) / ps.length : null;
-    var lvl = avg == null ? 'لا توجد درجات بعد' : (avg >= 90 ? 'ممتاز' : avg >= 80 ? 'جيد جداً' : avg >= 70 ? 'جيد' : avg >= 60 ? 'متوسط' : 'ضعيف') + ' (' + Math.round(avg) + '%)';
-    fetchUsage(st.name);
-    return '✅ تم التحقق من المعرّف\n👤 الطالب: ' + st.name + '\n🎓 الصف: ' + (GN5[st.grade] || '—') + '\n📊 مستوى الطالب: ' + lvl +
-      '\n📝 الدرجات: ' + (g.length ? g.slice(0, 6).map(function (r) { return (r.s || 'مادة') + ' ' + r.v; }).join(' • ') : 'لا توجد') +
-      '\n🚫 الغيابات: ' + (a.length ? a.length + ' (آخرها ' + (a[0].d || '') + ')' : 'لا توجد') +
-      '\n⭐ تقييم المدرسين: ' + (ev.length ? ev.slice(0, 6).map(function (r) { return (r.s || 'مادة') + ': ' + (EVL[r.lv] || r.lv) + (r.by ? ' (' + r.by + ')' : ''); }).join(' • ') : 'لا يوجد') +
-      '\n📚 دروس اليوم: ' + todayLessons(st.grade) + '\n⏱ استخدام التطبيق: ' + usageText(st.name);
-  }
+  /* سياسة الخصوصية: مساعد الدعم لا يعطي أي معلومات عن طلاب أو حسابات أو درجات أو غيابات أو استخدام، بأي صيغة سؤال */
   window.afSupReply = function (msg) {
     var t = String(msg || '').trim();
     for (var i = 0; i < SUP.length; i++) if (SUP[i][0] === t) return SUP[i][1];
-    // معرّف حساب (مثل S266): يكشف التفاصيل الكاملة
-    var idm = t.match(/^[A-Za-z]{0,2}\s?(\d{2,6})$/);
-    if (idm) {
-      var digits = String(idm[1]).replace(/^0+/, ''), st = students().filter(function (x) { return String(x.accountId || '').replace(/\D/g, '').replace(/^0+/, '') === digits; })[0];
-      if (st) return fullStudent(st);
-      return 'ما لقيت طالب بهذا المعرّف. تأكد منه واكتبه مثل S266.';
-    }
-    // اسم طالب
-    if (t.split(/\s+/).length >= 2) { var found = students().filter(function (x) { return sameN(x.name, t); })[0]; if (found) return basicStudent(found); }
     var l = t.toLowerCase();
     if (/نسيت|كلمة السر|كلمه السر|المعرف|المعرّف/.test(l)) return SUP[5][1];
-    if (/تسجيل|دخول|login|حساب/.test(l)) return SUP[0][1];
-    if (/درج|غياب/.test(l)) return SUP[6][1];
-    if (/تحضير|اعلان|إعلان|درس/.test(l)) return SUP[7][1];
-    return 'تفضّل، اختر من الخيارات اللي تحت، أو اكتب اسم الطالب الثلاثي لأعرض معلوماته:';
+    if (/تسجيل|دخول|login/.test(l)) return SUP[0][1];
+    return '🔒 للحفاظ على الخصوصية لا أستطيع إعطاء أي معلومات عن الطلاب أو الحسابات أو الدرجات أو الغيابات. اختر من الخيارات اللي تحت لمعرفة طريقة الاستخدام، أو اكتب رسالتك للإدارة (بدون كلمة السر).';
   };
   function supTick(d) {
     try {

@@ -106,6 +106,7 @@ object WebHolder {
             textZoom = 100 // نفس حجم الخط على كل الأجهزة بغض النظر عن حجم خط النظام
             userAgentString = userAgentString + " AlfarabiApp/1.0"
         }
+        try { WebView.setWebContentsDebuggingEnabled(false) } catch (_: Throwable) {}
         w.setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
         try { w.setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false) } catch (_: Throwable) {}
         CookieManager.getInstance().setAcceptThirdPartyCookies(w, true)
