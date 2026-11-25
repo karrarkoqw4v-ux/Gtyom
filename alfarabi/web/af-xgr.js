@@ -66,6 +66,8 @@
       rep("var ALLG=['1','2','3','4','5'],", "var ALLG=(U.role==='teacher'?TG(U):['1','2','3','4','5']),");
       rep("var G5=['1','2','3','4','5'],", "var G5=(U.role==='teacher'?TG(U):['1','2','3','4','5']),");
       rep("U.role==='teacher'?stageGrades:[U.grade||stageGrades[0]]", "U.role==='teacher'?TG(U):[U.grade||stageGrades[0]]");
+      rep("return DB().accounts.find(function(a){return String(a.createdAt||a.name)===o})||{name:'مستخدم'}}", "return DB().accounts.find(function(a){return String(a.createdAt||a.name)===o})||(o==='admin'?{name:'الإدارة',role:'admin'}:{name:'مستخدم'})}");
+      rep("a.role==='parent'?'ولي أمر':(GN[a.grade]||'طالب')", "a.role==='parent'?'ولي أمر':a.role==='admin'?'إدارة المدرسة':(GN[a.grade]||'طالب')");
       var k = src.lastIndexOf('}');
       src = src.slice(0, k) + HELPERS + SRC + '\n}';
       window.userMain = (0, eval)('(' + src + ')');

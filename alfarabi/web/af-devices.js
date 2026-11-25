@@ -34,6 +34,8 @@
       fetch(nodeUrl(DID) + '?_=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d && d.out) gone(); }).catch(function () { });
     }
     setTimeout(beat, 1500); setInterval(beat, 60000); setInterval(watch, 4000);
+    /* أندرويد: نطلب إذن الكاميرا والمايك مرة وحدة بعد الدخول حتى يشتغل التصوير والبصمة الصوتية بدون مشاكل */
+    try { if (P.Android && P.Android.requestMediaPermissions && !LS.getItem('af_media_asked2')) { LS.setItem('af_media_asked2', '1'); setTimeout(function () { try { P.Android.requestMediaPermissions(); } catch (e) { } }, 6000); } } catch (e) { }
     document.addEventListener('visibilitychange', function () { if (!document.hidden) { watch(); beat(); } });
     /* تسجيل الخروج العادي يحذف سجل هذا الجهاز */
     try {
@@ -48,12 +50,12 @@
     V.devices = function () {
       mark('settings');
       var timer = 0, drawn = false;
-      function draw(map) {
+      function draw(map, loading) {
         var others = Object.keys(map || {}).filter(function (k) { return k !== DID && map[k] && typeof map[k] === 'object' && !map[k].out; }).map(function (k) { var o = map[k]; o.id = k; return o; }).sort(function (a, b) { return (b.ls || 0) - (a.ls || 0); });
         var h = '<div class="sc" id="afdv"><style>.afd{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #e1e8f4;border-radius:20px;padding:12px 14px;margin:0 0 10px}.afd i{flex:none;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#38bdf8,#0a86d6);color:#fff;display:grid;place-items:center}.afd b{display:block;font-size:15.5px;color:#14213d}.afd small{display:block;color:#51647e;font-size:12.5px;margin-top:2px}.afd .on{flex:none;background:#e3f7ec;color:#14965b;font-weight:800;font-size:12.5px;border-radius:12px;padding:4px 11px}.afd .off{flex:none;background:#edf1f7;color:#7a8aa3;font-weight:800;font-size:12px;border-radius:12px;padding:4px 10px}.afd button{flex:none;border:0;border-radius:12px;background:#fdecee;color:#d9283d;font:inherit;font-weight:800;font-size:13px;padding:8px 14px;cursor:pointer}.afd button:active{opacity:.6}.afdh{font-size:13px;font-weight:800;color:#51647e;margin:14px 4px 8px}</style>' +
           '<div class="afdh" style="margin-top:2px">جهازك الحالي</div><div class="afd"><i>' + ICO + '</i><div style="flex:1;min-width:0"><b>' + esc(devName()) + '</b><small>' + (apple ? 'آيفون / آبل' : 'أندرويد / متصفح') + '</small></div><span class="on">متصل</span></div>' +
           '<div class="afdh">الأجهزة الأخرى المسجلة بحسابك</div>' +
-          (others.length ? others.map(function (o) { var live = Date.now() - (o.ls || 0) < 150000; return '<div class="afd"><i>' + ICO + '</i><div style="flex:1;min-width:0"><b>' + esc(o.n || 'جهاز') + '</b><small>' + (live ? 'متصل الآن' : 'آخر ظهور ' + rel(o.ls || 0)) + '</small></div><span class="' + (live ? 'on' : 'off') + '">' + (live ? 'متصل' : 'غير متصل') + '</span><button type="button" data-out="' + esc(o.id) + '">خروج</button></div>'; }).join('') : '<p class="hint" style="margin:4px 6px">لا توجد أجهزة أخرى مسجلة بحسابك.</p>') +
+          (others.length ? others.map(function (o) { var live = Date.now() - (o.ls || 0) < 150000; return '<div class="afd"><i>' + ICO + '</i><div style="flex:1;min-width:0"><b>' + esc(o.n || 'جهاز') + '</b><small>' + (live ? 'متصل الآن' : 'آخر ظهور ' + rel(o.ls || 0)) + '</small></div><span class="' + (live ? 'on' : 'off') + '">' + (live ? 'متصل' : 'غير متصل') + '</span><button type="button" data-out="' + esc(o.id) + '">خروج</button></div>'; }).join('') : '<p class="hint" style="margin:4px 6px">' + (loading ? 'جاري تحميل الأجهزة...' : 'لا توجد أجهزة أخرى مسجلة بحسابك.') + '</p>') +
           (others.length > 1 ? '<button class="bt ghost" id="afdAll" style="margin-top:6px;color:#d9283d">خروج من كل الأجهزة الأخرى</button>' : '') + '</div>';
         shell('الأجهزة المسجلة', '', h, V.settings); drawn = true;
         var sc = card.querySelector('#afdv'); if (!sc) return;
@@ -62,10 +64,12 @@
           if (b) kick([b.dataset.out]); else if (a) kick(others.map(function (o) { return o.id; }));
         };
       }
-      function load() { if (!B()) { draw({}); return; } fetch(B() + '/acc_dev/' + AK + '.json?_=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (m) { if (drawn && !card.querySelector('#afdv')) { clearInterval(timer); return; } draw(m || {}); }).catch(function () { }); }
+      function load() { if (!B()) { draw({}); return; } fetch(B() + '/acc_dev/' + AK + '.json?_=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (m) { if (drawn && !card.querySelector('#afdv')) { clearInterval(timer); return; } try { LS.setItem(CK2, JSON.stringify(m || {})); } catch (e) { } draw(m || {}); }).catch(function () { }); }
       function kick(ids) {
         Promise.all(ids.map(function (d) { return fetch(nodeUrl(d), { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ out: Date.now() }) }); })).then(function () { toast(ids.length > 1 ? 'تم إخراج كل الأجهزة الأخرى' : 'تم إخراج الجهاز من حسابك'); load(); }).catch(function () { toast('تعذّر الإخراج، تأكد من الاتصال'); });
       }
+      var CK2 = 'af_dv_c_' + AK, cached = {}; try { cached = JSON.parse(LS.getItem(CK2) || '{}') || {}; } catch (e) { }
+      draw(cached, !Object.keys(cached).length);   /* تظهر الشاشة فوراً بآخر قائمة محفوظة، ثم تتحدّث من الخادم */
       beat(); load(); timer = setInterval(function () { if (!card.querySelector('#afdv')) { clearInterval(timer); return; } load(); }, 5000);
     };
 

@@ -305,7 +305,7 @@
         }
         wall($('tgm'));
         function me() { c = chOne(id) || c; return mrole(c); }
-        function memb() { return !!(c.m && c.m['u' + ok(uid)]) || me() > 0; }
+        function memb() { return !!(c.sys || (c.m && c.m['u' + ok(uid)])) || me() > 0; }
         function canPost() { return me() > 0; }
         function head() {
           c = chOne(id); if (!c) { closeCh(); return; }
@@ -313,9 +313,9 @@
           var hk = [c.cn, (c.img || '').length, c.col, Object.keys(c.m || {}).length, c.on].join('|'); if (hk === head.k) return; head.k = hk;
           g = gcol(c);
           $('tgav').innerHTML = av(null, 40, c.img); $('tgn').textContent = c.cn;
-          $('tgs').textContent = Object.keys(c.m || {}).length + ' مشترك';
+          $('tgs').textContent = (c.sys ? DB().accounts.filter(function (a) { return !a.kicked; }).length : Object.keys(c.m || {}).length) + ' مشترك';
         }
-        $('tgb').onclick = function (e) { e.stopPropagation(); closeCh(); };
+        $('tgb').onclick = function (e) { e.stopPropagation(); closeCh(); if (P.ADMINCHAT) P.closeAdminChat(); };
         $('tgpl').onclick = function (e) { if (e.target.closest('input')) return; showInfo('m'); };
         $('tgmn').onclick = function (e) { e.stopPropagation(); channelMenu(); };
         function toggleSearch() {

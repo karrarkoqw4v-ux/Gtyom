@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="fonts/fonts.css">
   <script src="af-ios.js"></script>
   <script src="af-webshim.js?v=1794060001"></script>
-  <script src="af-landing.js?v=eb47ead1"></script>
-  <script src="af-dev.js?v=eb47ead1"></script>
+  <script src="af-landing.js?v=b845fa91"></script>
+  <script src="af-dev.js?v=b845fa91"></script>
   
   <script src="af-push.js?v=1794060002"></script>
   <script src="af-assist.js?v=1794060004"></script>
@@ -1283,6 +1283,10 @@ function waitBase(ms){return new Promise(function(res){var t0=Date.now();(functi
 /* جلب بيانات المدرسة/الحسابات من الخادم فوراً (للدخول من جهاز جديد قبل اكتمال المزامنة) */
 window.AFSchoolNow=function(ms){return waitBase(ms||7000).then(function(b){if(!b)return false;return fetch(b+'/school.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(c){if(c&&!dS)applySchool(c);return true})}).catch(function(){return false})};
 window.AFAccountsNow=function(ms){return waitBase(ms||7000).then(function(b){if(!b)return false;return fetch(b+'/accounts.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(c){if(c)applyAcc(c);return true})}).catch(function(){return false})};
+/* جلب حساب واحد فقط من الخادم بدل كل الحسابات (أسرع بكثير عند الدخول من جهاز جديد) */
+window.AFAccountFor=function(email,ms){return waitBase(ms||5000).then(function(b){if(!b)return false;return fetch(b+'/accounts.json?orderBy=%22email%22&equalTo=%22'+encodeURIComponent(email)+'%22',{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(c){if(c&&c.error)throw 0;var d=J(DBK,{accounts:[]});d.accounts=d.accounts||[];var add=0;if(c&&typeof c==='object')Object.keys(c).forEach(function(k){var a=c[k];if(a&&a.email&&!d.accounts.some(function(x){return x.email===a.email})&&!killed(a)){d.accounts.push(a);add++}});if(add)raw.call(localStorage,DBK,JSON.stringify(d));return true}).catch(function(){return window.AFAccountsNow(ms||5000)})}).catch(function(){return false})};
+/* تحميل مسبق لبيانات المدرسة والحسابات وشاشة الدخول ظاهرة، حتى يكون الدخول فورياً */
+setTimeout(function(){try{if(!localStorage.getItem('alfarabi_session')){window.AFSchoolNow(20000);window.AFAccountsNow(20000)}}catch(e){}},300);
 window.AFChatLoad=function(g,cb,first){if(window.AFSYNC&&window.AFSYNC.loadRoom){window.AFSYNC.loadRoom(g,cb,150);return}var b=base;if(!b||hold){cb&&cb(0);return}
  fetch(authQ(b+'/chat/g'+ok(String(g))+'.json?orderBy=%22%24key%22&limitToLast=150'),{cache:'no-store'}).then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(d){
   var loc=J(CK,{}),arr=Array.isArray(loc[g])?loc[g]:[],byId={},add=0;arr.forEach(function(m,idx){if(m&&m.id)byId[m.id]=idx});
@@ -2077,7 +2081,7 @@ o.appendChild(g);o.appendChild(bx);o.appendChild(fb);o.appendChild(tt);o.appendC
     const em = p.role + '.' + sid(key) + '@alfarabi.local';
     let db = loadDB();
     let a = db.accounts.find((x) => x.email === em);
-    if (!a && !p._srv && window.AFAccountsNow) { window.AFAccountsNow(6000).then(() => enterAs(Object.assign({}, p, { _srv: 1 }))); return; }
+    if (!a && !p._srv && (window.AFAccountFor || window.AFAccountsNow)) { (window.AFAccountFor ? window.AFAccountFor(em, 4000) : window.AFAccountsNow(6000)).then(() => enterAs(Object.assign({}, p, { _srv: 1 }))); return; }
     p = Object.assign({}, p); delete p._srv; db = loadDB(); a = db.accounts.find((x) => x.email === em);
     if (!a) {
       a = Object.assign({}, p, { email: em, fuid: '', pass: '', photo: '', createdAt: Date.now() });
@@ -2250,7 +2254,7 @@ o.appendChild(g);o.appendChild(bx);o.appendChild(fb);o.appendChild(tt);o.appendC
         tStatus.innerHTML = '<span class="t-msg t-err">' + NOGO + 'لم يتم العثور على هذا الاسم مع الصف والمادة</span>'
           + '<span class="t-sub">تأكد من الاتصال بالإنترنت، أو تواصل مع الدعم أو مع الإدارة</span>';
       });
-    }, 900);
+    }, 0);
   });
 
   $('teacherBack').addEventListener('click', () => showScreen('loginCard'));
@@ -2619,7 +2623,7 @@ o.appendChild(g);o.appendChild(bx);o.appendChild(fb);o.appendChild(tt);o.appendC
         pStatus.innerHTML = '<span class="t-msg t-err">' + PARENTCHILD + 'لم يتم العثور على اسم الابن</span>'
           + '<span class="t-msg t-sub">' + PEOPLE + 'تواصل مع الإدارة أو مع المدرسة للتأكد من اسم ابنك ' + BOOKS + '</span>';
       });
-    }, 1200);
+    }, 0);
   });
   const pvForm = $('parentVerifyForm'), pvCode = $('parentVerifyCode'), pvBtn = $('parentVerifyBtn'), pvStatus = $('parentVerifyStatus');
   let pVerify = null, pvBusy = false;
@@ -2807,10 +2811,10 @@ function home(){mark('home');card.innerHTML=logo(U.photo)+'<h1 class="title">'+e
 V.perm=function(){try{P.AFDEV.permission()}catch(e){}};
 V.settings=function(){mark('settings');shell('الإعدادات','','<div class="sc">'+[['perm','🔐 صلاحية حسابي'],['prof','الملف الشخصي'],['devices','الأجهزة المسجلة'],['priv','الإعدادات والخصوصية'],['cset','إعدادات المحادثة']].concat((U.role==='teacher'&&String(U.grade)==='3')?[['ministry','أسئلة وزارية']]:[]).map(opt).join('')+'</div>',home);bindOpt()};
 V.devices=function(){var ua=(navigator.userAgent||'').slice(0,100),kind=/Android/i.test(ua)?'هاتف Android':/iPhone|iPad/i.test(ua)?'جهاز Apple':/Windows/i.test(ua)?'حاسوب Windows':/Macintosh/i.test(ua)?'حاسوب Mac':'متصفح ويب';var key='alf_devices_'+String(uid||U.email||U.name||'user');var arr=[];try{arr=JSON.parse(localStorage.getItem(key)||'[]')}catch(e){}if(!arr.some(function(x){return x.ua===ua})){arr.unshift({ua:ua,kind:kind,at:new Date().toLocaleString('ar-IQ')});arr=arr.slice(0,10);try{localStorage.setItem(key,JSON.stringify(arr))}catch(e){}}shell('الأجهزة المسجلة','','<div class="sc"><p class="hint">الأجهزة التي سُجّل دخولها من هذا المتصفح فقط.</p>'+arr.map(function(x,i){return '<div class="device-card"><span class="di">▣</span><div style="flex:1"><b>'+esc(x.kind)+(i===0?' · هذا الجهاز':'')+'</b><small>'+esc(x.at||'')+'</small></div>'+(i===0?'<span style="color:#14965b;font-size:12px">نشط</span>':'<button class="bt ghost" data-rm="'+i+'" style="width:auto;padding:5px 10px">إزالة</button>')+'</div>'}).join('')+'</div>',V.settings);var sc=card.querySelector('.sc');if(sc)sc.onclick=function(e){var b=e.target.closest('[data-rm]');if(!b)return;arr.splice(+b.dataset.rm,1);try{localStorage.setItem(key,JSON.stringify(arr))}catch(x){}V.devices()}};
-V.prof=function(){var extra='';if(U.role==='parent'){extra=row('نوع الحساب','ولي أمر')+row('معرّف الحساب',U.accountId||U.id||uid||'—')+row('البريد الإلكتروني',U.email||'—')+row('رقم الهاتف',U.phone||U.mobile||'—')+row('اسم الطالب المرتبط',U.studentName||U.childName||U.student||'غير مسجل')+row('الصف الدراسي',U.grade?(GN[U.grade]||U.grade):'—')+row('صلة القرابة',U.relation||'—')}shell('الملف الشخصي','','<div class="rows">'+row('الاسم الكامل',U.name||'—')+(U.role==='parent'?extra:(U.grade?row('الصف',GN[U.grade]):'')+(U.subject?row('المادة',U.subject):'')+(U.role==='student'?row('كلمة السر',(function(){var q=(SD.students||[]).filter(function(x){return x.name===U.name})[0];return (q&&q.password)||U.password||'—'})()):row('البريد',U.email||'—')))+'</div><p class="hint" style="font-size:12px">المعلومات المعروضة هي المسجلة في الحساب.</p>',V.settings,{img:U.photo||ini(U.name),edit:function(){pick('image/*',function(x){P.cropImg(document,x,function(d){saveMe(function(a){a.photo=d});toast('تم تغيير صورتك');V.prof()})})}})};
+V.prof=function(){var extra='';if(U.role==='parent'){extra=row('نوع الحساب','ولي أمر')+row('معرّف الحساب',U.accountId||U.id||uid||'—')+row('رقم الهاتف',U.phone||U.mobile||'—')+row('اسم الطالب المرتبط',U.studentName||U.childName||U.student||'غير مسجل')+row('الصف الدراسي',U.grade?(GN[U.grade]||U.grade):'—')+row('صلة القرابة',U.relation||'—')}shell('الملف الشخصي','','<div class="rows">'+row('الاسم الكامل',U.name||'—')+(U.role==='parent'?extra:(U.grade?row('الصف',GN[U.grade]):'')+(U.subject?row('المادة',U.subject):'')+(U.role==='student'?row('كلمة السر',(function(){var q=(SD.students||[]).filter(function(x){return x.name===U.name})[0];return (q&&q.password)||U.password||'—'})()):''))+'</div><p class="hint" style="font-size:12px">المعلومات المعروضة هي المسجلة في الحساب.</p>',V.settings,{img:U.photo||ini(U.name),edit:function(){pick('image/*',function(x){P.cropImg(document,x,function(d){saveMe(function(a){a.photo=d});toast('تم تغيير صورتك');V.prof()})})}})};
 var OK='<svg class="okc" viewBox="0 0 52 52"><defs><linearGradient id="gr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0aa6f5"/><stop offset="1" stop-color="#2fbf71"/></linearGradient></defs><circle class="oc" cx="26" cy="26" r="23"/><path class="ok" d="M14 27l8 8 16-17"/></svg>';
 function done(t,back){shell('','',OK+'<h2 style="text-align:center;margin:6px 0 14px">'+t+'</h2><button class="bt" id="bk">رجوع</button>');$('bk').onclick=back||V.priv}
-V.priv=function(){shell('الإعدادات والخصوصية','','<div class="sc"><p class="hint">معلومات الحساب للعرض فقط ولا يمكن تعديلها من هذه الصفحة.</p><div class="rows">'+row('الاسم',U.name||'—')+row('معرّف الحساب',U.accountId||U.id||uid||'—')+row('نوع الحساب',RLT||U.role||'—')+(U.grade?row('الصف',GN[U.grade]||U.grade):'')+(U.subject?row('المادة',U.subject):'')+row('البريد الإلكتروني',U.email||'—')+'</div></div>',V.settings);};
+V.priv=function(){shell('الإعدادات والخصوصية','','<div class="sc"><p class="hint">معلومات الحساب للعرض فقط ولا يمكن تعديلها من هذه الصفحة.</p><div class="rows">'+row('الاسم',U.name||'—')+row('معرّف الحساب',U.accountId||U.id||uid||'—')+row('نوع الحساب',RLT||U.role||'—')+(U.grade?row('الصف',GN[U.grade]||U.grade):'')+(U.subject?row('المادة',U.subject):'')+'</div></div>',V.settings);};
 V.email=function(){shell('البريد الإلكتروني','','<div class="sc"><p class="hint">البريد الحالي: '+esc(U.email)+'</p><div class="fd"><input id="ne" type="email" placeholder="البريد الإلكتروني الجديد" autocomplete="off"></div><div class="fd"><input id="op" type="password" placeholder="كلمة السر الحالية" autocomplete="off"></div><button class="bt" id="go">التالي</button></div>',V.priv);
 $('go').onclick=async function(){var ne=$('ne').value.trim().toLowerCase(),op=$('op').value;if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ne)){toast('صيغة البريد غير صحيحة');return}if(!op){toast('اكتب كلمة السر الحالية');return}
 try{await P.FA.chEmail(U.email,op,ne)}catch(x){toast(P.FA.err(x.message));return}
@@ -3498,7 +3502,7 @@ function openChat(g){cg=g;document.body.classList.add('cho');ch.classList.add('o
  ch.innerHTML='<div class="ch-h"><button class="ch-c" id="cb">'+ARW+'</button><div class="ch-p" id="cpn">'+(g.indexOf('dsup_')===0&&U.role!=='admin'?av(null,46,SD.logo||P.DEFLOGO):g[0]==='d'?av(dmo(g),46):av(null,46,gimg(g)))+'<div class="tx"><b>'+esc(gname(g))+'</b><small id="hs">'+(g[0]==='d'?'':n+' أعضاء, 1 متصلًا')+'</small></div></div><button class="ch-c" id="cc">'+PH+'</button><button class="ch-c" id="cm">'+DOT+'</button></div><div class="ch-m" id="cl"></div><div class="ch-i">'+'<button class="ch-c ch-plus" id="cplus" aria-label="إرفاق"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button><div class="ch-pill"><div id="ci" class="aci" contenteditable="true" role="textbox" data-ph="رسالة"></div><button class="ch-c ch-emo" id="cemo" aria-label="ملصقات"><svg viewBox="0 0 24 24"><path d="M20.5 12A8.5 8.5 0 1 0 12 20.5h1a7.5 7.5 0 0 0 7.5-7.5z"/><path d="M20.4 13H17a4 4 0 0 0-4 4v3.4"/></svg></button></div><div class="ch-act"><button class="ch-c ch-mic" id="cmic" aria-label="إملاء صوتي"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg></button><button class="ch-s" id="cs" aria-label="إرسال"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button></div><button class="ch-c" id="ce" style="display:none" tabindex="-1"></button><button id="ca" style="display:none" tabindex="-1"></button>';
  paint();drawMsgs(1);last=LS.getItem(CK);clearInterval(poll);poll=setInterval(function(){if(!cg)return;hdr();wallApply();var x=LS.getItem(CK);if(x===last)return;last=x;var l=$('cl');drawMsgs(l.scrollHeight-l.scrollTop-l.clientHeight<90)},600);
  $('cb').onclick=function(){try{if(window.__vrStop)window.__vrStop()}catch(x){}ch.classList.remove('on');document.body.classList.remove('cho');cg=null;if(P.ADMINCHAT)P.closeAdminChat()};
- if(g[0]!=='d'){var _mc=$('cmic');if(_mc)_mc.style.display='none';var _bi=ch.querySelector('.ch-i');if(_bi)_bi.classList.add('nomic')}$('cc').onclick=function(){callUI()};$('cpn').onclick=g[0]==='d'?null:info;if(!(g[0]==='d'&&g.indexOf('dsup_')!==0))$('cc').style.display='none';$('cm').onclick=function(){custom(cg)};
+ if(g[0]!=='d'||g.indexOf('dsup_')===0){var _mc=$('cmic');if(_mc)_mc.style.display='none';var _bi=ch.querySelector('.ch-i');if(_bi)_bi.classList.add('nomic')}$('cc').onclick=function(){callUI()};$('cpn').onclick=g[0]==='d'?null:info;if(!(g[0]==='d'&&g.indexOf('dsup_')!==0))$('cc').style.display='none';$('cm').onclick=function(){custom(cg)};
  function send(){var ci=$('ci'),t=String(ci.innerText||ci.textContent||'').trim();t=t.replace(/\[ملصق (\d+)\]/g,function(a,n){var d=(ci._st||{})[n];return d?'\u27e6img:'+d+'\u27e7':a});if(!t)return;var chatKey=cg,o=base();o.t=t;if(push(o)){ci.innerHTML='';ci.style.height='';typ(0);drawMsgs(1);if(chatKey&&chatKey.indexOf('dsup_')===0&&U.role!=='admin'){setTimeout(function(){var d=J(CK,{}),arr=d[chatKey]||[];var answer=window.alfSupportAnswer?window.alfSupportAnswer(t):'وصلتنا رسالتك، شكراً لتواصلك مع ثانوية الفارابي الأهلية. يمكنك انتظار رد الإدارة هنا، وإذا كانت المشكلة عاجلة اكتب تفاصيلها.';arr.push({id:Date.now(),u:'alf_support_bot',n:'مساعد الدعم',r:'assistant',ts:Date.now(),t:answer});d[chatKey]=arr;W(CK,d);if(cg===chatKey)drawMsgs(1)},450)}}}
  $('cs').onclick=function(){var b=this;b.classList.add('sending');setTimeout(function(){b.classList.remove('sending')},700);send()};window.aeInput&&window.aeInput($('ci'));$('ci').oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,140)+'px';typ(1)};
  (function(){var ci=$('ci'),bar=ci.closest('.ch-i'),pn=document.createElement('div'),tch=U.role==='teacher',SK='alfarabi_stk_'+(U.name||U.id||'t'),tab=0,cnt=0;pn.className='ep';pn.hidden=true;ci._st={};
@@ -3532,7 +3536,7 @@ function openChat(g){cg=g;document.body.classList.add('cho');ch.classList.add('o
   var VR=null;
  window.__vrStop=function(){if(VR)VR.fin(false)};
  $('cmic').onclick=function(){
-  if(!(cg&&cg[0]==='d'))return;
+  if(!(cg&&cg[0]==='d'&&cg.indexOf('dsup_')!==0))return;
   if(VR)return;
   if(!window.MediaRecorder||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('التسجيل الصوتي غير مدعوم في هذا المتصفح');return}
   if(P.permOK&&!P.permOK('mic')){P.askPerm(document,'mic',function(){$('cmic')&&$('cmic').onclick()});return}
@@ -3942,7 +3946,7 @@ ready(function(){
 
 <script id="alfarabi-timetable-announcements-init">(function(){try{var D={"1":{"الأحد":["اسلامية","فيزياء","عربي","انكليزي","احياء"],"الاثنين":["كيمياء","انكليزي","اجتماعيات","احياء","رياضيات"],"الثلاثاء":["اسلامية","رياضيات","فيزياء","عربي","اجتماعيات"],"الأربعاء":["انكليزي","اجتماعيات","عربي","اسلامية","رياضة"],"الخميس":["عربي","انكليزي","رياضيات","فيزياء","كيمياء"]},"2":{"الأحد":["فيزياء","اسلامية","انكليزي","احياء","رياضيات"],"الاثنين":["اجتماعيات","كيمياء","انكليزي","رياضيات","احياء"],"الثلاثاء":["فيزياء","اسلامية","عربي","اجتماعيات","رياضة"],"الأربعاء":["رياضيات","انكليزي","اجتماعيات","عربي","اسلامية"],"الخميس":["انكليزي","رياضيات","عربي","كيمياء","فيزياء"]},"3":{"الأحد":["احياء","اجتماعيات","كيمياء","رياضيات","عربي"],"الاثنين":["احياء","اجتماعيات","كيمياء","رياضة","عربي"],"الثلاثاء":["رياضيات","فيزياء","انكليزي","اسلامية","عربي"],"الأربعاء":["انكليزي","رياضيات","فيزياء","كيمياء","عربي"],"الخميس":["رياضيات","انكليزي","فيزياء","عربي","اسلامية"]}};if(!window.SD)return;window.SD.info=window.SD.info||{};window.SD.info.announcements=window.SD.info.announcements||[];window.SD.info.schoolDays=window.SD.info.schoolDays||{};var GN={1:'الأول متوسط',2:'الثاني متوسط',3:'الثالث متوسط',4:'الرابع العلمي',5:'الخامس العلمي'};window.SD.schedule=window.SD.schedule||{};Object.keys(GN).forEach(function(g){var s=SD.schedule[g]=SD.schedule[g]||{cls:GN[g],days:{}};s.days=s.days||{};if(D[g])Object.keys(D[g]).forEach(function(day){var cur=s.days[day];if(!Array.isArray(cur)||!cur.some(function(x){return String(x||'').trim()}))s.days[day]=D[g][day].slice();});});window.AF_DEF_TT=D;}catch(e){console.error('تهيئة بيانات الجدول',e)}})();</script>
 
-<script id="sw-register">if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}</script>
+<script id="sw-register">if('serviceWorker' in navigator&&!window.Android){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}</script>
 <style id="alfarabi-main-dashboard-css">.alf-dash{display:grid;gap:10px;margin:14px 0;text-align:right;direction:rtl}.alf-dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.alf-dash-card{border:1px solid #d9e8f5;border-radius:16px;padding:12px;background:rgba(255,255,255,.86);box-shadow:0 6px 18px #2b609018}.alf-dash-card b{display:block;font-size:20px;color:#087fc4}.alf-dash-card small{color:#5b6b86}.alf-dash-title{font-weight:900;color:#14213d;margin:5px 0}.alf-dash-row{padding:9px 10px;border-radius:12px;background:#fff;color:#263b5c;font-size:13px;border:1px solid #e4edf7}.alf-dash-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.alf-dash-actions button{border:0;border-radius:13px;padding:11px 7px;font:inherit;font-weight:800;background:linear-gradient(135deg,#0aa6f5,#3f6fd6);color:#fff}.alf-dash-actions button.alt{background:#fff;color:#1678bd;border:1px solid #b9dcf4}@media(max-width:360px){.alf-dash-card{padding:9px}.alf-dash-card b{font-size:17px}.alf-dash-row{font-size:12px}}.alf-search-box{display:flex;gap:6px;margin:10px 0}.alf-search-box input{flex:1;min-width:0;border:1px solid #cbdceb;border-radius:11px;padding:10px;font:inherit}.alf-search-box button{border:0;border-radius:11px;padding:9px 12px;background:#0aa6f5;color:#fff;font:inherit;font-weight:800}</style><script id="alfarabi-dashboard-runtime">(function(){
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function data(){var s=window.SD||{};var rec=[];try{rec=JSON.parse(localStorage.getItem('alfarabi_rec_v1')||'[]')}catch(e){};return {s:s,st:s.students||[],rec:rec}}
@@ -5309,8 +5313,11 @@ try{document.head.insertAdjacentHTML('beforeend',CSSY)}catch(e){}
 </script>
 <script src="af-menu.js?v=20261112m2"></script>
 <script src="af-sched.js?v=20261116a"></script>
+<script src="af-schoolch.js?v=20261125a"></script>
 <script src="af-admin2.js?v=20261125a"></script>
 <script src="af-xgr.js?v=20261118a"></script>
+<script src="af-chats2.js?v=20261125a"></script>
+<script src="af-abs.js?v=20261125a"></script>
 <script src="af-devices.js?v=20261125a"></script>
 <script src="af-lite.js?v=20261118a"></script>
 <script src="af-oneui.js?v=20261118a"></script>

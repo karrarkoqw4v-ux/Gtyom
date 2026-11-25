@@ -3,7 +3,7 @@
 (function () {
   'use strict';
   var W = window, D = document, PUB = {"kty":"EC","x":"9IvmMNuga6JvjOjjBUFq4MYBDfjhllaUD8rByaS5iD0","y":"JyAh6qs9loudQZR3OnaSysYMTcy7vpZ-FuhME4BnpF8","crv":"P-256"}, EMAIL_H = 'a00925dce925b9dd79013eb6524f845bf2d4e8d14ab8ae1e6e7325622e5ca05e';
-  var BUILD_TS = 1795607116000; /* وقت بناء ملفات الاستضافة: أي نسخة مرفوعة من حساب المطوّر قبله تُتجاهل حتى لا تُرجع ملفات أقدم (مثل الزر العائم القديم) */
+  var BUILD_TS = 1795609619000; /* وقت بناء ملفات الاستضافة: أي نسخة مرفوعة من حساب المطوّر قبله تُتجاهل حتى لا تُرجع ملفات أقدم (مثل الزر العائم القديم) */
   var CHUNK = 700 * 1024, MAXB = 25 * 1024 * 1024, KEYS = 'af_ota_key', CACHE = 'alfarabi-ota-web';
   var BASE = (function () { var s = D.currentScript; var u = s && s.src ? s.src : location.href; return u.replace(/[^\/]*([?#].*)?$/, ''); })();
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }

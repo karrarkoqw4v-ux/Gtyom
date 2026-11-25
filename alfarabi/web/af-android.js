@@ -157,6 +157,7 @@
     if (nativeOn()) return; // المزامنة الأصلية شغالة: ما نحتاج نقرأ ونحلل البيانات هنا (يخفف التقطيع)
     var u = me(); if (!u || u.role === 'admin') return;
     var s = LS.getItem(CK) || ''; if (s.length === lastLen) return; lastLen = s.length;
+    if (!s) { chatInit = true; return; }   /* مخزن فارغ (جهاز جديد): نعتبر التهيئة تمت حتى لا تضيع أول رسالة تصل */
     var d; try { d = JSON.parse(s) || {}; } catch (e) { return; }
     var groups = (J(SK, {}).groups) || {}, visible = fg();
     Object.keys(d).forEach(function (g) {
@@ -201,7 +202,7 @@
       else if (r.k === 'imp' && String(r.uid) !== u.uid) list.push({ id: 'i' + r.id, r: r, t: 'imp' });
       else if (r.k === 'cp') {
         var c = chans.filter(function (x) { return x.id === r.ch; })[0];
-        if (c && ((c.m && c.m['u' + okk(u.uid)]) || (u.role === 'student' && c.gr && String(c.gr) === u.grade)) && String(c.o) !== u.uid && !(c.mu && c.mu['u' + okk(u.uid)])) list.push({ id: 'p' + r.id, r: r, c: c, t: 'cp' });
+        if (c && (c.sys || (c.m && c.m['u' + okk(u.uid)]) || (u.role === 'student' && c.gr && String(c.gr) === u.grade)) && String(c.o) !== u.uid && !(c.mu && c.mu['u' + okk(u.uid)])) list.push({ id: 'p' + r.id, r: r, c: c, t: 'cp' });
       }
       else if (r.k === 'cc' && String(r.to) === u.uid && String(r.u) !== u.uid) list.push({ id: 'c' + r.id, r: r, t: 'cc' });
       else if (r.k === 'lp' && (u.role === 'student' || u.role === 'parent') && (!u.grade || String(r.gr || '').charAt(0) === String(u.grade).charAt(0)) && !(r.exp && r.exp < Date.now())) list.push({ id: 'l' + r.id, r: r, t: 'lp' });
