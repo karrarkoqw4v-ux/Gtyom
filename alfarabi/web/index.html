@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="fonts/fonts.css">
   <script src="af-ios.js"></script>
   <script src="af-webshim.js?v=1794060001"></script>
-  <script src="af-landing.js?v=0a084f9d"></script>
-  <script src="af-dev.js?v=0a084f9d"></script>
+  <script src="af-landing.js?v=eb47ead1"></script>
+  <script src="af-dev.js?v=eb47ead1"></script>
   
   <script src="af-push.js?v=1794060002"></script>
   <script src="af-assist.js?v=1794060004"></script>
@@ -985,6 +985,18 @@ var m=document.querySelector('link[rel="manifest"]');if(m)m.href='manifest.json?
         <div class="s-status" id="parentStatus" role="alert" aria-live="polite"></div>
         <button type="submit" class="btn-primary" id="parentBtn">موافق ومتابعة</button>
       </form>
+
+      <form id="parentVerifyForm" class="form" novalidate autocomplete="off" hidden>
+        <div style="text-align:center;margin:2px 0 6px"><svg viewBox="0 0 24 24" width="54" height="54" fill="none" stroke="#0a86d6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.800-7-5.500-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h2 style="text-align:center;margin:0 0 6px;font-size:19px">التحقق الثانوي • الأمانة والخصوصية</h2>
+        <p style="text-align:center;margin:0 0 14px;font-size:14px;line-height:1.9;color:#51647e">حفاظاً على خصوصية الطالب وأمانة بياناته، أدخل <b>معرّف الابن</b> أو <b>كلمة السر</b> الخاصة به (أحدهما يكفي).</p>
+        <label class="field">
+          <span class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+          <input type="text" id="parentVerifyCode" placeholder="معرّف الابن أو كلمة السر" autocomplete="off" autocapitalize="characters" spellcheck="false">
+        </label>
+        <div class="s-status" id="parentVerifyStatus" role="alert" aria-live="polite"></div>
+        <button type="submit" class="btn-primary" id="parentVerifyBtn">تحقق وتسجيل الدخول</button>
+      </form>
     </section>
 
     <!-- اختيار طريقة إنشاء الحساب -->
@@ -1157,16 +1169,16 @@ function toArr(v){return Array.isArray(v)?v.filter(function(x){return x!=null}):
 var badT=null;
 function st(t){window.FBSTATE=t;var e=document.getElementById('fbst');if(e)e.textContent='الاتصال بالخادم: '+t;
  var bad=/غير متصل|تعذّر/.test(t);if(!bad){clearTimeout(badT);badT=null;var b0=document.getElementById('afNet');if(b0)b0.remove();return}
- if(badT)return;badT=setTimeout(function(){badT=null;if(!/غير متصل|تعذّر/.test(window.FBSTATE||'')||!document.body||document.getElementById('afNet'))return;
+ if(badT)return;badT=setTimeout(function(){badT=null;if(!/غير متصل|تعذّر/.test(window.FBSTATE||'')||!document.body||document.getElementById('afNet')||(window.__afNetOff&&Date.now()<window.__afNetOff)||navigator.onLine===false)return;
   var b=document.createElement('div');b.id='afNet';b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:2147482000;background:#b91c1c;color:#fff;font:800 13px Cairo,Tahoma,sans-serif;text-align:center;padding:calc(7px + env(safe-area-inset-top,0px)) 10px 7px;direction:rtl;cursor:pointer';
-  b.textContent='⚠ غير متصل بقاعدة البيانات، الحسابات والمحادثات ما تتزامن (اضغط لمعرفة السبب)';b.onclick=netDiag;document.body.appendChild(b)},6000)}
+  b.innerHTML='<span style="padding:0 26px">⚠ غير متصل بقاعدة البيانات، الحسابات والمحادثات ما تتزامن (اضغط لمعرفة السبب)</span><i id="afNetX0" style="position:absolute;left:8px;top:calc(4px + env(safe-area-inset-top,0px));width:28px;height:28px;display:grid;place-items:center;font-style:normal;font-size:17px;background:rgba(255,255,255,.18);border-radius:50%">✕</i>';b.onclick=function(e){if(e.target&&e.target.id==='afNetX0'){window.__afNetOff=Date.now()+600000;b.remove();return}netDiag()};document.body.appendChild(b)},20000)}
 function netDiag(){if(window.afConnFix){window.afConnFix(document);return}var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:2147483500;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl;font-family:Cairo,Tahoma,sans-serif';
  o.innerHTML='<div style="background:#fff;color:#14213d;border-radius:20px;padding:18px;max-width:380px;width:100%;max-height:86vh;overflow:auto"><h3 style="margin:0 0 10px;font-size:17px">فحص الاتصال بقاعدة البيانات</h3><div id="afNetR" style="font-size:13.5px;font-weight:700;line-height:1.9">جاري الفحص...</div><button id="afNetX" style="margin-top:12px;width:100%;height:44px;border:0;border-radius:12px;background:#0aa6f5;color:#fff;font:inherit;font-weight:800">إغلاق</button></div>';
  document.body.appendChild(o);document.getElementById('afNetX').onclick=function(){o.remove()};
  var rows=[],i=0,anyOk=0;function add(ok,m){rows.push('<div style="color:'+(ok?'#15803d':'#be123c')+'">'+(ok?'✓ ':'✗ ')+m+'</div>')}
  if(location.protocol==='http:'&&location.hostname!=='localhost')add(false,'الموقع يشتغل بـ http بدون شهادة SSL. فعّل الشهادة المجانية من لوحة الاستضافة.');
  add(navigator.onLine,'الإنترنت: '+(navigator.onLine?'متصل':'مقطوع'));
- (function nx(){if(i>=cands.length){if(!anyOk)add(false,'ما اكو رابط يستجيب. إما الشبكة تحجب Firebase (جرّب VPN)، أو قاعدة البيانات غير موجودة أو اسمها مختلف.');document.getElementById('afNetR').innerHTML=rows.join('');return}
+ (function nx(){if(i>=cands.length){if(!anyOk)add(false,'ما اكو رابط يستجيب. إما الشبكة تحجب Firebase، أو الـVPN اللي شغّلته يحجبه أو يبطّئه (جرّب تطفيه أو تغيّر نوعه)، أو قاعدة البيانات غير موجودة أو اسمها مختلف.');document.getElementById('afNetR').innerHTML=rows.join('');return}
   var u=cands[i++],nm=u.replace('https://','').split('/')[0];
   fetch(u+'/school.json?shallow=true',{cache:'no-store'}).then(function(r){if(r.ok)anyOk=1;add(r.ok,nm+' — '+(r.ok?'يستجيب':(r.status===401||r.status===403?'مرفوض ('+r.status+'): قواعد الحماية Rules غير منشورة':'رد '+r.status)));nx()}).catch(function(){add(false,nm+' — لا يستجيب');nx()})})()}
 
@@ -2544,8 +2556,9 @@ o.appendChild(g);o.appendChild(bx);o.appendChild(fb);o.appendChild(tt);o.appendC
     $('parentChoice').hidden = v !== 'choice';
     pForm.hidden = v !== 'new';
     ppForm.hidden = v !== 'old';
-    $('parentTitle').textContent = v === 'old' ? 'دخول ولي الأمر المسجل' : 'مرحباً بك ولي أمر الطالب';
-    $('parentHint').textContent = v === 'choice' ? 'اختر طريقة الدخول' : v === 'old' ? 'اكتب اسم ابنك الثلاثي وكلمة السر' : 'اكتب اسمك واسم ابنك الثلاثي مع رقم الهاتف';
+    $('parentVerifyForm').hidden = v !== 'verify';
+    $('parentTitle').textContent = v === 'old' ? 'دخول ولي الأمر المسجل' : v === 'verify' ? 'التحقق الثانوي' : 'مرحباً بك ولي أمر الطالب';
+    $('parentHint').textContent = v === 'choice' ? 'اختر طريقة الدخول' : v === 'old' ? 'اكتب اسم ابنك الثلاثي وكلمة السر' : v === 'verify' ? 'الأمانة والخصوصية' : 'اكتب اسمك واسم ابنك الثلاثي مع رقم الهاتف';
   }
 
   function setPGrade(g) {
@@ -2565,6 +2578,7 @@ o.appendChild(g);o.appendChild(bx);o.appendChild(fb);o.appendChild(tt);o.appendC
     pStatus.innerHTML = '';
     clearTimeout(ppTimer);
     ppBusy = false; ppForm.reset(); ppBtn.disabled = false; ppStatus.innerHTML = ''; ppPass.type = 'password';
+    try { pvForm.reset(); pvStatus.innerHTML = ''; pvBtn.disabled = false; pvBusy = false; pVerify = null; } catch (x) { }
     setPView('choice');
   }
   [pParent, pChild].forEach((i) => i.addEventListener('input', () => { if (!pBusy) pStatus.innerHTML = ''; }));
@@ -2594,9 +2608,11 @@ o.appendChild(g);o.appendChild(bx);o.appendChild(fb);o.appendChild(tt);o.appendC
     pStatus.innerHTML = '<span class="t-msg t-wait"><i class="spin"></i>جاري المعالجة والتحقق . . .</span>';
     pTimer = setTimeout(() => {
       withSync(() => STUDENTS.some((st) => norm(String(st.name||'')) === child && gradeEq(st.grade, pGrade)), () => {
-        pStatus.innerHTML = '<span class="t-msg t-ok">✓ تم التحقق، جاري الدخول . . .</span>';
-        const who = { role: 'parent', name: pParent.value.trim(), child: pChild.value.trim(), grade: pGrade, phone: '+964' + phone };
-        pTimer = setTimeout(() => enterAs(who), 180);
+        /* الخطوة الثانية: التحقق الثانوي بمعرّف الابن أو كلمة سره */
+        pBusy = false; pBtn.disabled = false; pStatus.innerHTML = '';
+        pVerify = { role: 'parent', name: pParent.value.trim(), child: pChild.value.trim(), grade: pGrade, phone: '+964' + phone, nchild: child };
+        pvCode.value = ''; pvStatus.innerHTML = ''; pvBtn.disabled = false; setPView('verify');
+        try { pvCode.focus(); } catch (x) { }
       }, () => {
         pBusy = false;
         pBtn.disabled = false;
@@ -2605,7 +2621,29 @@ o.appendChild(g);o.appendChild(bx);o.appendChild(fb);o.appendChild(tt);o.appendC
       });
     }, 1200);
   });
-  $('parentBack').addEventListener('click', () => { if (pView !== 'choice' && !pBusy && !ppBusy) { resetParent(); return; } showScreen('loginCard'); });
+  const pvForm = $('parentVerifyForm'), pvCode = $('parentVerifyCode'), pvBtn = $('parentVerifyBtn'), pvStatus = $('parentVerifyStatus');
+  let pVerify = null, pvBusy = false;
+  const codeNorm = (x) => String(x || '').trim().toUpperCase().replace(/\s+/g, '');
+  const codeDigits = (x) => String(x || '').replace(/\D/g, '').replace(/^0+/, '');
+  pvCode.addEventListener('input', () => { if (!pvBusy) pvStatus.innerHTML = ''; });
+  pvForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (pvBusy || !pVerify) return;
+    const code = pvCode.value;
+    if (!codeNorm(code)) { pvStatus.innerHTML = '<span class="t-msg t-err">يرجى إدخال معرّف الابن أو كلمة السر</span>'; return; }
+    const match = (st) => norm(String(st.name || '')) === pVerify.nchild && gradeEq(st.grade, pVerify.grade) && (
+      (st.password && codeNorm(st.password) === codeNorm(code)) ||
+      (st.accountId && (codeNorm(st.accountId) === codeNorm(code) || (codeDigits(code).length >= 2 && /^[A-Za-z]{0,2}\s?\d+$/.test(String(code).trim()) && codeDigits(st.accountId) === codeDigits(code)))));
+    pvBusy = true; pvBtn.disabled = true;
+    pvStatus.innerHTML = '<span class="t-msg t-wait"><i class="spin"></i>جاري التحقق . . .</span>';
+    const fail = () => { pvBusy = false; pvBtn.disabled = false; pvStatus.innerHTML = '<span class="t-msg t-err">' + PARENTCHILD + 'معرّف الابن أو كلمة السر غير صحيحة</span><span class="t-msg t-sub">' + PEOPLE + 'تجدها في بطاقة الطالب من المدرسة ' + BOOKS + '</span>'; };
+    setTimeout(() => withSync(() => STUDENTS.some(match) || ((window.SD && Array.isArray(SD.students)) && SD.students.some(match)), () => {
+      pvStatus.innerHTML = '<span class="t-msg t-ok">✓ تم التحقق، جاري الدخول . . .</span>';
+      const who = { role: 'parent', name: pVerify.name, child: pVerify.child, grade: pVerify.grade, phone: pVerify.phone };
+      setTimeout(() => { pvBusy = false; enterAs(who); }, 180);
+    }, fail), 60);
+  });
+  $('parentBack').addEventListener('click', () => { if (pView === 'verify' && !pvBusy) { setPView('new'); return; } if (pView !== 'choice' && !pBusy && !ppBusy && !pvBusy) { resetParent(); return; } showScreen('loginCard'); });
   $('parentNewBtn').addEventListener('click', () => setPView('new'));
   $('parentOldBtn').addEventListener('click', () => setPView('old'));
   [ppChild, ppPass].forEach((i) => i.addEventListener('input', () => { if (!ppBusy) ppStatus.innerHTML = ''; }));
@@ -5271,7 +5309,9 @@ try{document.head.insertAdjacentHTML('beforeend',CSSY)}catch(e){}
 </script>
 <script src="af-menu.js?v=20261112m2"></script>
 <script src="af-sched.js?v=20261116a"></script>
+<script src="af-admin2.js?v=20261125a"></script>
 <script src="af-xgr.js?v=20261118a"></script>
+<script src="af-devices.js?v=20261125a"></script>
 <script src="af-lite.js?v=20261118a"></script>
 <script src="af-oneui.js?v=20261118a"></script>
 <script src="af-admin-edit.js?v=20261112m2"></script>

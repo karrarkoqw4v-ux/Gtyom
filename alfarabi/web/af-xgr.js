@@ -30,7 +30,7 @@
     V.xgr = function () {
       mark('settings');
       var sel = XG(U).slice(1);
-      var all = ['1', '2', '3', '4', '5'];
+      var all = TG(U);
       function draw() {
         var main = String(U.grade || '');
         shell('الصفوف الإضافية', '', '<div class="sc"><p class="hint" style="margin:2px 4px 10px">صفك الأساسي: <b>' + esc(GN[main] || '—') + '</b>. إذا تدرّس صفاً ثانياً أو أكثر اضغط عليه، فتظهر عند الطلاب وأولياء أمورهم في «محادثة المدرسين»، وتصير عضواً في مجموعة كل صف تضيفه.</p>' +
@@ -50,7 +50,7 @@
   };
 
   var SRC = '\n/* ===== af-xgr ===== */\n(' + USER.toString() + ')();\n';
-  var HELPERS = '\nfunction XG(a){var o=[],m=a&&a.grade!=null?String(a.grade):"";if(m)o.push(m);if(a&&a.xg)String(a.xg).split(",").forEach(function(x){x=x.trim();if(x&&o.indexOf(x)<0)o.push(x)});return o}\nfunction XGL(a){return XG(a).map(function(g){return GN[g]||""}).filter(Boolean).join(" + ")}\n';
+  var HELPERS = '\nfunction TG(a){var g=String(a&&a.grade||"");var prep=(g==="4"||g==="5")||(!g&&P.document&&P.document.body.classList.contains("prep-section"));return prep?["4","5"]:["1","2","3"]}\nfunction XG(a){var o=[],m=a&&a.grade!=null?String(a.grade):"";if(m)o.push(m);if(a&&a.xg)String(a.xg).split(",").forEach(function(x){x=x.trim();if(x&&o.indexOf(x)<0)o.push(x)});return o}\nfunction XGL(a){return XG(a).map(function(g){return GN[g]||""}).filter(Boolean).join(" + ")}\n';
   try {
     var src = window.userMain && window.userMain.toString();
     if (src) {
@@ -59,6 +59,13 @@
       rep("String(a.grade).indexOf(gr)>-1", "XG(a).some(function(q){return String(q).indexOf(gr)>-1})");
       rep("rpBase(a.grade)===gr", "XG(a).some(function(q){return rpBase(q)===gr})");
       rep("(a.subject||'')+(a.subject&&GN[a.grade]?' - ':'')+(GN[a.grade]||'')", "(a.subject||'')+(a.subject&&GN[a.grade]?' - ':'')+XGL(a)");
+      /* مدرس الإعدادية: صفّان فقط (الرابع والخامس العلمي)، ومدرس المتوسطة: الأول والثاني والثالث فقط */
+      rep("U.role==='teacher'?['1','2','3','4','5']:[String(U.grade||'2')]", "U.role==='teacher'?TG(U):[String(U.grade||'2')]");
+      rep("if(U.role==='teacher')return ['1','2','3','4','5'];", "if(U.role==='teacher')return TG(U);");
+      rep("var gradeList=['1','2','3','4','5'];var g1=String(U.grade||gradeList[0]);", "var gradeList=TG(U);var g1=String(U.grade||gradeList[0]);");
+      rep("var ALLG=['1','2','3','4','5'],", "var ALLG=(U.role==='teacher'?TG(U):['1','2','3','4','5']),");
+      rep("var G5=['1','2','3','4','5'],", "var G5=(U.role==='teacher'?TG(U):['1','2','3','4','5']),");
+      rep("U.role==='teacher'?stageGrades:[U.grade||stageGrades[0]]", "U.role==='teacher'?TG(U):[U.grade||stageGrades[0]]");
       var k = src.lastIndexOf('}');
       src = src.slice(0, k) + HELPERS + SRC + '\n}';
       window.userMain = (0, eval)('(' + src + ')');
