@@ -14,9 +14,9 @@ import kotlinx.coroutines.withContext
 class NativeChatActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        try { window.setFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE, android.view.WindowManager.LayoutParams.FLAG_SECURE) } catch (_: Throwable) {}
         val me = ChatRepo.me(this)
         if (me == null) { finish(); return }
+        try { if (me.role != "student" && me.role != "parent") window.setFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE, android.view.WindowManager.LayoutParams.FLAG_SECURE) } catch (_: Throwable) {}
         val room = ChatRepo.roomOf(me)
         val title = if (room == "p") "أولياء الأمور" else "جروب الصف " + (mapOf("1" to "الأول", "2" to "الثاني", "3" to "الثالث", "4" to "الرابع", "5" to "الخامس")[me.grade] ?: me.grade)
         setContent {

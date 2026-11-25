@@ -329,6 +329,7 @@ object WebHolder {
             if (uid.isEmpty()) pr.remove("u_uid").remove("u_role").remove("u_grade").remove("u_name").remove("u_child")
             else pr.putString("u_uid", uid).putString("u_role", role).putString("u_grade", grade).putString("u_name", name).putString("u_child", child)
             pr.apply()
+            activity?.runOnUiThread { activity?.applySecure(if (uid.isEmpty()) "" else role) }
             try {
                 if (uid.isNotEmpty()) {
                     val i = Intent(app, KeepAliveService::class.java)

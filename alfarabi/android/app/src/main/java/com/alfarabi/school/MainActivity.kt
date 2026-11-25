@@ -34,7 +34,8 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         /* حماية: منع لقطات الشاشة وتسجيلها وإخفاء محتوى التطبيق من قائمة التطبيقات الأخيرة */
-        try { window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE) } catch (_: Throwable) {}
+        /* حماية لقطة الشاشة: مسموحة للطلاب وأولياء الأمور، ممنوعة للمدرسين والإدارة (وقبل الدخول) */
+        applySecure(WebHolder.prefs(this).getString("u_role", "") ?: "")
         super.onCreate(savedInstanceState)
         /* 90/120 هرتز: اختيار أعلى معدل تحديث تدعمه الشاشة */
         try {
@@ -233,6 +234,14 @@ class MainActivity : Activity() {
                 android.widget.Toast.makeText(this, "فعّل إذن الكاميرا والمايك من إعدادات التطبيق ← الأذونات", android.widget.Toast.LENGTH_LONG).show()
                 startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")))
             }
+        } catch (_: Throwable) {}
+    }
+
+    /** منع لقطات الشاشة إلا للطالب وولي الأمر */
+    fun applySecure(role: String) {
+        try {
+            if (role == "student" || role == "parent") window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            else window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         } catch (_: Throwable) {}
     }
 
