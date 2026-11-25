@@ -43,12 +43,37 @@ object WebHolder {
     const val REQ_FILE = 31
     const val REQ_MEDIA = 32
     const val REQ_NOTIF = 33
+    const val REQ_MEDIA2 = 34
 
     lateinit var app: Application
     var activity: MainActivity? = null
     var web: WebView? = null
     var fileCb: ValueCallback<Array<Uri>>? = null
     var permReq: PermissionRequest? = null
+    /** طلبات الكاميرا/المايك المعلّقة (قد يصل أكثر من طلب بنفس الوقت: كاميرا + تسجيل صوت) */
+    val pendingPerms = ArrayList<PermissionRequest>()
+    @Volatile var askingMedia = false
+
+    fun mediaNeeds(r: PermissionRequest): List<String> {
+        val need = ArrayList<String>()
+        r.resources.forEach {
+            if (it == PermissionRequest.RESOURCE_VIDEO_CAPTURE) need.add(Manifest.permission.CAMERA)
+            if (it == PermissionRequest.RESOURCE_AUDIO_CAPTURE) need.add(Manifest.permission.RECORD_AUDIO)
+        }
+        return need
+    }
+
+    /** بعد جواب المستخدم: نمنح أو نرفض كل الطلبات المعلّقة حسب الصلاحيات الفعلية */
+    fun flushPerms() {
+        askingMedia = false
+        val list = ArrayList(pendingPerms); pendingPerms.clear()
+        list.forEach { r ->
+            try {
+                val miss = mediaNeeds(r).filter { app.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
+                if (miss.isEmpty()) r.grant(r.resources) else r.deny()
+            } catch (_: Throwable) {}
+        }
+    }
     @Volatile var foreground = false
     @Volatile var pendingOpen = ""
     @Volatile var pendingLink = ""
@@ -140,17 +165,20 @@ object WebHolder {
             }
 
             override fun onPermissionRequest(request: PermissionRequest) {
-                val need = ArrayList<String>()
-                request.resources.forEach {
-                    if (it == PermissionRequest.RESOURCE_VIDEO_CAPTURE) need.add(Manifest.permission.CAMERA)
-                    if (it == PermissionRequest.RESOURCE_AUDIO_CAPTURE) need.add(Manifest.permission.RECORD_AUDIO)
-                }
-                val miss = need.filter { app.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
+                val miss = mediaNeeds(request).filter { app.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
+                if (miss.isEmpty()) { request.grant(request.resources); return }
                 val a = activity
-                if (miss.isEmpty()) request.grant(request.resources)
-                else if (a == null) request.deny()
-                else { permReq?.deny(); permReq = request; a.requestPermissions(miss.toTypedArray(), REQ_MEDIA) }
+                if (a == null) { request.deny(); return }
+                pendingPerms.add(request)
+                if (!askingMedia) {
+                    askingMedia = true
+                    val all = ArrayList<String>()
+                    pendingPerms.forEach { r -> mediaNeeds(r).forEach { if (app.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED && !all.contains(it)) all.add(it) } }
+                    try { a.requestPermissions(all.toTypedArray(), REQ_MEDIA) } catch (_: Throwable) { flushPerms() }
+                }
             }
+
+            override fun onPermissionRequestCanceled(request: PermissionRequest) { pendingPerms.remove(request) }
         }
 
         w.setDownloadListener { url, ua, cd, mime, _ ->
@@ -235,6 +263,10 @@ object WebHolder {
         @JavascriptInterface
         fun notifySchool(title: String, body: String, sub: String, tag: String, photo: String) =
             Notifier.school(app, title, body, sub, tag, photo)
+
+        /** طلب إذن الكاميرا والمايك مرة وحدة بشكل استباقي حتى يشتغل التصوير والتسجيل الصوتي بدون تأخير */
+        @JavascriptInterface
+        fun requestMediaPermissions() { activity?.runOnUiThread { activity?.askMediaPermissions() } }
 
         @JavascriptInterface
         fun requestNotifPermission() { activity?.runOnUiThread { activity?.askNotifPermission() } }

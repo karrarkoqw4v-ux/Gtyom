@@ -10,10 +10,10 @@
     rep('<button data-del="\'+a.id+\'">حذف</button>',
         '<button data-ed="\'+a.id+\'" style="margin-inline-start:6px">تعديل</button><button data-del="\'+a.id+\'">حذف</button>');
 
-    var oldPub = "A.push({id:Date.now(),title:title,desc:desc,image:$('annImage').value.trim(),target:target,student:student,targetLabel:target==='student'?student:labels[target],createdAt:Date.now()});$('annTitle').value='';$('annDesc').value='';$('annImage').value='';draw();toast('تم نشر الإعلان')";
+    var oldPub = "A.push({id:Date.now(),title:title,desc:desc,image:$('annImage').value.trim(),target:target,student:student,targetLabel:target==='student'?student:labels[target],createdAt:Date.now()});$('annTitle').value='';$('annDesc').value='';$('annImage').value='';try{var AP=(typeof P!=='undefined'&&P.AFPUSH)||window.AFPUSH;AP&&AP.ann(SD.name||'ثانوية الفارابي',title,desc,target,student,Date.now())}catch(e){}draw();toast('تم نشر الإعلان')";
     var newPub = "var _ed=window.__annEd?A.filter(function(x){return String(x.id)===String(window.__annEd)})[0]:null;"
       + "if(_ed){_ed.title=title;_ed.desc=desc;_ed.image=$('annImage').value.trim();_ed.target=target;_ed.student=student;_ed.targetLabel=target==='student'?student:labels[target];_ed.editedAt=Date.now();window.__annEd=null;$('annPublish').textContent='نشر الإعلان';$('annTitle').value='';$('annDesc').value='';$('annImage').value='';draw();toast('تم تعديل الإعلان وإرسال الإشعار')}"
-      + "else{A.push({id:Date.now(),title:title,desc:desc,image:$('annImage').value.trim(),target:target,student:student,targetLabel:target==='student'?student:labels[target],createdAt:Date.now()});$('annTitle').value='';$('annDesc').value='';$('annImage').value='';draw();toast('تم نشر الإعلان')}";
+      + "else{A.push({id:Date.now(),title:title,desc:desc,image:$('annImage').value.trim(),target:target,student:student,targetLabel:target==='student'?student:labels[target],createdAt:Date.now()});$('annTitle').value='';$('annDesc').value='';$('annImage').value='';try{var AP=(typeof P!=='undefined'&&P.AFPUSH)||window.AFPUSH;AP&&AP.ann(SD.name||'ثانوية الفارابي',title,desc,target,student,Date.now())}catch(e){}draw();toast('تم نشر الإعلان')}";
     rep(oldPub, newPub);
 
     rep("$('annList').onclick=function(e){var b=e.target.closest('[data-del]');",

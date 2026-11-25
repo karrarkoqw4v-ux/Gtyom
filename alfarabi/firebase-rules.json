@@ -38,7 +38,10 @@
         "$f": {
           ".validate": "!newData.isString() || newData.val().length <= 3000000"
         }
-      }
+      },
+      ".indexOn": [
+        "email"
+      ]
     },
     "chat": {
       ".read": true,

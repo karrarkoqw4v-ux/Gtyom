@@ -226,6 +226,13 @@ class MainActivity : Activity() {
     }
 
     // ===== الصلاحيات =====
+    fun askMediaPermissions() {
+        try {
+            val miss = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO).filter { checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
+            if (miss.isNotEmpty()) requestPermissions(miss.toTypedArray(), WebHolder.REQ_MEDIA2)
+        } catch (_: Throwable) {}
+    }
+
     fun askNotifPermission(thenSettings: Boolean = false) {
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), WebHolder.REQ_NOTIF)
@@ -235,10 +242,8 @@ class MainActivity : Activity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            WebHolder.REQ_MEDIA -> {
-                val r = WebHolder.permReq; WebHolder.permReq = null
-                if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) r?.grant(r.resources) else r?.deny()
-            }
+            WebHolder.REQ_MEDIA -> WebHolder.flushPerms()
+            WebHolder.REQ_MEDIA2 -> { /* طلب استباقي: لا شيء معلّق */ }
             WebHolder.REQ_NOTIF -> if (firstRun) { firstRun = false; showSettings(true) }
         }
     }

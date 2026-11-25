@@ -74,6 +74,21 @@
       setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500); return true;
     }
 
+
+    /* محادثة المدرسين (كانت «قيد الإعداد»): قائمة مدرسي مرحلتك ومراسلة خاصة مع كل مدرس */
+    V.chat = function () {
+      mark('');
+      var A = []; try { A = JSON.parse(P.localStorage.getItem(DBK)).accounts || []; } catch (e) { }
+      var ts = A.filter(function (a) { return a && a.role === 'teacher' && !a.kicked; }).sort(function (x, y) { return String(x.name).localeCompare(String(y.name), 'ar'); });
+      function glab(a) { var o = [String(a.grade)]; String(a.xg || '').split(',').forEach(function (g) { g = g.trim(); if (g && o.indexOf(g) < 0) o.push(g); }); return o.map(function (g) { return GN[g] || ''; }).filter(Boolean).join(' + '); }
+      shell(T.chat, '', '<div class="sc"><p class="hint" style="font-size:12.5px;margin:2px 4px 8px">كل المدرسين المسجلين (المتوسطة والإعدادية). اختر المدرس لتراسله مباشرة، وتظهر المحادثة عنده في «المراسلات».</p>' +
+        (ts.length ? ts.map(function (a, i) { return '<div class="li"><div>' + esc(a.name) + '<small>' + esc((a.subject || '') + (a.subject ? ' — ' : '') + glab(a)) + '</small></div><button data-t="' + i + '">مراسلة</button></div>'; }).join('') : '<p class="hint" style="margin:10px 6px">لا يوجد مدرسون مسجلون في هذه المرحلة بعد.</p>') + '</div>', home);
+      var sc = card.querySelector('.sc'); if (sc) sc.onclick = function (e) {
+        var b = e.target.closest('[data-t]'); if (!b) return; var a = ts[+b.dataset.t]; if (!a) return;
+        P.openAdminChat('d' + ['admin', String(a.createdAt || a.name)].sort().join('~'));
+      };
+    };
+
     V.grades = function () {
       mark('');
       var K = 'alfarabi_rec_v1', S = { s: '', t: '' };

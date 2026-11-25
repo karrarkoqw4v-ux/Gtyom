@@ -299,7 +299,7 @@ object Sync {
         val chId = r.opt("ch")?.toString() ?: return
         val ch = get(base, "/records/r${okKey(chId)}.json")?.let { try { JSONObject(it) } catch (_: Throwable) { null } } ?: return
         val forGrade = u.role == "student" && u.grade.isNotEmpty() && ch.opt("gr")?.toString() == u.grade
-        val member = forGrade || ch.optJSONObject("m")?.has("u" + okKey(u.uid)) == true
+        val member = forGrade || (ch.opt("sys")?.toString() == "true" || ch.opt("sys")?.toString() == "1") || ch.optJSONObject("m")?.has("u" + okKey(u.uid)) == true   // قناة إعلانات المدرسة: الجميع مشتركون
         val muted = ch.optJSONObject("mu")?.has("u" + okKey(u.uid)) == true
         if (!member || muted || ch.opt("o")?.toString() == u.uid) return
         val text = r.optString("t", "").ifEmpty { if (r.has("img")) "📷 صورة" else if (r.has("q")) "📊 استطلاع" else "منشور جديد" }
