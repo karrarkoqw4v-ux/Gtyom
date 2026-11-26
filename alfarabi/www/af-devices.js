@@ -10,6 +10,9 @@
     var AK = sk(uid), DID = '';
     try { DID = LS.getItem('af_did') || ''; if (!DID) { DID = 'd' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); LS.setItem('af_did', DID); } } catch (e) { DID = 'd' + Date.now().toString(36); }
     function B() { return P.FBBASE || ''; }
+    /* وقت دخول هذا الجهاز لهذا الحساب: أي «إخراج» أقدم منه (بقي مخزّناً بالخادم) يُتجاهل، حتى ما ينطرد المستخدم بعد ما يدخل من جديد */
+    var LTK = 'af_lt_' + AK, LT = 0;
+    try { LT = +LS.getItem(LTK) || 0; if (!LT) { LT = Date.now(); LS.setItem(LTK, String(LT)); } } catch (e) { LT = Date.now(); }
     function nodeUrl(d) { return B() + '/acc_dev/' + AK + '/' + d + '.json'; }
     var ua = navigator.userAgent || '', apple = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
     function devName() {
@@ -26,12 +29,13 @@
     function gone() {
       if (outing) return; outing = true;
       try { fetch(nodeUrl(DID), { method: 'DELETE' }).catch(function () { }); } catch (e) { }
+      try { LS.removeItem(LTK); } catch (e) { }
       try { toast('تم إخراجك من هذا الجهاز من جهاز آخر بحسابك'); } catch (e) { }
       setTimeout(function () { try { P.adminLogout(); } catch (e) { try { LS.removeItem('alfarabi_session'); LS.removeItem('alfarabi_sess_acc'); P.location.reload(); } catch (x) { } } }, 1200);
     }
     function watch() {
       if (!B() || document.hidden || outing) return;
-      fetch(nodeUrl(DID) + '?_=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d && d.out) gone(); }).catch(function () { });
+      fetch(nodeUrl(DID) + '?_=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d && d.out && +d.out > LT - 60000) gone(); }).catch(function () { });
     }
     setTimeout(beat, 1500); setInterval(beat, 60000); setInterval(watch, 4000);
     /* أندرويد: نطلب إذن الكاميرا والمايك مرة وحدة بعد الدخول حتى يشتغل التصوير والبصمة الصوتية بدون مشاكل */
@@ -41,7 +45,7 @@
     try {
       if (!P.__afLoW && typeof P.adminLogout === 'function') {
         var _lo = P.adminLogout; P.__afLoW = 1;
-        P.adminLogout = function () { try { fetch(nodeUrl(DID), { method: 'DELETE', keepalive: true }).catch(function () { }); } catch (e) { } return _lo.apply(this, arguments); };
+        P.adminLogout = function () { try { LS.removeItem(LTK); } catch (e) { } try { fetch(nodeUrl(DID), { method: 'DELETE', keepalive: true }).catch(function () { }); } catch (e) { } return _lo.apply(this, arguments); };
       }
     } catch (e) { }
 

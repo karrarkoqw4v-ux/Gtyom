@@ -6,9 +6,15 @@
   var CSS = [
     H + ',' + H + ' *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;text-shadow:none!important;transition:none!important;animation:none!important}',
     H + ' .ch-m,' + H + ' #cl{background-image:none!important;background-color:#0d1721!important}',
-    H + ' .ch-h{background:#14222f!important;border:0!important}',
+    /* الشريط العلوي بنمط تيليجرام: دائرتان وكبسولة بخلفية غامقة وحافة رفيعة فوق خلفية المحادثة */
+    H2 + ' .ch-h{background:transparent!important;border:0!important;gap:8px!important;padding:calc(8px + env(safe-area-inset-top)) 8px 6px!important}',
+    H2 + ' .ch-h .ch-c{width:46px!important;height:46px!important;border-radius:50%!important;background:rgba(24,27,25,.93)!important;border:1px solid rgba(255,255,255,.17)!important;color:#f1f3f6!important;box-shadow:0 4px 14px rgba(0,0,0,.4)!important}',
+    H2 + ' .ch-h .ch-p{height:48px!important;border-radius:24px!important;background:rgba(24,27,25,.93)!important;border:1px solid rgba(255,255,255,.17)!important;box-shadow:0 4px 14px rgba(0,0,0,.4)!important;padding:0 6px!important}',
+    H2 + ' .ch-h .ch-p .tx b{font-size:16.5px!important;font-weight:700!important}',
+    H2 + ' .ch-h .ch-p .tx small{color:#9b9ea4!important;font-weight:700!important;font-size:12px!important}',
     /* شريط الكتابة بنمط تيليجرام الزجاجي: كبسولة وحدة فيها إيموجي | نص | مرفقات | كاميرا | دائرة زرقاء (إرسال أو مايك) */
     H + ' .ch-i{direction:ltr!important;display:flex!important;flex-direction:row!important;align-items:center!important;gap:0!important;height:47px!important;min-height:47px!important;margin:0 8px calc(10px + env(safe-area-inset-bottom))!important;padding:0 3px 0 8px!important;border-radius:25px!important;background:rgba(24,27,25,.93)!important;border:1px solid rgba(255,255,255,.2)!important;box-shadow:0 6px 18px rgba(0,0,0,.5)!important}',
+    H2 + ' .ch-i.vr{height:auto!important;min-height:0!important;padding:6px 8px!important;align-items:stretch!important;border-radius:24px!important;flex-wrap:nowrap!important}',
     H + ' .ch-i .ch-pill{display:contents!important}',
     H + ' .ch-i #cemo{order:1!important}',
     H + ' .ch-i #ci{order:2!important;flex:1 1 auto!important;min-width:0!important;direction:rtl!important;text-align:right!important;font-size:17px!important;font-weight:700!important;color:#eceef1!important;background:transparent!important;border:0!important;padding:10px 8px!important;line-height:26px!important;align-self:center!important;box-sizing:border-box!important}',
