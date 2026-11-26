@@ -87,8 +87,8 @@ class MainActivity : Activity() {
     }
 
     override fun onStop() { super.onStop(); leftAt = SystemClock.elapsedRealtime() }
-    override fun onResume() { super.onResume(); WebHolder.foreground = true; Notifier.cancel(this, "call") }
-    override fun onPause() { WebHolder.foreground = false; super.onPause() }
+    override fun onResume() { super.onResume(); WebHolder.foreground = true; Notifier.cancel(this, "call"); barH.removeCallbacks(barTick); barH.postDelayed(barTick, 600) }
+    override fun onPause() { WebHolder.foreground = false; barH.removeCallbacks(barTick); super.onPause() }
 
     // ===== لون الشريطين (أعلى وأسفل الجهاز) نفس لون التطبيق =====
     fun applyBars(dark: Boolean) {
@@ -108,6 +108,45 @@ class MainActivity : Activity() {
         window.decorView.systemUiVisibility = f
         root.setBackgroundColor(status)
         WebHolder.web?.setBackgroundColor(status)
+    }
+
+    // ===== لون شريطي الجهاز يُقرأ من البكسلات الفعلية للشاشة (بدل التخمين من CSS) فيطابق الصفحة تماماً =====
+    private val barH = android.os.Handler(android.os.Looper.getMainLooper())
+    private var lastTop = 0
+    private var lastBot = 0
+    private val barTick = object : Runnable {
+        override fun run() {
+            try { sampleBars() } catch (_: Throwable) {}
+            barH.postDelayed(this, 450)
+        }
+    }
+
+    private fun median(bm: android.graphics.Bitmap): Int {
+        val xs = (0 until bm.width).map { bm.getPixel(it, 0) }.sortedBy { (android.graphics.Color.red(it) * 299 + android.graphics.Color.green(it) * 587 + android.graphics.Color.blue(it)) }
+        return xs[xs.size / 2] or 0xFF000000.toInt()
+    }
+
+    private fun sampleBars() {
+        val w = WebHolder.web ?: return
+        if (!w.isShown || w.width < 10 || w.height < 10) return
+        val loc = IntArray(2); w.getLocationInWindow(loc)
+        val topBm = android.graphics.Bitmap.createBitmap(16, 1, android.graphics.Bitmap.Config.ARGB_8888)
+        val botBm = android.graphics.Bitmap.createBitmap(16, 1, android.graphics.Bitmap.Config.ARGB_8888)
+        val x0 = loc[0]; val x1 = loc[0] + w.width
+        val ty = loc[1] + 2; val by = loc[1] + w.height - 3
+        android.view.PixelCopy.request(window, android.graphics.Rect(x0, ty, x1, ty + 1), topBm, { r1 ->
+            if (r1 != android.view.PixelCopy.SUCCESS) return@request
+            android.view.PixelCopy.request(window, android.graphics.Rect(x0, by, x1, by + 1), botBm, { r2 ->
+                if (r2 != android.view.PixelCopy.SUCCESS) return@request
+                val t = median(topBm); val b = median(botBm)
+                fun far(a: Int, c: Int) = Math.abs(android.graphics.Color.red(a) - android.graphics.Color.red(c)) + Math.abs(android.graphics.Color.green(a) - android.graphics.Color.green(c)) + Math.abs(android.graphics.Color.blue(a) - android.graphics.Color.blue(c)) > 12
+                if (far(t, lastTop) || far(b, lastBot)) {
+                    lastTop = t; lastBot = b
+                    val lum = (android.graphics.Color.red(t) * 299 + android.graphics.Color.green(t) * 587 + android.graphics.Color.blue(t)) / 255000f
+                    paintBars(t, b, lum < 0.5f)
+                }
+            }, barH)
+        }, barH)
     }
 
     /** يطلب إعفاء التطبيق من توفير البطارية حتى تصل الإشعارات والمحادثات والتطبيق مغلق */

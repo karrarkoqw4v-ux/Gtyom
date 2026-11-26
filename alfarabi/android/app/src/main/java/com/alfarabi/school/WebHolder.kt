@@ -424,19 +424,11 @@ object WebHolder {
         }
 
         @JavascriptInterface
-        fun setBars(dark: Boolean) { activity?.runOnUiThread { activity?.applyBars(dark) } ?: prefs(app).edit().putBoolean("dark", dark).apply() }
+        fun setBars(dark: Boolean) { prefs(app).edit().putBoolean("dark", dark).apply() /* ألوان الشريطين تُقرأ الآن من بكسلات الشاشة */ }
 
         /** لون شريط الحالة وشريط التنقل (hex) مع كون الأيقونات داكنة؛ نص فارغ = رجوع للون الافتراضي */
         @JavascriptInterface
-        fun setBarColors(status: String, nav: String, darkIcons: Boolean) {
-            activity?.runOnUiThread {
-                val a = activity ?: return@runOnUiThread
-                try {
-                    if (status.isEmpty()) a.applyBars(prefs(app).getBoolean("dark", false))
-                    else a.applyBarColors(android.graphics.Color.parseColor(status), android.graphics.Color.parseColor(nav.ifEmpty { status }), darkIcons)
-                } catch (_: Throwable) {}
-            }
-        }
+        fun setBarColors(status: String, nav: String, darkIcons: Boolean) { /* تم الاستغناء عنه: MainActivity تقرأ لون الحافتين من الشاشة نفسها */ }
 
         @JavascriptInterface
         fun askBatteryExemption() { activity?.runOnUiThread { activity?.askBatteryExemption() } }
