@@ -219,7 +219,7 @@ private fun Bubble(m: Msg, first: Boolean, last: Boolean, mine: Boolean, playing
         }
         Column(Modifier.widthIn(max = 300.dp).clip(shape).background(bg).padding(horizontal = 11.dp, vertical = 6.dp)) {
             if (!mine && first && m.name.isNotEmpty()) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End, modifier = Modifier.align(Alignment.End)) {
                     if (m.role == "teacher" || m.role == "admin") {
                         Text("المشرف", color = Color(0xFF62D17A), fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = Naskh,
                             modifier = Modifier.clip(RoundedCornerShape(9.dp)).background(Color(0xFF17301F)).padding(horizontal = 7.dp))
@@ -247,7 +247,7 @@ private fun Bubble(m: Msg, first: Boolean, last: Boolean, mine: Boolean, playing
                 }
             }
             if (m.text.isNotEmpty()) Text(m.text, color = Color.White, fontSize = 16.sp, lineHeight = 24.sp, fontFamily = Naskh,
-                style = TextStyle(textDirection = TextDirection.Rtl, textAlign = TextAlign.Right), modifier = Modifier.fillMaxWidth())
+                style = TextStyle(textDirection = TextDirection.Rtl, textAlign = TextAlign.Right), modifier = Modifier.align(Alignment.End))
             Row(Modifier.align(Alignment.End).padding(top = 1.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(timeOf(m.ts), color = if (mine) Color(0xFFC3D8F6) else Muted, fontSize = 10.5.sp, fontFamily = Naskh)
                 if (mine) { Spacer(Modifier.width(4.dp)); if (m.sending) Icon(Ic.Tick, Color(0xFFC3D8F6), 14.dp) else Icon(Ic.Ticks, Color(0xFFC3D8F6), 14.dp) }
