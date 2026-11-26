@@ -25,9 +25,10 @@ class ChatShotTest {
             Msg(4, "333", "زينب كاظم", "student", t + 180000, "تمام وصلت، شكراً أستاذ"),
             Msg(5, "111", "الأستاذ علي صادق", "teacher", t + 240000, "الامتحان الشهري يوم الأحد الساعة التاسعة صباحاً"),
             Msg(6, "222", "كرار حيدر", "student", t + 300000, "ان شاء الله، هل يشمل الفصل الثالث؟"),
-            Msg(7, "222", "كرار حيدر", "student", t + 360000, "هلا", sending = true)
+            Msg(7, "111", "الأستاذ علي صادق", "teacher", t + 330000, "", aud = "x", ad = 12),
+            Msg(8, "222", "كرار حيدر", "student", t + 360000, "هلا", sending = true)
         )
-        rule.setContent { ChatScreen("جروب الصف الثالث متوسط", "5 أعضاء", msgs, "222", {}, {}) }
+        rule.setContent { ChatScreen("جروب الصف الثالث متوسط", "5 أعضاء", msgs, "222", {}, {}, typing = listOf("حسين أحمد")) }
         rule.onRoot().captureRoboImage("build/shots/native_chat.png")
     }
 }

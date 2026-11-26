@@ -6,7 +6,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /** رسالة محادثة (نفس بنية الويب في قاعدة المدرسة: chat/g<الصف>/m<id>) */
-data class Msg(val id: Long, val uid: String, val name: String, val role: String, val ts: Long, val text: String, val hasImg: Boolean = false, val sending: Boolean = false)
+data class Msg(val id: Long, val uid: String, val name: String, val role: String, val ts: Long, val text: String, val hasImg: Boolean = false, val sending: Boolean = false,
+               val img: String = "", val aud: String = "", val ad: Int = 0)
 
 /** طبقة الشبكة الأصلية للمحادثات (REST على Firebase Realtime Database) */
 object ChatRepo {
@@ -48,15 +49,36 @@ object ChatRepo {
         for (k in o.keys()) {
             val m = o.optJSONObject(k) ?: continue
             if (m.has("c") || m.optLong("ts", 0) == 0L) continue   // مكالمات وأحداث
-            out.add(Msg(m.optLong("id"), m.optString("u"), m.optString("n"), m.optString("r"), m.optLong("ts"), m.optString("t"), m.has("img") || m.has("vid")))
+            out.add(Msg(m.optLong("id"), m.optString("u"), m.optString("n"), m.optString("r"), m.optLong("ts"), m.optString("t"), m.has("img") || m.has("vid"),
+                img = m.optString("img", ""), aud = m.optString("aud", ""), ad = m.optInt("ad", 0)))
         }
         return out.sortedBy { it.ts }
     }
 
-    fun send(base: String, room: String, me: Me, text: String): Msg? {
+    fun send(base: String, room: String, me: Me, text: String, img: String = "", aud: String = "", ad: Int = 0): Msg? {
         val ts = System.currentTimeMillis()
-        val j = JSONObject().put("id", ts).put("u", me.uid).put("n", me.name).put("r", me.role).put("ts", ts).put("t", text)
+        val j = JSONObject().put("id", ts).put("u", me.uid).put("n", me.name).put("r", me.role).put("ts", ts)
+        if (text.isNotEmpty()) j.put("t", text) else j.put("t", "")
+        if (img.isNotEmpty()) j.put("img", img)
+        if (aud.isNotEmpty()) { j.put("aud", aud); j.put("ad", ad) }
         val ok = call("$base/chat/$room/m${key(ts.toString())}.json", "PUT", j.toString()) != null
-        return if (ok) Msg(ts, me.uid, me.name, me.role, ts, text) else null
+        return if (ok) Msg(ts, me.uid, me.name, me.role, ts, text, img.isNotEmpty(), false, img, aud, ad) else null
+    }
+
+    /** «فلان يكتب...»: نفس مسار الويب typing/<الغرفة>/<المستخدم> */
+    fun setTyping(base: String, room: String, me: Me) {
+        call("$base/typing/${key(room)}/${key(me.uid)}.json", "PUT", JSONObject().put("n", me.name).put("ts", System.currentTimeMillis()).toString())
+    }
+
+    fun typing(base: String, room: String, me: Me): List<String> {
+        val txt = call("$base/typing/${key(room)}.json", "GET") ?: return emptyList()
+        val o = try { JSONObject(txt) } catch (_: Throwable) { return emptyList() }
+        val now = System.currentTimeMillis(); val out = ArrayList<String>(); val mine = key(me.uid)
+        for (k in o.keys()) {
+            if (k == mine) continue
+            val t = o.optJSONObject(k) ?: continue
+            if (now - t.optLong("ts", 0) < 6000) out.add(t.optString("n", ""))
+        }
+        return out.filter { it.isNotEmpty() }
     }
 }
