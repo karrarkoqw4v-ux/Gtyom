@@ -280,10 +280,6 @@ class MainActivity : Activity() {
             text = "فحص تحديث التطبيق (APK)"
             setOnClickListener { updShown = false; checkUpdate(true) }
         })
-        col.addView(Button(this).apply {
-            text = "المحادثات الأصلية (Kotlin) - تجريبي"
-            setOnClickListener { try { startActivity(Intent(this@MainActivity, NativeChatActivity::class.java)) } catch (_: Throwable) {} }
-        })
         col.addView(TextView(this).apply { text = "\nأدوات البيانات"; textSize = 13f })
         col.addView(Button(this).apply {
             text = "فحص المزامنة مع الخادم"

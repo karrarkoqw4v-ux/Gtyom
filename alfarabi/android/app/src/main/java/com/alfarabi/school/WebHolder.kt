@@ -307,10 +307,6 @@ object WebHolder {
         @JavascriptInterface
         fun requestMediaPermissions() { activity?.runOnUiThread { activity?.askMediaPermissions() } }
 
-        /** فتح المحادثة الأصلية (Kotlin) */
-        @JavascriptInterface
-        fun openNativeChat() { activity?.runOnUiThread { try { val a = activity ?: return@runOnUiThread; a.startActivity(Intent(a, NativeChatActivity::class.java)) } catch (_: Throwable) {} } }
-
         /** صلاحيات الجهاز الحقيقية (بدل نوافذ المتصفح): media | mic | cam */
         @JavascriptInterface
         fun hasPerm(k: String): Boolean = MainActivity.permsFor(k).all { app.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }
