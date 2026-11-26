@@ -12,8 +12,8 @@ android {
         applicationId = "com.alfarabi.school"
         minSdk = 26
         targetSdk = 34
-        versionCode = 69
-        versionName = "5.0.19"
+        versionCode = 70
+        versionName = "5.0.20"
     }
     signingConfigs {
         getByName("debug") {

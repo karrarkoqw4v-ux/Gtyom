@@ -91,19 +91,43 @@
     return list.find(function (a) { return String(a.createdAt || a.name) === s; });
   }
   function photoOf(uid) { var a = accOf(uid), p = a && a.photo; return p && String(p).length < 350000 ? String(p) : ''; }
-  /* لون شريطي الجهاز (أعلى/أسفل) يتبع الشاشة: المحادثات والقنوات داكنة فلا يظهر شريط أبيض */
-  var barDark = null;
+  /* لون شريطي الجهاز (أعلى/أسفل) يطابق لون الشاشة المعروضة فعلاً: نقرأ لون الخلفية عند أعلى وأسفل الشاشة
+     (حتى داخل الإطارات) فلا يبقى أي خط أبيض فوق أو تحت */
+  function rgbOf(s) {
+    var m = /rgba?\(([^)]+)\)/.exec(s || ''); if (!m) return null;
+    var p = m[1].split(/[\s,\/]+/).filter(Boolean).map(parseFloat);
+    return p.length >= 3 && !(p.length >= 4 && p[3] < 0.9) ? p : null;
+  }
+  function colAt(doc, x, y, depth) {
+    try {
+      var el = doc.elementFromPoint(x, y); if (!el) return null;
+      if (el.tagName === 'IFRAME' && depth < 4) {
+        var cd = el.contentDocument;
+        if (cd && el.style.display !== 'none') { var r = el.getBoundingClientRect(), c0 = colAt(cd, x - r.left, y - r.top, depth + 1); if (c0) return c0; }
+      }
+      var w = doc.defaultView;
+      for (var e = el; e && e.nodeType === 1; e = e.parentElement) {
+        var cs = w.getComputedStyle(e), c = rgbOf(cs.backgroundColor);
+        if (c) return c;
+        var g = /rgba?\([^)]*\)/.exec(cs.backgroundImage || '');
+        if (g) { c = rgbOf(g[0]); if (c) return c; }
+      }
+    } catch (e) {}
+    return null;
+  }
+  function hex(c) { return '#' + c.slice(0, 3).map(function (v) { v = Math.max(0, Math.min(255, Math.round(v))); return (v < 16 ? '0' : '') + v.toString(16); }).join(''); }
+  function lum(c) { return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; }
+  var barKey = null;
   setInterval(function () {
-    var dark = false;
-    ['adminFrame', 'chatFrame'].forEach(function (fid) {
-      try {
-        var f = document.getElementById(fid), d = f && f.contentDocument;
-        if (!d || f.style.display === 'none') return;
-        var ch = d.getElementById('ch');
-        if ((ch && ch.classList.contains('on')) || d.querySelector('.cx.tg')) dark = true;
-      } catch (e) {}
-    });
-    if (dark !== barDark) { barDark = dark; try { A.setBarColors && A.setBarColors(dark ? '#0a0908' : '', dark ? '#0a0908' : '', dark); } catch (e) {} }
+    try {
+      var W = window.innerWidth || 360, H = window.innerHeight || 640;
+      var top = colAt(document, W / 2, 2, 0), bot = colAt(document, W / 2, H - 2, 0);
+      if (!top && !bot) return;
+      top = top || bot; bot = bot || top;
+      var dark = lum(top) < 0.5, key = hex(top) + hex(bot) + dark;
+      if (key === barKey) return; barKey = key;
+      A.setBarColors && A.setBarColors(hex(top), hex(bot), dark);
+    } catch (e) {}
   }, 400);
   var lastUid = null, lastBase = '';
   setInterval(function () {
