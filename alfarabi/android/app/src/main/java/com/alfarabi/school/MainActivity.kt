@@ -245,11 +245,32 @@ class MainActivity : Activity() {
         } catch (_: Throwable) {}
     }
 
+    private var askKey = ""
+    /** طلب صلاحية من نظام الأندرويد نفسه، والنتيجة تُرجَع للصفحة */
+    fun askPermFor(k: String) {
+        val miss = permsFor(k).filter { checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
+        if (miss.isEmpty()) { WebHolder.web?.evaluateJavascript("window.__afPerm&&__afPerm('$k',true)", null); return }
+        askKey = k
+        try { requestPermissions(miss.toTypedArray(), WebHolder.REQ_ASK) }
+        catch (_: Throwable) { WebHolder.web?.evaluateJavascript("window.__afPerm&&__afPerm('$k',false)", null) }
+    }
+
+    /** عند أول فتح: كاميرا ومايك وصور وفيديو دفعة وحدة بنافذة النظام */
     fun askMediaPermissions() {
         try {
-            val miss = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO).filter { checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
+            val all = (permsFor("cam") + permsFor("mic") + permsFor("media")).distinct()
+            val miss = all.filter { checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
             if (miss.isNotEmpty()) requestPermissions(miss.toTypedArray(), WebHolder.REQ_MEDIA2)
         } catch (_: Throwable) {}
+    }
+
+    companion object {
+        fun permsFor(k: String): List<String> = when (k) {
+            "media" -> if (Build.VERSION.SDK_INT >= 33) listOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO) else listOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            "mic" -> listOf(Manifest.permission.RECORD_AUDIO)
+            "cam" -> listOf(Manifest.permission.CAMERA)
+            else -> emptyList()
+        }
     }
 
     fun askNotifPermission(thenSettings: Boolean = false) {
@@ -267,6 +288,12 @@ class MainActivity : Activity() {
                 if (deniedPerm != null) permDeniedHint(deniedPerm)
             }
             WebHolder.REQ_MEDIA2 -> { /* طلب استباقي: لا شيء معلّق */ }
+            WebHolder.REQ_ASK -> {
+                val ok = grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+                val k = askKey
+                if (!ok) permissions.indices.firstOrNull { grantResults.getOrNull(it) != PackageManager.PERMISSION_GRANTED }?.let { permDeniedHint(permissions[it]) }
+                WebHolder.web?.evaluateJavascript("window.__afPerm&&__afPerm('$k',$ok)", null)
+            }
             WebHolder.REQ_CAM -> {
                 val p = WebHolder.pendingParams; WebHolder.pendingParams = null
                 val ok = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED

@@ -45,6 +45,7 @@ object WebHolder {
     const val REQ_NOTIF = 33
     const val REQ_MEDIA2 = 34
     const val REQ_CAM = 35
+    const val REQ_ASK = 36
 
     lateinit var app: Application
     var activity: MainActivity? = null
@@ -299,6 +300,13 @@ object WebHolder {
         /** طلب إذن الكاميرا والمايك مرة وحدة بشكل استباقي حتى يشتغل التصوير والتسجيل الصوتي بدون تأخير */
         @JavascriptInterface
         fun requestMediaPermissions() { activity?.runOnUiThread { activity?.askMediaPermissions() } }
+
+        /** صلاحيات الجهاز الحقيقية (بدل نوافذ المتصفح): media | mic | cam */
+        @JavascriptInterface
+        fun hasPerm(k: String): Boolean = MainActivity.permsFor(k).all { app.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }
+
+        @JavascriptInterface
+        fun askPerm(k: String) { activity?.runOnUiThread { activity?.askPermFor(k) } ?: android.os.Handler(android.os.Looper.getMainLooper()).post { web?.evaluateJavascript("window.__afPerm&&__afPerm('$k',false)", null) } }
 
         @JavascriptInterface
         fun requestNotifPermission() { activity?.runOnUiThread { activity?.askNotifPermission() } }
