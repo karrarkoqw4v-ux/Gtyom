@@ -237,12 +237,9 @@ class MainActivity : Activity() {
         } catch (_: Throwable) {}
     }
 
-    /** منع لقطات الشاشة إلا للطالب وولي الأمر */
+    /** لقطات الشاشة وتسجيل الفيديو مسموحة للجميع: لا توجد حماية للشاشة */
     fun applySecure(role: String) {
-        try {
-            if (role == "student" || role == "parent") window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
-            else window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        } catch (_: Throwable) {}
+        try { window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) } catch (_: Throwable) {}
     }
 
     private var askKey = ""

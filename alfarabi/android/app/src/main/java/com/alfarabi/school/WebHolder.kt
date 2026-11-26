@@ -14,6 +14,12 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
+import android.content.ContentUris
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
+import android.os.Bundle
 import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
@@ -307,6 +313,50 @@ object WebHolder {
 
         @JavascriptInterface
         fun askPerm(k: String) { activity?.runOnUiThread { activity?.askPermFor(k) } ?: android.os.Handler(android.os.Looper.getMainLooper()).post { web?.evaluateJavascript("window.__afPerm&&__afPerm('$k',false)", null) } }
+
+        /** كل صور الجهاز (من الأحدث): معرّفات MediaStore بدفعات */
+        @JavascriptInterface
+        fun listPhotos(offset: Int, limit: Int): String {
+            val out = org.json.JSONArray()
+            try {
+                val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                val b = Bundle()
+                b.putInt(android.content.ContentResolver.QUERY_ARG_LIMIT, limit)
+                b.putInt(android.content.ContentResolver.QUERY_ARG_OFFSET, offset)
+                b.putStringArray(android.content.ContentResolver.QUERY_ARG_SORT_COLUMNS, arrayOf(MediaStore.Images.Media.DATE_ADDED))
+                b.putInt(android.content.ContentResolver.QUERY_ARG_SORT_DIRECTION, android.content.ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+                app.contentResolver.query(uri, arrayOf(MediaStore.Images.Media._ID), b, null)?.use { c -> while (c.moveToNext()) out.put(c.getLong(0)) }
+            } catch (_: Throwable) {}
+            return out.toString()
+        }
+
+        private fun decodePhoto(id: Long, max: Int): ByteArray? {
+            val uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            val cr = app.contentResolver
+            val o = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            cr.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, o) }
+            if (o.outWidth <= 0) return null
+            var ss = 1
+            while (maxOf(o.outWidth, o.outHeight) / (ss * 2) >= max) ss *= 2
+            val o2 = BitmapFactory.Options().apply { inSampleSize = ss }
+            var bm = cr.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, o2) } ?: return null
+            val rot = try { cr.openInputStream(uri)?.use { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, 1) } ?: 1 } catch (_: Throwable) { 1 }
+            val deg = when (rot) { 6 -> 90f; 3 -> 180f; 8 -> 270f; else -> 0f }
+            val sc = minOf(1f, max.toFloat() / maxOf(bm.width, bm.height))
+            if (deg != 0f || sc < 1f) {
+                val m = Matrix(); m.postRotate(deg); m.postScale(sc, sc)
+                bm = Bitmap.createBitmap(bm, 0, 0, bm.width, bm.height, m, true)
+            }
+            val bo = java.io.ByteArrayOutputStream()
+            bm.compress(Bitmap.CompressFormat.JPEG, if (max <= 300) 70 else 85, bo)
+            return bo.toByteArray()
+        }
+
+        @JavascriptInterface
+        fun photoThumb(id: Long): String = try { Base64.encodeToString(decodePhoto(id, 240) ?: ByteArray(0), Base64.NO_WRAP) } catch (_: Throwable) { "" }
+
+        @JavascriptInterface
+        fun photoData(id: Long, max: Int): String = try { Base64.encodeToString(decodePhoto(id, max.coerceIn(300, 2400)) ?: ByteArray(0), Base64.NO_WRAP) } catch (_: Throwable) { "" }
 
         @JavascriptInterface
         fun requestNotifPermission() { activity?.runOnUiThread { activity?.askNotifPermission() } }
