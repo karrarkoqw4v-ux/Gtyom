@@ -28,6 +28,10 @@ jobs:
           mkdir -p alfarabi/dist
           rm -f alfarabi/dist/*.apk
           cp alfarabi/android/app/build/outputs/apk/debug/app-debug.apk "alfarabi/dist/alfarabi-v$V.apk"
+          C=$(grep -oP 'versionCode = \K[0-9]+' alfarabi/android/app/build.gradle.kts)
+          SHA=$(sha256sum "alfarabi/dist/alfarabi-v$V.apk" | cut -d' ' -f1)
+          SZ=$(stat -c%s "alfarabi/dist/alfarabi-v$V.apk")
+          printf '{"versionCode":%s,"versionName":"%s","url":"https://github.com/karrarkoqw4v-ux/Gtyom/raw/%s/alfarabi/dist/alfarabi-v%s.apk","sha256":"%s","size":%s}\n' "$C" "$V" "$GITHUB_REF_NAME" "$V" "$SHA" "$SZ" > alfarabi/dist/latest.json
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
           git add -A alfarabi/dist

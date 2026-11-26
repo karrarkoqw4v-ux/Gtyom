@@ -21,6 +21,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.Switch
 import android.widget.TextView
 
@@ -87,7 +88,7 @@ class MainActivity : Activity() {
     }
 
     override fun onStop() { super.onStop(); leftAt = SystemClock.elapsedRealtime() }
-    override fun onResume() { super.onResume(); WebHolder.foreground = true; Notifier.cancel(this, "call"); barH.removeCallbacks(barTick); barH.postDelayed(barTick, 600) }
+    override fun onResume() { super.onResume(); WebHolder.foreground = true; Notifier.cancel(this, "call"); barH.removeCallbacks(barTick); barH.postDelayed(barTick, 600); try { checkUpdate() } catch (_: Throwable) {} }
     override fun onPause() { WebHolder.foreground = false; barH.removeCallbacks(barTick); super.onPause() }
 
     // ===== لون الشريطين (أعلى وأسفل الجهاز) نفس لون التطبيق =====
@@ -108,6 +109,58 @@ class MainActivity : Activity() {
         window.decorView.systemUiVisibility = f
         root.setBackgroundColor(status)
         WebHolder.web?.setBackgroundColor(status)
+    }
+
+    // ===== تحديث التطبيق (APK) تلقائياً =====
+    private var updShown = false
+    private var updDlg: android.app.AlertDialog? = null
+    private var updReady: java.io.File? = null
+
+    fun checkUpdate(force: Boolean = false) {
+        if (updShown) return
+        val p = WebHolder.prefs(this)
+        val now = System.currentTimeMillis()
+        if (!force && now - p.getLong("upd_chk", 0) < 30 * 60_000) return
+        p.edit().putLong("upd_chk", now).apply()
+        Thread {
+            val info = ApkUpdater.fetch() ?: return@Thread
+            if (info.code <= ApkUpdater.currentCode(this)) return@Thread
+            if (!force && p.getLong("upd_skip_code", 0) == info.code && now - p.getLong("upd_skip_ts", 0) < 6 * 3600_000) return@Thread
+            runOnUiThread { if (!isFinishing) showUpdate(info) }
+        }.start()
+    }
+
+    private fun showUpdate(info: ApkUpdater.Info) {
+        if (updShown) return
+        updShown = true
+        val pad = (20 * resources.displayMetrics.density).toInt()
+        val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(pad, pad, pad, 0); layoutDirection = View.LAYOUT_DIRECTION_RTL }
+        val msg = TextView(this).apply { textSize = 15f; text = "تحديث جديد للتطبيق: ${info.name}\nيتحمّل بثواني ويُثبَّت فوق النسخة الحالية، وبياناتك وحسابك تبقى." }
+        val bar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply { max = 100; visibility = View.GONE }
+        col.addView(msg); col.addView(bar)
+        val dlg = android.app.AlertDialog.Builder(this).setTitle("تحديث متوفر").setView(col)
+            .setPositiveButton("تحديث الآن", null).setNegativeButton("لاحقاً") { _, _ ->
+                WebHolder.prefs(this).edit().putLong("upd_skip_code", info.code).putLong("upd_skip_ts", System.currentTimeMillis()).apply()
+            }.setOnDismissListener { updShown = false }.create()
+        updDlg = dlg
+        dlg.show()
+        dlg.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener { btn ->
+            btn.isEnabled = false; bar.visibility = View.VISIBLE; msg.text = "جاري تحميل التحديث..."
+            val ready = updReady
+            if (ready != null && ready.exists()) { startInstall(ready, dlg, msg, btn); return@setOnClickListener }
+            Thread {
+                val f = ApkUpdater.download(this, info) { p -> runOnUiThread { bar.progress = p; msg.text = "جاري تحميل التحديث... $p%" } }
+                runOnUiThread {
+                    if (f == null) { msg.text = "تعذّر التحميل، تأكد من الإنترنت وجرّب مرة ثانية"; btn.isEnabled = true; bar.visibility = View.GONE }
+                    else { updReady = f; startInstall(f, dlg, msg, btn) }
+                }
+            }.start()
+        }
+    }
+
+    private fun startInstall(f: java.io.File, dlg: android.app.AlertDialog, msg: TextView, btn: View) {
+        if (ApkUpdater.install(this, f)) { dlg.dismiss() }
+        else { msg.text = "فعّل «السماح بتثبيت التطبيقات» لهذا التطبيق من الصفحة اللي انفتحت، ثم ارجع واضغط «تحديث الآن»"; btn.isEnabled = true }
     }
 
     // ===== لون شريطي الجهاز يُقرأ من البكسلات الفعلية للشاشة (بدل التخمين من CSS) فيطابق الصفحة تماماً =====
@@ -222,6 +275,10 @@ class MainActivity : Activity() {
         col.addView(Button(this).apply {
             text = "السماح للتطبيق بالعمل بالخلفية"
             setOnClickListener { try { startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) } catch (_: Exception) {} }
+        })
+        col.addView(Button(this).apply {
+            text = "فحص تحديث التطبيق (APK)"
+            setOnClickListener { updShown = false; checkUpdate(true) }
         })
         col.addView(Button(this).apply {
             text = "المحادثات الأصلية (Kotlin) - تجريبي"
