@@ -25,8 +25,8 @@
     H + ' .ch-i #ce,' + H + ' .ch-i #ca{display:none!important}',
     H + ' .ch-i .ch-c{width:36px!important;height:36px!important;background:transparent!important;border:0!important;color:#b6b9bf!important;flex:none!important;border-radius:50%!important}',
     H + ' .ch-i .ch-c svg{width:23px!important;height:23px!important;stroke-width:1.8!important}',
-    H + ' .ch-i #cemo svg{display:none!important}',
-    H + ' .ch-i #cemo::after{content:"";display:block;width:28px;height:28px;margin:auto;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.9%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%279%27/%3E%3Cpath d=%27M8 14.5s1.5 2 4 2 4-2 4-2M9 9.5h.01M15 9.5h.01%27/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.9%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%279%27/%3E%3Cpath d=%27M8 14.5s1.5 2 4 2 4-2 4-2M9 9.5h.01M15 9.5h.01%27/%3E%3C/svg%3E") center/contain no-repeat}',
+    /* حذف زر الإيموجي/الملصقات المصمّمة ولوحتها من المحادثة */
+    H2 + ' .ch-i #cemo,' + H2 + ' #ch .ch-emo,' + H2 + ' .ch-i + .stk,' + H2 + ' .stkpn,' + H2 + ' .ch-emo-panel{display:none!important}',
     H2 + ' .ch-i .ch-act #cs.ch-s,' + H2 + ' .ch-i .ch-act #cmic.ch-mic{position:absolute!important;top:4px!important;right:0!important;left:auto!important;bottom:auto!important;width:39px!important;height:39px!important;border-radius:50%!important;background:#4f77f0!important;background-image:none!important;color:#fff!important;border:0!important;margin:0!important;box-shadow:none!important}',
     H + ' .ch-i .ch-act #cs.ch-s svg,' + H + ' .ch-i .ch-act #cmic.ch-mic svg{width:22px!important;height:22px!important;stroke:#fff!important;fill:none!important}',
     H + ' .ch-i .ch-act #cmic.ch-mic svg{fill:#fff!important}',

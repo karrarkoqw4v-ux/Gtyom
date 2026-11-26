@@ -6,7 +6,7 @@
   'use strict';
 
   var HELPERS = `
-function afChunks(vis,top){vis=vis.filter(function(x){return !x.dl});var o=[],last='';if(top&&cg&&cg[0]==='d')o.push({k:'n',h:'<div class="chn">🔒 هذه محادثة خاصة بين الطرفين</div>'});
+function afChunks(vis,top){vis=vis.filter(function(x){return !x.dl});var o=[],last='';if(top&&cg&&cg[0]==='d')o.push({k:'n',h:'<div class="chn">هذه محادثة خاصة بين الطرفين</div>'});
  vis.forEach(function(x){var k=new Date(x.ts).toDateString();if(k!==last){last=k;o.push({k:'d'+k,h:'<div class="chd"><span>'+dayLabel(x.ts)+'</span></div>'})}o.push({k:'m'+x.id,h:x.c?cbub(x):bub(x)})});return o}
 function afReconcile(l,list,room){
  if(l.__rk!==room||!l.__ck){l.innerHTML='';l.__ck={};l.__rk=room}
