@@ -5,12 +5,14 @@
   var ua = navigator.userAgent || '';
   var standalone = (W.matchMedia && W.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
   if (standalone) return;
+  /* تطبيق الصيانة: بعد إدخال كلمة السر مرة وحدة يدخل الجهاز مباشرة إلى واجهة المدرسة بدون صفحة التثبيت */
+  try { if (W.localStorage && W.localStorage.getItem('af_designer') === '1') return; } catch (e) { }
   var BASE = (function () { var s = D.currentScript; var u = s && s.src ? s.src : location.href; return u.replace(/[^\/]*([?#].*)?$/, ''); })();
   var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   var isAnd = /Android/i.test(ua);
   var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|GSA|FBAN|FBAV|Instagram|Line\/|Telegram|Snapchat|MicroMessenger/.test(ua);
   var REPO = 'karrarkoqw4v-ux/Gtyom', BR = 'claude/hala-yweuvu', DIR = 'alfarabi/dist';
-  var VER = '2026.11.28-n';
+  var VER = '2026.11.28-o';
   var apk = { url: 'https://github.com/' + REPO + '/raw/' + BR + '/' + DIR + '/alfarabi-v2.0.apk', ver: '' };
   var dip = null, rtApk = null;
   setTimeout(function () { try { if (W.afSite) W.afSite.apkMeta().then(function (m) { if (m && m.ver) rtApk = m; }); } catch (e) { } }, 1500);
@@ -309,7 +311,7 @@
     '<p class="ds">ثبّت التطبيق على جهازك حتى توصلك الإشعارات والرسائل والتفاصيل مباشرة، حتى لو كان التطبيق مغلقاً.</p>' +
     '<button class="bt a" data-a="apk"><span class="lg2">' + I.and + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Android</bdi></b><small>تنزيل مباشر لنسخة <bdi dir="ltr">APK</bdi></small><em class="mt"><u id="afbv">أحدث إصدار</u><u id="afbs">تنزيل سريع</u></em></span>' + (isAnd ? badge('جهازك') : '') + '<span class="go">' + I.apk + '</span></button>' +
     '<button class="bt i" data-a="ios"><span class="lg2">' + I.app + '</span>' + '<span class="t"><b>تثبيت على <bdi dir="ltr">Apple</bdi></b><small><bdi dir="ltr">iPhone</bdi> و <bdi dir="ltr">iPad</bdi> من سفاري</small><em class="mt"><u>خطوتان فقط</u><u>بدون ملفات</u><u>Safari</u></em></span>' + (isIOS ? badge('جهازك') : '') + '<span class="go">' + I.shr + '</span></button>' +
-    (isIOS ? '' : '<button class="bt d" data-a="designer"><span class="lg2"><svg viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M9 10l2 2 4-4"/></svg></span><span class="t"><b>تثبيت كتطبيق للمصممين</b><small>للمصمم والمسؤول فقط — يحتاج كلمة سر</small></span></button>') +
+    (isIOS ? '' : '<button class="bt d" data-a="designer"><span class="lg2"><svg viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M9 10l2 2 4-4"/></svg></span><span class="t"><b>تطبيق الصيانة</b><small>للمصمم والمسؤول فقط — يحتاج كلمة سر</small></span></button>') +
     '<div class="bt g"><span class="lg2">' + I.app + '</span><span class="t"><b><bdi dir="ltr">App Store</bdi></b><small>قريباً على متجر آبل</small></span><span class="bd">قيد التطبيق</span></div>' +
     '<div class="pl"><span id="afv2">أحدث إصدار</span><span>Android 8 فأحدث</span><span>تحديثات تلقائية</span></div>' +
     '<div class="ft">' + I.lock + '<span>بياناتك نفسها في الموقع والتطبيق</span></div><div class="ft" style="opacity:.7;margin-top:2px">نسخة الموقع <bdi dir="ltr">' + VER + '</bdi></div>' +
@@ -414,10 +416,10 @@
   /* ===== تثبيت كتطبيق للمصممين (أندرويد فقط): بكلمة سر، نفس النسخة الأصلية، ولا يستلم تحديثات الموقع الجماعية ===== */
   var DHASH = '0d3f4081f6970a42d19d75caa6ce60ca8632ec2322817eef56ee686e3d978b6e';
   function designerSheet() {
-    sheet('<h2>تثبيت كتطبيق للمصممين</h2><p class="sb">للمصمم والمسؤول فقط. اكتب كلمة السر ثم يثبّت التطبيق على جهاز الأندرويد مثل التطبيقات من جوجل.</p>' +
+    sheet('<h2>تطبيق الصيانة</h2><p class="sb">للمصمم والمسؤول فقط. اكتب كلمة السر ثم تدخل مباشرة إلى واجهة المدرسة داخل المتصفح.</p>' +
       '<input id="afdpw" type="password" autocomplete="off" placeholder="كلمة السر" style="width:100%;border:2px solid #e1e8f4;border-radius:14px;padding:13px;font:inherit;margin:0 0 10px;background:#f6f9fd;direction:ltr;text-align:center">' +
       '<div id="afdm" style="color:#d9283d;font-weight:700;font-size:13px;min-height:20px;text-align:center"></div>' +
-      '<button class="bt p" data-a="dgo"><span class="t"><b>تثبيت</b></span></button>');
+      '<button class="bt p" data-a="dgo"><span class="t"><b>دخول</b></span></button>');
     var i = D.getElementById('afdpw'); if (i) { i.focus(); i.addEventListener('keydown', function (e) { if (e.key === 'Enter') designerGo(); }); }
   }
   function designerGo() {
@@ -428,12 +430,9 @@
       var hex = Array.prototype.map.call(new Uint8Array(h), function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
       if (hex !== DHASH) { m.textContent = 'كلمة السر غير صحيحة'; return; }
       try { localStorage.setItem('af_designer', '1'); } catch (e) { }   /* هذي النسخة لا تستلم تحديثات الموقع الجماعية (zip المطوّر) */
-      if (dip) { dip.prompt(); dip.userChoice.then(function (c) { dip = null; if (c && c.outcome === 'accepted') close(); }); m.style.color = '#0b7a3b'; m.textContent = 'اضغط «تثبيت» بالنافذة اللي ظهرت'; }
-      else {
-        /* الموقع على http (غير آمن) فكروم يمنع تثبيت PWA: نكمل تلقائياً بتنزيل التطبيق (APK) مباشرة بعد التحقق */
-        m.style.color = '#0b7a3b'; m.innerHTML = 'تم التحقق ✓ جاري تنزيل التطبيق...<br>بعد ما ينتهي افتح الملف واسمح بالتثبيت.';
-        setTimeout(function () { act('apk'); }, 400);
-      }
+      /* دخول مباشر إلى واجهة المدرسة (تسجيل الدخول) داخل المتصفح بآخر تحديث */
+      m.style.color = '#0b7a3b'; m.textContent = 'تم التحقق ✓';
+      setTimeout(function () { close(); }, 250);
     });
   }
   function refreshPwa() { var c = D.getElementById('afpwa'); if (c && dip && !isIOS) c.style.display = '';  var s = D.getElementById('afpw'); if (s) s.querySelector('small').textContent = dip ? 'تثبيت مباشر بضغطة وحدة' : 'من قائمة المتصفح ⋮ ← تثبيت التطبيق'; }
