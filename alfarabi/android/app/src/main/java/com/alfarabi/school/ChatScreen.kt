@@ -233,7 +233,7 @@ private fun Bubble(m: Msg, first: Boolean, last: Boolean, mine: Boolean, playing
                 val b = bm
                 if (b != null) Image(b.asImageBitmap(), null, Modifier.padding(vertical = 2.dp).widthIn(max = 240.dp).clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.FillWidth)
                 else Box(Modifier.padding(vertical = 2.dp).size(200.dp, 140.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFF2B2E33)))
-            } else if (m.hasImg) Text("📷", color = Color.White, fontSize = 14.sp)
+            } else if (m.hasImg) Text("صورة", color = Color.White, fontSize = 14.sp, fontFamily = Naskh)
             if (m.aud.isNotEmpty()) {
                 Row(Modifier.padding(vertical = 2.dp).widthIn(min = 200.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(38.dp).clip(CircleShape).background(Accent).clickable { onPlay(m) }, contentAlignment = Alignment.Center) { Icon(if (playing) Ic.Pause else Ic.Play, Color.White, 18.dp) }
