@@ -531,8 +531,8 @@
         function loadPdfLib() {
           return new Promise(function (res, rej) {
             var lib = P.__afPdf || P.pdfjsLib; if (lib) return res(lib);
-            var s = P.document.createElement('script'); s.src = '/vendor/pdfjs/pdf.min.js';
-            s.onload = function () { try { P.pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs/pdf.worker.min.js'; P.__afPdf = P.pdfjsLib; res(P.pdfjsLib); } catch (e) { rej(e); } };
+            var s = P.document.createElement('script'); s.src = 'vendor/pdfjs/pdf.min.js';
+            s.onload = function () { try { P.pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs/pdf.worker.min.js'; P.__afPdf = P.pdfjsLib; res(P.pdfjsLib); } catch (e) { rej(e); } };
             s.onerror = function () { rej(new Error('تعذّر تحميل عارض PDF')); }; P.document.head.appendChild(s);
           });
         }
