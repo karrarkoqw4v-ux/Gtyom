@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="fonts/fonts.css">
   <script src="af-ios.js"></script>
   <script src="af-webshim.js?v=1794060001"></script>
-  <script src="af-landing.js?v=8d820b61"></script>
-  <script src="af-dev.js?v=8d820b61"></script>
+  <script src="af-landing.js?v=2078ec18"></script>
+  <script src="af-dev.js?v=2078ec18"></script>
   
   <script src="af-push.js?v=1794060002"></script>
   <script src="af-assist.js?v=1794060004"></script>
@@ -1603,7 +1603,7 @@ function drag(o){var pv=o.parentNode,mv=0;o.onpointerdown=function(e){e.preventD
  R.onclick=function(e){if(busy)return;var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a;
   if(a==='x'){R.remove()}
   else if(a==='cam')pickF(doc,'image/*,video/*',0,1,function(f){addFiles(f)});
-  else if(a==='pf')pickF(doc,'image/*,video/*',multi,0,function(f){addFiles(f)});
+  else if(a==='pf'){var P2=window.parent||window,sys=function(){pickF(doc,'image/*,video/*',multi,0,function(f){addFiles(f)})};if(P2.afPhotos)P2.afPhotos(doc,multi,function(f){addFiles(f)},sys);else sys()}
   else if(a==='mul'){multi=multi?0:1;draw();T(multi?'يمكنك اختيار عدة عناصر':'اختيار عنصر واحد')}
   else if(a==='rm'){it.splice(+b.dataset.i,1);draw()}
   else if(a==='next'){step='edit';cur=0;draw()}
